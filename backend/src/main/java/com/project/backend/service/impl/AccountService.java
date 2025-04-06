@@ -44,6 +44,12 @@ public class AccountService implements IAccountService {
     }
 
     @Override
+    public AccountResponse login(String email, String password) {
+        Account account = accountRepository.findByEmailAndPassword(email, password);
+        return accountMapper.toAccountResponse(account);
+    }
+
+    @Override
     public AccountResponse updateAccount(AccountUpdateRequest accountUpdateRequest) {
         Account account = accountRepository.findById(accountUpdateRequest.getId())
                 .orElseThrow(() -> new RuntimeException("Account not found"));
@@ -59,4 +65,6 @@ public class AccountService implements IAccountService {
         account.setEnabled(false);
         accountRepository.save(account);
     }
+
+
 }

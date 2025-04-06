@@ -40,13 +40,13 @@ public class AccountController {
                 .build();
     }
 
-    @PutMapping("/{id}")
-    public TemplateResponse<AccountResponse> updateAccount(@RequestBody AccountUpdateRequest accountUpdateRequest) {
-        AccountResponse response = accountService.updateAccount(accountUpdateRequest);
-        return TemplateResponse.<AccountResponse>builder()
-                .result(response)
-                .build();
-    }
+//    @PutMapping("/{id}")
+//    public TemplateResponse<AccountResponse> updateAccount(@RequestBody AccountUpdateRequest accountUpdateRequest) {
+//        AccountResponse response = accountService.updateAccount(accountUpdateRequest);
+//        return TemplateResponse.<AccountResponse>builder()
+//                .result(response)
+//                .build();
+//    }
 
     @DeleteMapping("/{id}")
     public TemplateResponse<Void> deleteAccount(@PathVariable Long id) {

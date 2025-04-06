@@ -12,4 +12,5 @@ public interface IAccountService {
     AccountResponse updateAccount(AccountUpdateRequest accountUpdateRequest);
     List<AccountResponse> getAllAccounts();
     AccountResponse createAccount(AccountCreationRequest accountCreationRequest);
+    AccountResponse login(String email, String password);
 }
