@@ -41,8 +41,8 @@ public class AccountController {
     }
 
     @PutMapping("/{id}")
-    public TemplateResponse<AccountResponse> updateAccount(@RequestBody AccountUpdateRequest updateRequest) {
-        AccountResponse response = accountService.updateAccount(updateRequest);
+    public TemplateResponse<AccountResponse> updateAccount(@RequestBody AccountUpdateRequest accountUpdateRequest) {
+        AccountResponse response = accountService.updateAccount(accountUpdateRequest);
         return TemplateResponse.<AccountResponse>builder()
                 .result(response)
                 .build();
@@ -50,7 +50,7 @@ public class AccountController {
 
     @DeleteMapping("/{id}")
     public TemplateResponse<Void> deleteAccount(@PathVariable Long id) {
-//        accountService.deleteAccount(id);
+        accountService.deleteAccount(id);
         return TemplateResponse.<Void>builder()
                 .build();
     }
