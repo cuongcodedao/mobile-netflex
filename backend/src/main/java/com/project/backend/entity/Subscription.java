@@ -1,5 +1,6 @@
 package com.project.backend.entity;
 
+import com.project.backend.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -16,8 +17,7 @@ import java.time.LocalDateTime;
 @Table(name = "Subscription")
 public class Subscription {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @ManyToOne
     @JoinColumn(nullable = false)
@@ -28,9 +28,8 @@ public class Subscription {
     private Plan plan;
 
     private LocalDate startDate;
-    private LocalDate endDate;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
+    private boolean active;
 }
 

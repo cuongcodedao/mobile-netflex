@@ -4,8 +4,10 @@ import com.project.backend.dto.request.AccountCreationRequest;
 import com.project.backend.dto.request.AccountUpdateRequest;
 import com.project.backend.dto.response.AccountResponse;
 import com.project.backend.entity.Account;
+import com.project.backend.entity.Plan;
 import com.project.backend.mapper.AccountMapper;
 import com.project.backend.repository.AccountRepository;
+import com.project.backend.repository.PlanRepository;
 import com.project.backend.service.IAccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 public class AccountService implements IAccountService {
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
+    private final PlanRepository planRepository;
 
     @Override
     public List<AccountResponse> getAllAccounts() {
@@ -38,7 +41,10 @@ public class AccountService implements IAccountService {
     @Override
     public AccountResponse createAccount(AccountCreationRequest accountCreationRequest) {
         Account account = accountMapper.toAccount(accountCreationRequest);
+        Plan plan = planRepository.findById(accountCreationRequest.getPlanId())
+                .orElseThrow(() -> new RuntimeException("Plan not found"));
         account.setCreatedAt(LocalDateTime.now());
+        account.setCurrentPlan(plan);
         account = accountRepository.save(account);
         return accountMapper.toAccountResponse(account);
     }

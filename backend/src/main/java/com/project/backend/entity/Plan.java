@@ -1,5 +1,6 @@
 package com.project.backend.entity;
 
+import com.project.backend.enums.PlanName;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -15,13 +16,12 @@ import java.time.LocalDateTime;
 @Table(name = "Plan")
 public class Plan {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
+    @Enumerated(EnumType.STRING)
+    private PlanName planName;
 
     private double price;
     private int maxNumberOfProfile;
     private int maxNumberOfDevice;
     private int maxNumberOfDeviceActive;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

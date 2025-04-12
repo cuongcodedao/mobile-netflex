@@ -1,9 +1,8 @@
 package com.project.backend.service.impl;
 
-import com.project.backend.dto.response.APIResponse;
 import com.project.backend.dto.response.Category;
 import com.project.backend.repository.ApiClient;
-import com.project.backend.service.IGenreService;
+import com.project.backend.service.ICategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +11,11 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class GenreService implements IGenreService {
+public class CategoryService implements ICategoryService {
 
     private final ApiClient apiClient;
     @Override
-    public List<Category> getAllGenres() throws IOException {
+    public List<Category> getAllCategories() throws IOException {
         return apiClient.getAllGenres();
     }
 
