@@ -15,4 +15,6 @@ public class AccountCreationRequest {
     private String lastName;
     private String email;
     private String password;
+    @Builder.Default()
+    private String planId = "basic-plan";
 }
