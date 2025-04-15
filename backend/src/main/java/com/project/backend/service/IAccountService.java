@@ -2,7 +2,10 @@ package com.project.backend.service;
 
 import com.project.backend.dto.request.AccountCreationRequest;
 import com.project.backend.dto.request.AccountUpdateRequest;
+import com.project.backend.dto.request.SignInRequest;
 import com.project.backend.dto.response.AccountResponse;
+import com.project.backend.dto.response.AuthResponse;
+import com.project.backend.exception.UserAlreadyExistsException;
 
 import java.util.List;
 
@@ -11,6 +14,7 @@ public interface IAccountService {
     AccountResponse getAccountById(Long id);
     AccountResponse updateAccount(AccountUpdateRequest accountUpdateRequest);
     List<AccountResponse> getAllAccounts();
-    AccountResponse createAccount(AccountCreationRequest accountCreationRequest);
-    AccountResponse login(String email, String password);
+    AccountResponse createAccount(AccountCreationRequest accountCreationRequest) throws UserAlreadyExistsException;
+    AuthResponse login(SignInRequest signInRequest);
+    AuthResponse refreshToken(String refreshToken);
 }
