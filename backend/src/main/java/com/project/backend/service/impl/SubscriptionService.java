@@ -54,12 +54,17 @@ public class SubscriptionService implements ISubscriptionService {
         return paypalSubscriptionResponse;
     }
 
-    public PaypalSubscriptionResponse getSubscription(String subscriptionId) throws IOException {
+    public PaypalSubscriptionResponse activeSubscription(String subscriptionId) throws IOException {
         PaypalSubscriptionResponse subscriptionResponse = paypalService.getSubscription(subscriptionId);
         Subscription subscription = subscriptionRepository.findById(subscriptionId)
                 .orElseThrow(() -> new RuntimeException("Subscription not found"));
+        Account account = subscription.getAccount();
         subscription.setStatus(PaymentStatus.valueOf(subscriptionResponse.getStatus()));
-        subscription.setActive(true);
+        if(subscriptionResponse.getStatus().equals("ACTIVE")) {
+            account.setCurrentPlan(subscription.getPlan());
+            subscription.setActive(true);
+            accountRepository.save(account);
+        }
         subscriptionRepository.save(subscription);
         return subscriptionResponse;
     }

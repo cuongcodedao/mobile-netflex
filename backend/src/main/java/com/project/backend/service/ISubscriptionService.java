@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ISubscriptionService {
     PaypalSubscriptionResponse create(SubscriptionCreationRequest subscriptionDTO) throws IOException;
-    PaypalSubscriptionResponse getSubscription(String subscriptionId) throws IOException;
+    PaypalSubscriptionResponse activeSubscription(String subscriptionId) throws IOException;
     void cancelSubscription(String subscriptionId) throws IOException;
     List<SubscriptionResponse> getAllSubscriptions() throws IOException;
 }
