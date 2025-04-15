@@ -16,6 +16,8 @@ public enum ErrorCode {
     UNAUTHORIZED(1008, "Unauthorized", HttpStatus.FORBIDDEN),
     INVALID_DOB(1009, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
     TOKEN_REVOKED(1010, "Token revoked", HttpStatus.UNAUTHORIZED),
+    TOKEN_EXPIRED(1011, "Token expired", HttpStatus.UNAUTHORIZED),
+    USER_ALREADY_EXISTS(1012, "User already exists", HttpStatus.CONFLICT),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode httpStatusCode) {

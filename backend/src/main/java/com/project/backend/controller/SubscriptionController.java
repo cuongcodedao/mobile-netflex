@@ -27,7 +27,7 @@ public class SubscriptionController {
     @GetMapping("/{subscription_id}")
     public TemplateResponse<?> getSubscription(@PathVariable String subscription_id) throws IOException {
         return TemplateResponse.builder()
-                .result(subscriptionService.getSubscription(subscription_id).getStatus())
+                .result(subscriptionService.activeSubscription(subscription_id).getStatus())
                 .build();
     }
     @DeleteMapping("/cancel/{subscription_id}")

@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
     Account findByEmailAndPassword(String email, String password);
+    Account findByEmail(String email);
+    boolean existsByEmail(String email);
 }

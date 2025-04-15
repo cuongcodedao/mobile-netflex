@@ -32,13 +32,6 @@ public class AccountController {
                 .build();
     }
 
-    @PostMapping("")
-    public TemplateResponse<AccountResponse> createAccount(@RequestBody AccountCreationRequest accountCreationRequest) {
-        AccountResponse response = accountService.createAccount(accountCreationRequest);
-        return TemplateResponse.<AccountResponse>builder()
-                .result(response)
-                .build();
-    }
 
     @PutMapping("/{id}")
     public TemplateResponse<AccountResponse> updateAccount(@RequestBody AccountUpdateRequest accountUpdateRequest) {
