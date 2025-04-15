@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/module/auth/screens/sign_in_screen.dart';
+import 'package:frontend/module/auth/screens/login_screen.dart';
+import 'package:frontend/module/auth/screens/sign_up_screen.dart';
+import 'package:frontend/module/auth/screens/profile_selection_screen.dart';
+import 'package:frontend/module/auth/screens/add_profile_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,12 +11,17 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SignInScreen(),
+      initialRoute: LoginScreen.routeName,
+      routes: {
+        LoginScreen.routeName: (context) => const LoginScreen(),
+        SignUpScreen.routeName: (context) => const SignUpScreen(),
+        ProfileSelectionScreen.routeName: (context) => const ProfileSelectionScreen(),
+        AddProfileScreen.routeName: (context) => const AddProfileScreen(),
+      },
     );
   }
 }
