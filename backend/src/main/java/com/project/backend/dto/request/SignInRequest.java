@@ -15,4 +15,10 @@ public class SignInRequest {
 
     @NotBlank(message = "Password is required!")
     private String password;
+    private String deviceId;
+    private String deviceName;
+    private String deviceType;
+    private String deviceAddress;
+    private String location;
+
 }

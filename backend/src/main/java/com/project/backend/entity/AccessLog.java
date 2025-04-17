@@ -23,7 +23,7 @@ public class AccessLog {
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    private Profile profile;
+    private Account account;
 
     private String deviceName;
 

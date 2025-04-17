@@ -52,7 +52,9 @@ public class AccountService implements IAccountService {
     public AccountResponse getAccountById(Long id) {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
-        return accountMapper.toAccountResponse(account);
+        AccountResponse accountResponse = accountMapper.toAccountResponse(account);
+        accountResponse.setCurrentPlan(account.getCurrentPlan());
+        return accountResponse;
     }
 
     @Override
