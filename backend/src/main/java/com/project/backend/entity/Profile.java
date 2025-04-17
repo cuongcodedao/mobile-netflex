@@ -19,6 +19,7 @@ public class Profile {
 
     String username;
     String avatar;
+    boolean gender;
     boolean kid;
 
 

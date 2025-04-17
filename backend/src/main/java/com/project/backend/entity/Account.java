@@ -33,6 +33,7 @@ public class Account {
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
     private List<Subscription> subscriptions;
+
     @ManyToOne
     @JoinColumn(nullable = false)
     private Plan currentPlan;
