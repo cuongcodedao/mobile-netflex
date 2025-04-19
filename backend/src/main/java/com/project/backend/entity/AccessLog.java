@@ -25,13 +25,15 @@ public class AccessLog {
     @JoinColumn(nullable = false)
     private Account account;
 
+    private String deviceId;
+
     private String deviceName;
 
     @Enumerated(EnumType.STRING)
     private DeviceType deviceType;
     private String deviceAddress;
     private String location;
-    private String status;
+    private boolean active;
     private LocalDateTime lastLogin;
 }
 
