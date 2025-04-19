@@ -6,11 +6,15 @@ import com.project.backend.dto.request.AccountUpdateRequest;
 import com.project.backend.dto.request.SignInRequest;
 import com.project.backend.dto.response.AccountResponse;
 import com.project.backend.dto.response.AuthResponse;
+import com.project.backend.entity.AccessLog;
 import com.project.backend.entity.Account;
 import com.project.backend.entity.Plan;
 import com.project.backend.entity.RefreshToken;
+import com.project.backend.exception.AppException;
+import com.project.backend.exception.ErrorCode;
 import com.project.backend.exception.UserAlreadyExistsException;
 import com.project.backend.mapper.AccountMapper;
+import com.project.backend.repository.AccessLogRepository;
 import com.project.backend.repository.AccountRepository;
 import com.project.backend.repository.PlanRepository;
 import com.project.backend.service.IAccountService;
@@ -40,6 +44,7 @@ public class AccountService implements IAccountService {
     private final AuthenticationManager authenticationManager;
     private final JWTUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
+    private final AccessLogRepository accessLogRepository;
 
     @Override
     public List<AccountResponse> getAllAccounts() {
@@ -77,9 +82,19 @@ public class AccountService implements IAccountService {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(signInRequest.getEmail(), signInRequest.getPassword())
         );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String accessTokenId = UUID.randomUUID().toString();
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        List<AccessLog> accessLogs = accessLogRepository.findByAccountIdAndDeviceId(userDetails.getId(), signInRequest.getDeviceId());
+        if(accessLogs.size()>=userDetails.getCurrentPlan().getMaxNumberOfDevice()){
+            throw new AppException(ErrorCode.EXCEEDS_MAX_DEVICE);
+        }
+        int cnt = 0;
+        for(AccessLog accessLog: accessLogs){
+            if(accessLog.isActive()) cnt++;
+        }
+        if(cnt>=userDetails.getCurrentPlan().getMaxNumberOfDeviceActive()){
+            throw new AppException(ErrorCode.EXCEEDS_MAX_DEVICE_ACTIVE);
+        }
+        SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(userDetails.getUsername());
         RefreshToken refreshToken = jwtUtils.createRefreshToken(userDetails.getUsername());
 
