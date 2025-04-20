@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../widgets/horizontal_film_list.dart'; // Import widget đã tạo
+import '../widgets/horizontal_film_list.dart';
+import '../widgets/feature_banner.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -16,8 +17,36 @@ class HomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Banner lớn trên cùng
-            _buildFeaturedBanner(),
-
+            const SizedBox(height: 16),
+            FeatureBanner(
+              films: [
+                BannerFilm(
+                  imageUrl: 'https://imageplaceholder.net/120x180?text=Film+1',
+                  genres: ['Action', 'Adventure'],
+                  onAddToList: () => print('Add to My List Film 1'),
+                  onPlay: () => print('Play Film 1'),
+                  onInfo: () => print('Info Film 1'),
+                  onTap: () => print('Tap Film 1'),
+                ),
+                BannerFilm(
+                  imageUrl: 'https://imageplaceholder.net/120x180?text=Film+2',
+                  genres: ['Action', 'Adventure', 'Drama'],
+                  onAddToList: () => print('Add to My List Film 2'),
+                  onPlay: () => print('Play Film 2'),
+                  onInfo: () => print('Info Film 2'),
+                  onTap: () => print('Tap Film 2'),
+                ),
+                BannerFilm(
+                  imageUrl: 'https://imageplaceholder.net/120x180?text=Film+3',
+                  genres: ['TV series', 'Cartoon', 'Science Fiction'],
+                  onAddToList: () => print('Add to My List Film 3'),
+                  onPlay: () => print('Play Film 3'),
+                  onInfo: () => print('Info Film 3'),
+                  onTap: () => print('Tap Film 3'),
+                ),
+                // Thêm các phim khác...
+              ],
+            ),
             // Danh sách TOP 10
             HorizontalFilmList(
               listTitle: 'TOP 10',
@@ -60,7 +89,7 @@ class HomeScreen extends StatelessWidget {
                   imageUrl: 'https://imageplaceholder.net/120x180?text=New+2',
                   labelType: FilmLabelType.hot,
                 ),
-                                FilmItem(
+                FilmItem(
                   imageUrl: 'https://imageplaceholder.net/120x180?text=New+1',
                   labelType: FilmLabelType.top,
                 ),
@@ -68,7 +97,7 @@ class HomeScreen extends StatelessWidget {
                   imageUrl: 'https://imageplaceholder.net/120x180?text=New+2',
                   labelType: FilmLabelType.newFilm,
                 ),
-                                FilmItem(
+                FilmItem(
                   imageUrl: 'https://imageplaceholder.net/120x180?text=New+1',
                   labelType: FilmLabelType.top,
                 ),
@@ -114,22 +143,6 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFeaturedBanner() {
-    return Container(
-      height: 200,
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        image: const DecorationImage(
-          image: NetworkImage(
-            'https://imageplaceholder.net/400x200?text=Featured+Banner',
-          ),
-          fit: BoxFit.cover,
         ),
       ),
     );
