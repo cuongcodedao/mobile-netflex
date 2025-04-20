@@ -60,6 +60,7 @@ flutter:
   assets:
     - assets/images/
     - lib/module/auth/assets/images/avatar-1.png
+    - lib/module/auth/assets/images/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
