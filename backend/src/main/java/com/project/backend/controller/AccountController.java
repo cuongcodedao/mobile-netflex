@@ -47,4 +47,12 @@ public class AccountController {
         return TemplateResponse.<Void>builder()
                 .build();
     }
+    @GetMapping("/check-email")
+    public TemplateResponse<Boolean> checkEmailExists(@RequestParam String email) {
+        boolean exists = accountService.isEmailExists(email);
+        return TemplateResponse.<Boolean>builder()
+                .result(exists)
+                .build();
+    }
+
 }
