@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/module/auth/screens/login_screen.dart';
+
 class GetStarted extends StatelessWidget {
-  const GetStarted ({super.key});
+  const GetStarted({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +60,12 @@ class GetStarted extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 40),
               child: InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                  );
+                },
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.red,

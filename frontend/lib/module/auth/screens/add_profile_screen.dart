@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/module/home/screens/home_screen.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_textfield.dart';
 
@@ -17,19 +18,29 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
   final List<String> _selectedInterests = [];
 
   final List<String> ageGroups = ['Dưới 18', '18-25', '26-40', 'Trên 40'];
-  final List<String> interests = ['Phim Hành Động', 'Phim Hài', 'Phim Kinh Dị', 'Phim Tình Cảm'];
+  final List<String> interests = [
+    'Phim Hành Động',
+    'Phim Hài',
+    'Phim Kinh Dị',
+    'Phim Tình Cảm',
+  ];
 
   void _saveProfile() {
     final name = _nameController.text;
-    if (name.isEmpty || _selectedAgeGroup == null || _selectedInterests.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng điền đầy đủ thông tin')),
-      );
-      return;
-    }
+    // if (name.isEmpty || _selectedAgeGroup == null || _selectedInterests.isEmpty) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('Vui lòng điền đầy đủ thông tin')),
+    //   );
+    //   return;
+    // }
 
-    print('New Profile: $name, Age Group: $_selectedAgeGroup, Interests: $_selectedInterests');
-    Navigator.pop(context);
+    print(
+      'New Profile: $name, Age Group: $_selectedAgeGroup, Interests: $_selectedInterests',
+    );
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => HomeScreen()),
+    );
   }
 
   @override
@@ -44,10 +55,11 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
         ),
         backgroundColor: Colors.black,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.white)
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       backgroundColor: Colors.black, // Set background to black
-      body: SingleChildScrollView( // Wrap with SingleChildScrollView
+      body: SingleChildScrollView(
+        // Wrap with SingleChildScrollView
         child: SizedBox(
           height: MediaQuery.of(context).size.height, // Ensure proper height
           child: Padding(
@@ -58,7 +70,8 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
                 CustomTextField(
                   hintText: 'Tên',
                   controller: _nameController,
-                  backgroundColor: Colors.black, // Black background for text field
+                  backgroundColor:
+                      Colors.black, // Black background for text field
                   textColor: Colors.white,
                   hintColor: Colors.grey,
                   borderRadius: 8.0,
@@ -68,15 +81,21 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: _selectedAgeGroup,
-                  items: ageGroups
-                      .map((ageGroup) => DropdownMenuItem(
-                            value: ageGroup,
-                            child: Text(
-                              ageGroup,
-                              style: const TextStyle(fontSize: 18, color: Colors.white), // Increased font size
+                  items:
+                      ageGroups
+                          .map(
+                            (ageGroup) => DropdownMenuItem(
+                              value: ageGroup,
+                              child: Text(
+                                ageGroup,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ), // Increased font size
+                              ),
                             ),
-                          ))
-                      .toList(),
+                          )
+                          .toList(),
                   onChanged: (value) {
                     setState(() {
                       _selectedAgeGroup = value;
@@ -84,13 +103,20 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
                   },
                   decoration: const InputDecoration(
                     labelText: 'Độ tuổi',
-                    labelStyle: TextStyle(fontSize: 18, color: Colors.white), // Increased font size
+                    labelStyle: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                    ), // Increased font size
                     border: OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white), // White border
+                      borderSide: BorderSide(
+                        color: Colors.white,
+                      ), // White border
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white), // White border
+                      borderSide: BorderSide(
+                        color: Colors.white,
+                      ), // White border
                     ),
                   ),
                   dropdownColor: Colors.black, // Dropdown background color
@@ -98,36 +124,42 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
                 const SizedBox(height: 16),
                 Text(
                   'Sở thích',
-                  style: const TextStyle(fontSize: 18, color: Colors.white), // Increased font size
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                  ), // Increased font size
                 ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8.0,
                   runSpacing: 4.0,
-                  children: interests.map((interest) {
-                    final isSelected = _selectedInterests.contains(interest);
-                    return FilterChip(
-                      label: Text(
-                        interest,
-                        style: TextStyle(
-                          color: isSelected ? Colors.black : Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                      selected: isSelected,
-                      backgroundColor: Colors.black,
-                      selectedColor: Colors.white,
-                      onSelected: (selected) {
-                        setState(() {
-                          if (selected) {
-                            _selectedInterests.add(interest);
-                          } else {
-                            _selectedInterests.remove(interest);
-                          }
-                        });
-                      },
-                    );
-                  }).toList(),
+                  children:
+                      interests.map((interest) {
+                        final isSelected = _selectedInterests.contains(
+                          interest,
+                        );
+                        return FilterChip(
+                          label: Text(
+                            interest,
+                            style: TextStyle(
+                              color: isSelected ? Colors.black : Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                          selected: isSelected,
+                          backgroundColor: Colors.black,
+                          selectedColor: Colors.white,
+                          onSelected: (selected) {
+                            setState(() {
+                              if (selected) {
+                                _selectedInterests.add(interest);
+                              } else {
+                                _selectedInterests.remove(interest);
+                              }
+                            });
+                          },
+                        );
+                      }).toList(),
                 ),
                 const SizedBox(height: 24),
                 Center(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/module/auth/screens/get_started_screen.dart';
 import 'package:frontend/module/auth/screens/sign_up_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -107,7 +108,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => SignUpScreen()),
+                      MaterialPageRoute(builder: (context) => GetStarted()),
                     );
                   },
                   child: Padding(
