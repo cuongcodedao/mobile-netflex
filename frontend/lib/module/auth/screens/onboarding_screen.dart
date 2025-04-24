@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/module/auth/screens/sign_up_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -49,7 +50,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   FittedBox(
                     alignment: Alignment.topCenter,
                     fit: BoxFit.contain,
-                    child: Image.asset(_onboardingData[index]['image']!,),
+                    child: Image.asset(_onboardingData[index]['image']!),
                   ),
                   // Gradient overlay
                   Container(
@@ -103,7 +104,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               verticalDirection: VerticalDirection.up,
               children: [
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SignUpScreen()),
+                    );
+                  },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 50),
                     child: Container(
