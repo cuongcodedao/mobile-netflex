@@ -17,4 +17,5 @@ public interface IAccountService {
     AccountResponse createAccount(AccountCreationRequest accountCreationRequest) throws UserAlreadyExistsException;
     AuthResponse login(SignInRequest signInRequest);
     AuthResponse refreshToken(String refreshToken);
+    boolean isEmailExists(String email);
 }

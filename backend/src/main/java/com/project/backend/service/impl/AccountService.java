@@ -119,6 +119,11 @@ public class AccountService implements IAccountService {
     }
 
     @Override
+    public boolean isEmailExists(String email) {
+        return accountRepository.existsByEmail(email);
+    }
+
+    @Override
     public AccountResponse updateAccount(AccountUpdateRequest accountUpdateRequest) {
         Account account = accountRepository.findById(accountUpdateRequest.getId())
                 .orElseThrow(() -> new RuntimeException("Account not found"));
@@ -134,5 +139,7 @@ public class AccountService implements IAccountService {
         account.setEnabled(false);
         accountRepository.save(account);
     }
+
+
 
 }
