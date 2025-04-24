@@ -5,6 +5,8 @@ import com.project.backend.dto.request.ProfileUpdateRequest;
 import com.project.backend.dto.response.ProfileResponse;
 import com.project.backend.entity.Account;
 import com.project.backend.entity.Profile;
+import com.project.backend.exception.AppException;
+import com.project.backend.exception.ErrorCode;
 import com.project.backend.mapper.ProfileMapper;
 import com.project.backend.repository.AccountRepository;
 import com.project.backend.repository.ProfileRepository;
@@ -25,6 +27,10 @@ public class ProfileService implements IProfileService {
         Profile profile = profileMapper.toProfile(creationRequest);
         Account account = accountRepository.findById(creationRequest.getAccountId())
                 .orElseThrow(() -> new RuntimeException("Account not found"));
+        List<Profile> existingProfiles = profileRepository.findAllByAccountId(account.getId());
+        if(existingProfiles.size() >= account.getCurrentPlan().getMaxNumberOfProfile()) {
+            throw new AppException(ErrorCode.EXCEEDS_MAX_PROFILE);
+        }
         profile.setAccount(account);
         profile = profileRepository.save(profile);
         return profileMapper.toProfileResponse(profile);

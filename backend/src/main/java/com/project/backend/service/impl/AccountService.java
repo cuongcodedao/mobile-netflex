@@ -1,18 +1,38 @@
 package com.project.backend.service.impl;
 
+import com.project.backend.dto.UserDetailsImpl;
 import com.project.backend.dto.request.AccountCreationRequest;
 import com.project.backend.dto.request.AccountUpdateRequest;
+import com.project.backend.dto.request.SignInRequest;
 import com.project.backend.dto.response.AccountResponse;
+import com.project.backend.dto.response.AuthResponse;
+import com.project.backend.entity.AccessLog;
 import com.project.backend.entity.Account;
+import com.project.backend.entity.Plan;
+import com.project.backend.entity.RefreshToken;
+import com.project.backend.exception.AppException;
+import com.project.backend.exception.ErrorCode;
+import com.project.backend.exception.UserAlreadyExistsException;
 import com.project.backend.mapper.AccountMapper;
+import com.project.backend.repository.AccessLogRepository;
 import com.project.backend.repository.AccountRepository;
+import com.project.backend.repository.PlanRepository;
 import com.project.backend.service.IAccountService;
+import com.project.backend.utils.JWTUtils;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,6 +40,11 @@ import java.util.stream.Collectors;
 public class AccountService implements IAccountService {
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
+    private final PlanRepository planRepository;
+    private final AuthenticationManager authenticationManager;
+    private final JWTUtils jwtUtils;
+    private final PasswordEncoder passwordEncoder;
+    private final AccessLogRepository accessLogRepository;
 
     @Override
     public List<AccountResponse> getAllAccounts() {
@@ -32,21 +57,65 @@ public class AccountService implements IAccountService {
     public AccountResponse getAccountById(Long id) {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
-        return accountMapper.toAccountResponse(account);
+        AccountResponse accountResponse = accountMapper.toAccountResponse(account);
+        accountResponse.setCurrentPlan(account.getCurrentPlan());
+        return accountResponse;
     }
 
     @Override
-    public AccountResponse createAccount(AccountCreationRequest accountCreationRequest) {
+    public AccountResponse createAccount(AccountCreationRequest accountCreationRequest) throws UserAlreadyExistsException {
+        if (accountRepository.existsByEmail(accountCreationRequest.getEmail())) {
+            throw new UserAlreadyExistsException("Email already exists");
+        }
         Account account = accountMapper.toAccount(accountCreationRequest);
+        account.setPassword(passwordEncoder.encode(accountCreationRequest.getPassword()));
+        Plan plan = planRepository.findById(accountCreationRequest.getPlanId())
+                .orElseThrow(() -> new RuntimeException("Plan not found"));
         account.setCreatedAt(LocalDateTime.now());
+        account.setCurrentPlan(plan);
         account = accountRepository.save(account);
         return accountMapper.toAccountResponse(account);
     }
 
     @Override
-    public AccountResponse login(String email, String password) {
-        Account account = accountRepository.findByEmailAndPassword(email, password);
-        return accountMapper.toAccountResponse(account);
+    public AuthResponse login(SignInRequest signInRequest) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(signInRequest.getEmail(), signInRequest.getPassword())
+        );
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        List<AccessLog> accessLogs = accessLogRepository.findByAccountIdAndDeviceId(userDetails.getId(), signInRequest.getDeviceId());
+        if(accessLogs.size()>=userDetails.getCurrentPlan().getMaxNumberOfDevice()){
+            throw new AppException(ErrorCode.EXCEEDS_MAX_DEVICE);
+        }
+        int cnt = 0;
+        for(AccessLog accessLog: accessLogs){
+            if(accessLog.isActive()) cnt++;
+        }
+        if(cnt>=userDetails.getCurrentPlan().getMaxNumberOfDeviceActive()){
+            throw new AppException(ErrorCode.EXCEEDS_MAX_DEVICE_ACTIVE);
+        }
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtUtils.generateJwtToken(userDetails.getUsername());
+        RefreshToken refreshToken = jwtUtils.createRefreshToken(userDetails.getUsername());
+
+        return AuthResponse.builder()
+                .accessToken(jwt)
+                .refreshToken(refreshToken.getRefreshToken())
+                .tokenType("Bearer")
+                .expiresIn(jwtUtils.getJwtExpirationMs())
+                .build();
+    }
+
+    public AuthResponse refreshToken(String refreshToken) {
+        RefreshToken token = jwtUtils.verifyRefreshToken(refreshToken);
+        String email = token.getEmail();
+        String newAccessToken = jwtUtils.generateJwtToken(email);
+        return AuthResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(token.getRefreshToken())
+                .tokenType("Bearer")
+                .expiresIn(jwtUtils.getJwtExpirationMs())
+                .build();
     }
 
     @Override
@@ -65,6 +134,5 @@ public class AccountService implements IAccountService {
         account.setEnabled(false);
         accountRepository.save(account);
     }
-
 
 }

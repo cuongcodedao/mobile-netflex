@@ -1,5 +1,6 @@
 package com.project.backend.entity;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -26,4 +27,5 @@ public class History {
 
     private LocalDateTime lastWatch;
     private int watchDuration;
+    private boolean finished;
 }
