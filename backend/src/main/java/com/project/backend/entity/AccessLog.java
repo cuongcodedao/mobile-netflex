@@ -23,7 +23,9 @@ public class AccessLog {
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    private Profile profile;
+    private Account account;
+
+    private String deviceId;
 
     private String deviceName;
 
@@ -31,7 +33,7 @@ public class AccessLog {
     private DeviceType deviceType;
     private String deviceAddress;
     private String location;
-    private String status;
+    private boolean active;
     private LocalDateTime lastLogin;
 }
 

@@ -16,6 +16,11 @@ public enum ErrorCode {
     UNAUTHORIZED(1008, "Unauthorized", HttpStatus.FORBIDDEN),
     INVALID_DOB(1009, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
     TOKEN_REVOKED(1010, "Token revoked", HttpStatus.UNAUTHORIZED),
+    TOKEN_EXPIRED(1011, "Token expired", HttpStatus.UNAUTHORIZED),
+    USER_ALREADY_EXISTS(1012, "User already exists", HttpStatus.CONFLICT),
+    EXCEEDS_MAX_PROFILE(1013, "Exceeds max profile", HttpStatus.BAD_REQUEST),
+    EXCEEDS_MAX_DEVICE(1014, "Exceeds max device", HttpStatus.BAD_REQUEST),
+    EXCEEDS_MAX_DEVICE_ACTIVE(1015, "Exceeds max device active", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode httpStatusCode) {
