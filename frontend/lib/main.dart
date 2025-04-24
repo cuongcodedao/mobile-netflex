@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/module/auth/screens/onboarding_screen.dart';
-import 'package:frontend/module/auth/screens/sign_up_screen.dart';
+import 'package:frontend/module/auth/screens/get_started_screen.dart';
 
 
 void main() {
@@ -15,7 +15,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: OnboardingScreen(),
-
     );
   }
 }
