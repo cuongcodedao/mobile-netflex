@@ -69,10 +69,13 @@ class HorizontalFilmList extends StatelessWidget {
               fit: BoxFit.cover,
               frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
                 if (wasSynchronouslyLoaded || frame != null) return child;
-                return Image.asset('lib/module/auth/assets/images/plhd.svg',
-                  height: itemHeight,
-                  width: itemWidth,
-                  fit: BoxFit.cover,
+                return Container(
+                  color: Colors.black,
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  ),
                 );
               },
             ),
@@ -94,13 +97,13 @@ class HorizontalFilmList extends StatelessWidget {
     String assetPath;
     switch (type) {
       case FilmLabelType.top:
-        assetPath = 'lib/module/auth/assets/images/top_label.png';
+        assetPath = 'assets/images/top_label.png';
         break;
       case FilmLabelType.newFilm:
-        assetPath = 'lib/module/auth/assets/images/new_label.png';
+        assetPath = 'assets/images/new_label.png';
         break;
       case FilmLabelType.hot:
-        assetPath = 'lib/module/auth/assets/images/hot_label.png';
+        assetPath = 'assets/images/hot_label.png';
         break;
       case FilmLabelType.none:
         return const SizedBox.shrink();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/module/auth/screens/add_profile_screen.dart';
 
 class Profile {
   final String name;
@@ -19,7 +20,8 @@ class ProfileSelectionScreen extends StatelessWidget {
     Profile(name: 'Chị Gái', color: Colors.purple),
   ];
 
-  static const String avatarPngPath = 'lib/module/auth/assets/images/avatar-1.png';
+  static const String avatarPngPath =
+      'assets/images/avatar-1.png';
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +46,10 @@ class ProfileSelectionScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: GridView.builder(
-                  itemCount: profiles.length < 6 ? profiles.length + 1 : profiles.length,
+                  itemCount:
+                      profiles.length < 6
+                          ? profiles.length + 1
+                          : profiles.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     childAspectRatio: 0.85,
@@ -93,7 +98,10 @@ class ProfileSelectionScreen extends StatelessWidget {
                           const SizedBox(height: 12),
                           Text(
                             profile.name,
-                            style: const TextStyle(color: Colors.white, fontSize: 20),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -101,7 +109,12 @@ class ProfileSelectionScreen extends StatelessWidget {
                     } else {
                       return GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(context, '/add-profile');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddProfileScreen(),
+                            ),
+                          );
                         },
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -139,7 +152,10 @@ class ProfileSelectionScreen extends StatelessWidget {
                             const SizedBox(height: 12),
                             const Text(
                               'Tạo Actor Mới',
-                              style: TextStyle(color: Colors.white, fontSize: 20),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                              ),
                               textAlign: TextAlign.center,
                             ),
                           ],
