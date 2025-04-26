@@ -28,7 +28,4 @@ public class AccountCreationRequest {
     @Size(min = 8, message = "Password must have at least 8 characters!")
     @Size(max = 20, message = "Password can have at most 20 characters!")
     private String password;
-
-    @Builder.Default()
-    private String planId = "basic-plan";
 }
