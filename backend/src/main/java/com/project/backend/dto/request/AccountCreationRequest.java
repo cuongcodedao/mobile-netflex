@@ -14,7 +14,10 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AccountCreationRequest {
+    @NotBlank(message = "First name is required!")
     private String firstName;
+
+    @NotBlank(message = "Last name is required!")
     private String lastName;
 
     @Email(message = "Email is not in valid format!")
@@ -23,7 +26,7 @@ public class AccountCreationRequest {
 
     @NotBlank(message = "Password is required!")
     @Size(min = 8, message = "Password must have at least 8 characters!")
-    @Size(max = 20, message = "Password can have have at most 20 characters!")
+    @Size(max = 20, message = "Password can have at most 20 characters!")
     private String password;
 
     @Builder.Default()

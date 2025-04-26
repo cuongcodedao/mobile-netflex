@@ -14,10 +14,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SubscriptionCreationRequest {
-    @NotNull
+    @NotNull(message = "Account ID is required!")
     @JsonProperty("account_id")
     Long accountId;
-    @NotNull
+    @NotNull(message = "Plan ID is required!")
     @JsonProperty("plan_id")
     String planId;
 
