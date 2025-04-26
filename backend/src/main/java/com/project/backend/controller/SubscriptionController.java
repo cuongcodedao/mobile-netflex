@@ -5,6 +5,7 @@ import com.project.backend.dto.response.SubscriptionResponse;
 import com.project.backend.dto.response.TemplateResponse;
 import com.project.backend.service.ISubscriptionService;
 import com.project.backend.service.impl.PaypalService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,7 @@ public class SubscriptionController {
     private final ISubscriptionService subscriptionService;
 
     @PostMapping("")
-    public TemplateResponse<?> create(@RequestBody SubscriptionCreationRequest subscriptionCreationRequest) throws IOException {
+    public TemplateResponse<?> create(@RequestBody @Valid SubscriptionCreationRequest subscriptionCreationRequest) throws IOException {
         return TemplateResponse.builder()
                 .result(subscriptionService.create(subscriptionCreationRequest))
                 .build();

@@ -53,28 +53,20 @@ public class GlobalExceptionHandler {
                 );
     }
 
-//    @ExceptionHandler(value = MethodArgumentNotValidException.class)
-//    ResponseEntity<TemplateResponse> handlingValidation(MethodArgumentNotValidException exception){
-//        String enumKey = exception.getFieldError().getDefaultMessage();
-//        ErrorCode errorCode = ErrorCode.UNCATEGORIZED_EXCEPTION;
-//        Map attributes = null;
-//        try {
-//            errorCode = ErrorCode.valueOf(enumKey);
-//
-//            var constraint = exception.getBindingResult().getAllErrors().getFirst().unwrap(ConstraintViolation.class);
-//            attributes = constraint.getConstraintDescriptor().getAttributes();
-//        } catch (IllegalArgumentException e){
-//
-//        }
-//
-//        TemplateResponse apiResponse = new TemplateResponse();
-//
-//        apiResponse.setCode(errorCode.getCode());
-//        apiResponse.setMessage(Objects.nonNull(attributes)? mapAtribute(errorCode.getMessage(), attributes) : errorCode.getMessage());
-//
-//        return ResponseEntity.badRequest().body(apiResponse);
-//    }
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    ResponseEntity<TemplateResponse> handlingValidation(MethodArgumentNotValidException exception) {
+        String errorMessage = exception.getBindingResult().getFieldErrors().stream()
+                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                .findFirst()
+                .orElse("Validation error");
 
+        TemplateResponse apiResponse = TemplateResponse.builder()
+                .code(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode())
+                .message(errorMessage)
+                .build();
+
+        return ResponseEntity.badRequest().body(apiResponse);
+    }
 
     @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
     ResponseEntity<TemplateResponse> handlingMethodNotSupported(HttpRequestMethodNotSupportedException exception){

@@ -8,6 +8,7 @@ import com.project.backend.dto.response.AuthResponse;
 import com.project.backend.dto.response.TemplateResponse;
 import com.project.backend.exception.UserAlreadyExistsException;
 import com.project.backend.service.IAccountService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +22,7 @@ public class AuthController {
     private final IAccountService accountService;
 
     @PostMapping("/signup")
-    public TemplateResponse<AccountResponse> createAccount(@RequestBody AccountCreationRequest accountCreationRequest) throws UserAlreadyExistsException {
+    public TemplateResponse<AccountResponse> createAccount(@RequestBody @Valid AccountCreationRequest accountCreationRequest) throws UserAlreadyExistsException {
         AccountResponse response = accountService.createAccount(accountCreationRequest);
         return TemplateResponse.<AccountResponse>builder()
                 .result(response)
@@ -29,7 +30,7 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public TemplateResponse<AuthResponse> login(@RequestBody SignInRequest signInRequest) {
+    public TemplateResponse<AuthResponse> login(@RequestBody @Valid SignInRequest signInRequest) {
         AuthResponse response = accountService.login(signInRequest);
         return TemplateResponse.<AuthResponse>builder()
                 .result(response)
@@ -37,7 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public TemplateResponse<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest refreshToken) {
+    public TemplateResponse<AuthResponse> refreshToken(@RequestBody @Valid RefreshTokenRequest refreshToken) {
         AuthResponse response = accountService.refreshToken(refreshToken.getRefreshToken());
         return TemplateResponse.<AuthResponse>builder()
                 .result(response)
