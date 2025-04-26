@@ -3,6 +3,7 @@ package com.project.backend.controller;
 import com.project.backend.dto.HistoryDTO;
 import com.project.backend.dto.response.TemplateResponse;
 import com.project.backend.service.IHistoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +23,7 @@ public class HistoryController {
     }
 
     @PostMapping("")
-    public TemplateResponse<HistoryDTO> createHistory(@RequestBody HistoryDTO historyRequest) {
+    public TemplateResponse<HistoryDTO> createHistory(@RequestBody @Valid HistoryDTO historyRequest) {
         HistoryDTO response = historyService.create(historyRequest);
         return TemplateResponse.<HistoryDTO>builder()
                 .result(response)
@@ -30,7 +31,7 @@ public class HistoryController {
     }
 
     @PutMapping("/{id}")
-    public TemplateResponse<HistoryDTO> updateHistory(@PathVariable Long id, @RequestBody HistoryDTO historyRequest) {
+    public TemplateResponse<HistoryDTO> updateHistory(@PathVariable Long id, @RequestBody @Valid HistoryDTO historyRequest) {
         historyRequest.setId(id);
         HistoryDTO response = historyService.update(historyRequest);
         return TemplateResponse.<HistoryDTO>builder()

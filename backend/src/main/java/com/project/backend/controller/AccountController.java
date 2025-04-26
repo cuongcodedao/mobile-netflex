@@ -5,6 +5,7 @@ import com.project.backend.dto.request.AccountUpdateRequest;
 import com.project.backend.dto.response.AccountResponse;
 import com.project.backend.dto.response.TemplateResponse;
 import com.project.backend.service.IAccountService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +35,7 @@ public class AccountController {
 
 
     @PutMapping("/{id}")
-    public TemplateResponse<AccountResponse> updateAccount(@RequestBody AccountUpdateRequest accountUpdateRequest) {
+    public TemplateResponse<AccountResponse> updateAccount(@RequestBody @Valid AccountUpdateRequest accountUpdateRequest) {
         AccountResponse response = accountService.updateAccount(accountUpdateRequest);
         return TemplateResponse.<AccountResponse>builder()
                 .result(response)

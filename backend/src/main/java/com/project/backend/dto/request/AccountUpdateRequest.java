@@ -3,8 +3,8 @@ package com.project.backend.dto.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Data
@@ -24,6 +24,5 @@ public class AccountUpdateRequest {
     @NotBlank(message = "Last name is required!")
     String lastName;
 
-    Long accountId;
 
 }

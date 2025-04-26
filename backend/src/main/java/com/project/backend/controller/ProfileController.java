@@ -5,6 +5,7 @@ import com.project.backend.dto.request.ProfileUpdateRequest;
 import com.project.backend.dto.response.ProfileResponse;
 import com.project.backend.dto.response.TemplateResponse;
 import com.project.backend.service.IProfileService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,7 @@ public class ProfileController {
     private final IProfileService profileService;
 
     @PostMapping("")
-    public TemplateResponse<ProfileResponse> createProfile(@RequestBody ProfileCreationRequest profileCreationRequest) {
+    public TemplateResponse<ProfileResponse> createProfile(@RequestBody @Valid ProfileCreationRequest profileCreationRequest) {
         ProfileResponse response = profileService.createProfile(profileCreationRequest);
         return TemplateResponse.<ProfileResponse>builder()
                 .result(response)
@@ -33,7 +34,7 @@ public class ProfileController {
     }
 
     @PutMapping("/")
-    public TemplateResponse<ProfileResponse> updateProfile(@RequestBody ProfileUpdateRequest profileUpdateRequest) {
+    public TemplateResponse<ProfileResponse> updateProfile(@RequestBody @Valid ProfileUpdateRequest profileUpdateRequest) {
         ProfileResponse response = profileService.updateProfile(profileUpdateRequest);
         return TemplateResponse.<ProfileResponse>builder()
                 .result(response)
