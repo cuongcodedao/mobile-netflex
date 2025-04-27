@@ -145,66 +145,31 @@ class _AddProfileScreenState extends ConsumerState<AddProfileScreen> {
                             _selectedAvatar = avatar;
                           });
                         },
-                        child: Container(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
                           margin: const EdgeInsets.symmetric(horizontal: 8.0),
                           decoration: BoxDecoration(
+                            color: _selectedAvatar == avatar ? Colors.white.withOpacity(0.2) : Colors.transparent,
                             border: Border.all(
-                              color: _selectedAvatar == avatar ? Colors.red : Colors.transparent,
-                              width: 2.0,
+                              color: Colors.white,
+                              width: _selectedAvatar == avatar ? 5.0 : 0.0,
                             ),
-                            borderRadius: BorderRadius.circular(8.0),
+                            borderRadius: BorderRadius.circular(12.0),
                           ),
-                          child: Image.asset(
-                            'assets/images/$avatar',
-                            width: 80,
-                            height: 80,
+                          child: AspectRatio(
+                            aspectRatio: 1, // Đảm bảo hình vuông
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12.0),
+                              child: Image.asset(
+                                'assets/images/$avatar',
+                                fit: BoxFit.cover, // Đảm bảo hình ảnh không bị bóp méo
+                              ),
+                            ),
                           ),
                         ),
                       );
                     },
                   ),
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: _selectedAgeGroup,
-                  items: ageGroups
-                      .map(
-                        (ageGroup) => DropdownMenuItem(
-                          value: ageGroup,
-                          child: Text(
-                            ageGroup,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedAgeGroup = value;
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    labelText: 'Độ tuổi',
-                    labelStyle: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
-                    border: OutlineInputBorder(),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.white,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  dropdownColor: Colors.black,
                 ),
                 const SizedBox(height: 16),
                 const Text(

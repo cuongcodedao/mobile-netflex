@@ -14,7 +14,7 @@ class AuthRepository {
   Future<bool> checkEmailExists(String email) async {
     try {
       final response = await apiService.get(
-        '/api/v1/account/check-email?email=$email',
+        '/api/v1/auth/check-email?email=$email',
       );
       final authResponse = Auth<bool>.fromJson(
         response.data,
@@ -81,6 +81,9 @@ class AuthRepository {
       final accountId = data['account']['id'] as int; // Đảm bảo accountId không phải null
       final accessToken = data['accessToken'];
       final refreshToken = data['refreshToken'];
+
+      // Set the accessToken in ApiService after successful login
+      apiService.setAccessToken(accessToken);
 
       return {
         'user': user,
