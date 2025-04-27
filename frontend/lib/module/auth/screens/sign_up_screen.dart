@@ -1,33 +1,63 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/repositories/auth_repository.dart';
+import 'package:frontend/services/api_services.dart';
 import '../widgets/custom_textfield.dart'; // Điều chỉnh đường dẫn nếu cần
 import '../widgets/custom_button.dart'; // Điều chỉnh đường dẫn nếu cần
 import 'login_screen.dart'; // Import LoginScreen để điều hướng
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+  final String? email; // Optional email parameter
+
+  const SignUpScreen({super.key, this.email});
+
   static const routeName = '/sign-up';
+
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  late final TextEditingController _emailController;
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
 
   final FocusNode _emailFocusNode = FocusNode();
-  final FocusNode _phoneFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
   final FocusNode _confirmPasswordFocusNode = FocusNode();
+  final FocusNode _firstNameFocusNode = FocusNode();
+  final FocusNode _lastNameFocusNode = FocusNode();
 
-  void _handleSignUp() {
+  @override
+  void initState() {
+    super.initState();
+    _emailController = TextEditingController(text: widget.email ?? ''); // Pre-fill email if provided
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    _confirmPasswordFocusNode.dispose();
+    _firstNameFocusNode.dispose();
+    _lastNameFocusNode.dispose();
+    super.dispose();
+  }
+
+  void _handleSignUp() async {
     final email = _emailController.text.trim();
-    final phone = _phoneController.text.trim();
     final password = _passwordController.text.trim();
     final confirmPassword = _confirmPasswordController.text.trim();
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
 
-    if (email.isEmpty || phone.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty || firstName.isEmpty || lastName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
       );
@@ -41,26 +71,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return;
     }
 
-    // Xử lý đăng ký
-    print('Email: $email, Phone: $phone, Password: $password');
-    // Sau khi đăng ký thành công, có thể điều hướng đến màn hình chính hoặc login
-    // Ví dụ: Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
-     ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sign Up Successful (Simulated)')),
+    try {
+      final authRepository = AuthRepository(ApiService());
+      final user = await authRepository.registerAccount(
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        password: password,
       );
-  }
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _phoneController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    _emailFocusNode.dispose();
-    _phoneFocusNode.dispose();
-    _passwordFocusNode.dispose();
-    _confirmPasswordFocusNode.dispose();
-    super.dispose();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sign Up Successful! Welcome, ${user.firstName}')),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen(email: email)),
+      );
+    } catch (e) {
+      print('Sign Up Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sign Up Failed. Please try again.')),
+      );
+    }
   }
 
   @override
@@ -93,7 +126,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 focusNode: _emailFocusNode,
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.emailAddress, // Kiểu bàn phím email
-                onSubmitted: (_) => FocusScope.of(context).requestFocus(_phoneFocusNode),
+                onSubmitted: (_) => FocusScope.of(context).requestFocus(_firstNameFocusNode),
                 backgroundColor: Colors.white, // Nền ô input trắng
                 textColor: Colors.black, // Chữ nhập màu đen
                 hintColor: Colors.grey, // Màu hint xám
@@ -102,13 +135,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 borderRadius: 4.0, // Bo góc viền (tùy chỉnh)
               ),
               const SizedBox(height: 16),
-              // Phone Number Input
+              // First Name Input
               CustomTextField(
-                controller: _phoneController,
-                hintText: "Phone Number",
-                focusNode: _phoneFocusNode,
+                controller: _firstNameController,
+                hintText: "First Name",
+                focusNode: _firstNameFocusNode,
                 textInputAction: TextInputAction.next,
-                keyboardType: TextInputType.phone, // Kiểu bàn phím số điện thoại
+                keyboardType: TextInputType.name,
+                onSubmitted: (_) => FocusScope.of(context).requestFocus(_lastNameFocusNode),
+                backgroundColor: Colors.white,
+                textColor: Colors.black,
+                hintColor: Colors.grey,
+                borderColor: Colors.green,
+                borderWidth: 1.0,
+                borderRadius: 4.0,
+              ),
+              const SizedBox(height: 16),
+              // Last Name Input
+              CustomTextField(
+                controller: _lastNameController,
+                hintText: "Last Name",
+                focusNode: _lastNameFocusNode,
+                textInputAction: TextInputAction.next,
+                keyboardType: TextInputType.name,
                 onSubmitted: (_) => FocusScope.of(context).requestFocus(_passwordFocusNode),
                 backgroundColor: Colors.white,
                 textColor: Colors.black,
@@ -190,15 +239,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     onTap: () {
                       // Quay lại màn hình Login
                       // Navigator.pop(context) hoạt động tốt nếu SignUp được push từ Login
-                      if (Navigator.canPop(context)) {
-                         Navigator.pop(context);
-                      } else {
+                      
                         // Trường hợp dự phòng: nếu không thể pop, thì pushReplacement
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => const LoginScreen()),
+                          MaterialPageRoute(builder: (context) => const LoginScreen(email: "")),
                         );
-                      }
+                      
                     },
                     child: const Text(
                       "Sign In",
