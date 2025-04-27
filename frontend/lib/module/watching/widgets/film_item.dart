@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/models/episode.dart';
+import 'package:frontend/models/episode/episode.dart';
 
 class FilmItem extends StatelessWidget {
   final Episode episode;
@@ -8,11 +8,11 @@ class FilmItem extends StatelessWidget {
   final bool isSelected;
 
   const FilmItem({
-    super.key, 
+    super.key,
     required this.episode,
     required this.urlEpisode,
     required this.isSelected,
-    required this.onTap
+    required this.onTap,
   });
 
   @override
@@ -24,7 +24,7 @@ class FilmItem extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            color: (isSelected) ? Colors.redAccent : Colors.black
+            color: (isSelected) ? Colors.redAccent : Colors.black,
           ),
           child: Row(
             children: [
@@ -41,18 +41,10 @@ class FilmItem extends StatelessWidget {
                     child: FittedBox(
                       fit: BoxFit.fill,
                       child: Image.network(urlEpisode),
-                    )
+                    ),
                   ),
-                  Icon(
-                    Icons.circle_outlined,
-                    size: 60,
-                    color: Colors.white
-                  ),
-                  Icon(
-                    Icons.play_arrow,
-                    size: 50,
-                    color: Colors.white
-                  ),
+                  Icon(Icons.circle_outlined, size: 60, color: Colors.white),
+                  Icon(Icons.play_arrow, size: 50, color: Colors.white),
                 ],
               ),
               Padding(
@@ -61,7 +53,7 @@ class FilmItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Episode: ${episode.name}",
+                      "Episode: ${episode.serverData[0].name}",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -81,8 +73,8 @@ class FilmItem extends StatelessWidget {
               ),
             ],
           ),
-        )
-      )
+        ),
+      ),
     );
   }
 }

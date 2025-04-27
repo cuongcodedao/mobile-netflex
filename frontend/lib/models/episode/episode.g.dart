@@ -7,11 +7,14 @@ part of 'episode.dart';
 // **************************************************************************
 
 Episode _$EpisodeFromJson(Map<String, dynamic> json) => Episode(
-  name: json['name'] as String,
-  linkM3u8: json['link_m3u8'] as String,
+  serverName: json['server_name'] as String,
+  serverData:
+      (json['server_data'] as List<dynamic>)
+          .map((e) => EpisodeData.fromJson(e as Map<String, dynamic>))
+          .toList(),
 );
 
 Map<String, dynamic> _$EpisodeToJson(Episode instance) => <String, dynamic>{
-  'name': instance.name,
-  'link_m3u8': instance.linkM3u8,
+  'server_name': instance.serverName,
+  'server_data': instance.serverData,
 };

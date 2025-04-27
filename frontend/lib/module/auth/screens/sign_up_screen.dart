@@ -14,7 +14,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _phoneFocusNode = FocusNode();
@@ -27,7 +28,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final password = _passwordController.text.trim();
     final confirmPassword = _confirmPasswordController.text.trim();
 
-    if (email.isEmpty || phone.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+    if (email.isEmpty ||
+        phone.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
       );
@@ -35,9 +39,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
 
     if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
       return;
     }
 
@@ -45,9 +49,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     print('Email: $email, Phone: $phone, Password: $password');
     // Sau khi đăng ký thành công, có thể điều hướng đến màn hình chính hoặc login
     // Ví dụ: Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
-     ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sign Up Successful (Simulated)')),
-      );
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Sign Up Successful (Simulated)')),
+    );
   }
 
   @override
@@ -60,7 +64,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _phoneFocusNode.dispose();
     _passwordFocusNode.dispose();
     _confirmPasswordFocusNode.dispose();
-    super.dispose();
+    // super.dispose();
   }
 
   @override
@@ -72,15 +76,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
         backgroundColor: Colors.white, // Nền AppBar trắng
         foregroundColor: Colors.black, // Màu chữ/icon AppBar đen
         elevation: 0, // Bỏ bóng dưới AppBar
-        leading: IconButton( // Nút back
+        leading: IconButton(
+          // Nút back
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      resizeToAvoidBottomInset: true, // Cho phép thay đổi kích thước khi bàn phím hiện
+      resizeToAvoidBottomInset:
+          true, // Cho phép thay đổi kích thước khi bàn phím hiện
       body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(), // Ẩn bàn phím khi chạm ra ngoài
-        child: SingleChildScrollView( // Cho phép cuộn nếu nội dung quá dài
+        onTap:
+            () =>
+                FocusScope.of(
+                  context,
+                ).unfocus(), // Ẩn bàn phím khi chạm ra ngoài
+        child: SingleChildScrollView(
+          // Cho phép cuộn nếu nội dung quá dài
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -93,7 +104,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 focusNode: _emailFocusNode,
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.emailAddress, // Kiểu bàn phím email
-                onSubmitted: (_) => FocusScope.of(context).requestFocus(_phoneFocusNode),
+                onSubmitted:
+                    (_) => FocusScope.of(context).requestFocus(_phoneFocusNode),
                 backgroundColor: Colors.white, // Nền ô input trắng
                 textColor: Colors.black, // Chữ nhập màu đen
                 hintColor: Colors.grey, // Màu hint xám
@@ -108,8 +120,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 hintText: "Phone Number",
                 focusNode: _phoneFocusNode,
                 textInputAction: TextInputAction.next,
-                keyboardType: TextInputType.phone, // Kiểu bàn phím số điện thoại
-                onSubmitted: (_) => FocusScope.of(context).requestFocus(_passwordFocusNode),
+                keyboardType:
+                    TextInputType.phone, // Kiểu bàn phím số điện thoại
+                onSubmitted:
+                    (_) =>
+                        FocusScope.of(context).requestFocus(_passwordFocusNode),
                 backgroundColor: Colors.white,
                 textColor: Colors.black,
                 hintColor: Colors.grey,
@@ -125,7 +140,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 isPassword: true,
                 focusNode: _passwordFocusNode,
                 textInputAction: TextInputAction.next,
-                onSubmitted: (_) => FocusScope.of(context).requestFocus(_confirmPasswordFocusNode),
+                onSubmitted:
+                    (_) => FocusScope.of(
+                      context,
+                    ).requestFocus(_confirmPasswordFocusNode),
                 backgroundColor: Colors.white,
                 textColor: Colors.black,
                 hintColor: Colors.grey,
@@ -170,7 +188,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     "Need help?",
                     style: TextStyle(
                       color: Colors.black, // Chữ trắng (hơi mờ để phân biệt)
-                      fontSize: 18, 
+                      fontSize: 18,
                       fontWeight: FontWeight.bold, // Chữ đậm
                     ),
                     textAlign: TextAlign.center,
@@ -191,12 +209,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       // Quay lại màn hình Login
                       // Navigator.pop(context) hoạt động tốt nếu SignUp được push từ Login
                       if (Navigator.canPop(context)) {
-                         Navigator.pop(context);
+                        Navigator.pop(context);
                       } else {
                         // Trường hợp dự phòng: nếu không thể pop, thì pushReplacement
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => const LoginScreen()),
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
                         );
                       }
                     },
@@ -220,3 +240,4 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 }
+

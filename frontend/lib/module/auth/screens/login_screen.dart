@@ -34,14 +34,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // test nếu pass và name là 123 thì chuyển sang màn hinh ProfileSelectionScreen
     if (email == "123" && password == "123") {
-    MaterialPageRoute route = MaterialPageRoute(
+      MaterialPageRoute route = MaterialPageRoute(
         builder: (context) => const ProfileSelectionScreen(),
       );
       Navigator.push(context, route);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login Failed')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Login Failed')));
     }
   }
 
@@ -51,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordController.dispose();
     _emailFocusNode.dispose();
     _passwordFocusNode.dispose();
-    super.dispose();
+    // super.dispose();
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:frontend/models/episode.dart';
-import 'package:frontend/models/film.dart';
+import 'package:frontend/models/episode/episode.dart';
+import 'package:frontend/models/film/film.dart';
+import 'package:frontend/models/film/film_page.dart';
 import 'package:frontend/services/api_services.dart';
 
 class FilmRepository {
@@ -8,24 +9,55 @@ class FilmRepository {
 
   FilmRepository(this.apiService);
 
-  Future<Film> getFilm() async {
+  Future<Film> getFilm(String slug) async {
     final response = await apiService.get(
-      'phim/ngoi-truong-xac-song?fbclid=IwY2xjawJsmnVleHRuA2FlbQIxMAABHq8LIcjX8qvks9PoHKO62WOOw3K37KodxLcLANLHhYfQaBg1-rk1KiOBz7X6_aem_sAtHUsjF2U_Q3ca8T5WO6A',
+      'api/v1/movie/$slug',
+      token:
+          "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmcxMTMwNUBnbWFpbC5jb20iLCJpYXQiOjE3NDU2Nzc3OTgsImV4cCI6MTc0NTc2NDE5OH0.0ohvELOHLIHTy7gS63kJ8JQXFd1cUwc70UiBb1Mi2uQ",
     );
 
-    print(response.data['movie'].toString());
-    Film film = Film.fromJson(response.data['movie']); 
-    
-    final List<dynamic> serverData = response.data['episodes'][0]['server_data'];
-    print(serverData.toString());
+    final result = response.data['result'];
+    final film = Film.fromJson(result['movie']);
 
-    List<Episode> allEpisodes = [];
+    final episodes =
+        (result['episodes'] as List<dynamic>)
+            .map((e) => Episode.fromJson(e))
+            .toList();
 
-    for(var info in serverData){
-      allEpisodes.add(Episode.fromJson(info));
-    }
+    print(result['episodes'].toString());
+    print("So tap" + episodes.length.toString());
 
-    film.listEpisolds = allEpisodes;
+    film.listEpisodes = episodes;
+    return film;
+  }
+
+  Future<List<Film>> getSearchFilm(String keyword) async {
+    final response = await apiService.get(
+      'api/v1/movie/search',
+      token:
+          "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmcxMTMwNUBnbWFpbC5jb20iLCJpYXQiOjE3NDU2Nzc3OTgsImV4cCI6MTc0NTc2NDE5OH0.0ohvELOHLIHTy7gS63kJ8JQXFd1cUwc70UiBb1Mi2uQ",
+    );
+
+    final films =
+        (response.data['result'] as List<dynamic>)
+            .map((e) => Film.fromJson(e))
+            .toList();
+    print("so phim tim duoc" + films.length.toString());
+
+    return films;
+  }
+
+  Future<FilmPage> getFilmPage(int page) async {
+    final response = await apiService.get(
+      'api/v1/movie',
+      data: {"page": page},
+      token:
+          "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmcxMTMwNUBnbWFpbC5jb20iLCJpYXQiOjE3NDU2Nzc3OTgsImV4cCI6MTc0NTc2NDE5OH0.0ohvELOHLIHTy7gS63kJ8JQXFd1cUwc70UiBb1Mi2uQ",
+    );
+
+    final result = response.data['result'];
+    print("film page" + result.toString());
+    final film = FilmPage.fromJson(result);
     return film;
   }
 }

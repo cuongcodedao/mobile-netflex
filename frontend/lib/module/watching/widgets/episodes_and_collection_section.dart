@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/models/film.dart';
+import 'package:frontend/models/film/film.dart';
 import 'package:frontend/module/watching/screens/playing_film_page.dart';
 import 'package:frontend/module/watching/widgets/button_pick.dart';
 import 'package:frontend/module/watching/widgets/film_item.dart';
@@ -8,9 +8,9 @@ class EpisodesAndCollectionSection extends StatefulWidget {
   final Film film;
   final int episodeSelected;
   const EpisodesAndCollectionSection({
-    super.key, 
+    super.key,
     required this.film,
-    this.episodeSelected = -1
+    this.episodeSelected = -1,
   });
 
   @override
@@ -57,35 +57,37 @@ class _EpisodesAndCollectionSectionState
         ),
         Column(
           children: List.generate(
-            widget.film.listEpisolds.length,
+            widget.film.listEpisodes.length,
             (index) => FilmItem(
-              episode: widget.film.listEpisolds[index],
+              episode: widget.film.listEpisodes[index],
               urlEpisode: widget.film.urlPoster,
               isSelected: (index == widget.episodeSelected),
-              onTap: (){
-                if(index == widget.episodeSelected) {
+              onTap: () {
+                if (index == widget.episodeSelected) {
                   return;
                 }
-                if(widget.episodeSelected == -1){
+                if (widget.episodeSelected == -1) {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => PlayingFilmPage(
-                      film: widget.film,
-                      episode: widget.film.listEpisolds[index],
-                      indexSelected: index
+                    MaterialPageRoute(
+                      builder:
+                          (context) => PlayingFilmPage(
+                            film: widget.film,
+                            episode: widget.film.listEpisodes[index],
+                            indexSelected: index,
+                          ),
                     ),
-                  ),
-                );
-                }
-                else {
+                  );
+                } else {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => PlayingFilmPage(
-                        film: widget.film,
-                        episode: widget.film.listEpisolds[index],
-                        indexSelected: index
-                      ),
+                      builder:
+                          (context) => PlayingFilmPage(
+                            film: widget.film,
+                            episode: widget.film.listEpisodes[index],
+                            indexSelected: index,
+                          ),
                     ),
                   );
                 }

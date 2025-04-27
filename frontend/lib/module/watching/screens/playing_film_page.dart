@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/models/episode.dart';
-import 'package:frontend/models/film.dart';
+import 'package:frontend/models/episode/episode.dart';
+import 'package:frontend/models/film/film.dart';
 import 'package:frontend/module/watching/widgets/custome_play_video.dart';
 import 'package:frontend/module/watching/widgets/episodes_and_collection_section.dart';
 import 'package:video_player/video_player.dart';
@@ -10,10 +10,10 @@ class PlayingFilmPage extends StatefulWidget {
   final Episode episode;
   final int indexSelected;
   const PlayingFilmPage({
-    super.key, 
+    super.key,
     required this.film,
     required this.episode,
-    required this.indexSelected
+    required this.indexSelected,
   });
 
   @override
@@ -40,7 +40,7 @@ class _PlayingFilmPageState extends State<PlayingFilmPage> {
   void initState() {
     super.initState();
     _controller = VideoPlayerController.network(
-      widget.episode.linkM3u8,
+      widget.episode.serverData[0].link_m3u8,
     );
     _initializeVideoPlayerFuture = _controller!.initialize().then((_) {
       setState(() {});
@@ -51,7 +51,7 @@ class _PlayingFilmPageState extends State<PlayingFilmPage> {
   @override
   void dispose() {
     _controller?.dispose();
-    super.dispose();
+    // super.dispose();
   }
 
   @override
@@ -63,29 +63,25 @@ class _PlayingFilmPageState extends State<PlayingFilmPage> {
           children: [
             Center(
               child:
-              _controller == null
-              ? SizedBox(
-                  height: 150,
-                  child: Center(
-                    child: CircularProgressIndicator()
-                  )
-                )
-              : FutureBuilder(
-                future: _initializeVideoPlayerFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return CustomePlayVideo(
-                      controller: _controller!,
-                    );
-                  } 
-                  else {
-                    return SizedBox( 
-                      height: 150,
-                      child: Center(child: CircularProgressIndicator()),
-                    );
-                  }
-                },
-              ),
+                  _controller == null
+                      ? SizedBox(
+                        height: 150,
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                      : FutureBuilder(
+                        future: _initializeVideoPlayerFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            return CustomePlayVideo(controller: _controller!);
+                          } else {
+                            return SizedBox(
+                              height: 150,
+                              child: Center(child: CircularProgressIndicator()),
+                            );
+                          }
+                        },
+                      ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
@@ -117,7 +113,7 @@ class _PlayingFilmPageState extends State<PlayingFilmPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical:20, horizontal: 15),
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
               child: EpisodesAndCollectionSection(
                 film: widget.film,
                 episodeSelected: widget.indexSelected,
