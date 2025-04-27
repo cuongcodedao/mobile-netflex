@@ -22,6 +22,7 @@ import com.project.backend.utils.JWTUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -54,6 +55,7 @@ public class AccountService implements IAccountService {
     }
 
     @Override
+    @PostAuthorize("returnObject.id == authentication.id")
     public AccountResponse getAccountById(Long id) {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
@@ -127,6 +129,7 @@ public class AccountService implements IAccountService {
     }
 
     @Override
+    @PostAuthorize("returnObject.id == authentication.id")
     public AccountResponse updateAccount(AccountUpdateRequest accountUpdateRequest) {
         Account account = accountRepository.findById(accountUpdateRequest.getId())
                 .orElseThrow(() -> new RuntimeException("Account not found"));
