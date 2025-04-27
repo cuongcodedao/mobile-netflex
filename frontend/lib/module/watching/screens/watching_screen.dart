@@ -31,7 +31,13 @@ class _WatchingScreenState extends State<WatchingScreen> {
 
   Future<void> loadFilm() async {
     try {
-      film = await filmRepository.getFilm(widget.slug); // truyen lug
+      Film filmt = await filmRepository.getFilm(widget.slug);;
+      setState(() {
+        film = filmt;
+      });
+      if(film != null){
+        print("So tap cua phim: "+ film!.listEpisodes.length.toString());
+      }
     } catch (e) {
       print('Error loading film: $e');
     } finally {
@@ -54,7 +60,7 @@ class _WatchingScreenState extends State<WatchingScreen> {
               color: Colors.blue,
               child: FittedBox(
                 fit: BoxFit.fill,
-                child: Image.network(film!.urlPoster),
+                child: Image.network(film!.urlThumb),
               ),
             ),
             Padding(

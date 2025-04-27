@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/models/episode/episode.dart';
+import 'package:frontend/models/episode/episode_data.dart';
 
 class FilmItem extends StatelessWidget {
-  final Episode episode;
+  final EpisodeData episode;
   final String urlEpisode;
   final VoidCallback onTap;
   final bool isSelected;
@@ -53,7 +53,7 @@ class FilmItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Episode: ${episode.serverData[0].name}",
+                      "Episode: ${episode.name}",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

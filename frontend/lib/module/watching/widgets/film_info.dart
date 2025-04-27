@@ -48,7 +48,7 @@ class FilmInfo extends StatelessWidget {
                     builder:
                         (context) => PlayingFilmPage(
                           film: film,
-                          episode: film.listEpisodes[0],
+                          episode: film.listEpisodes[0].serverData[0],
                           indexSelected: 0,
                         ),
                   ),

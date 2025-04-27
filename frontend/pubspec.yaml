@@ -39,6 +39,7 @@ dependencies:
   dio: ^5.4.0
   json_annotation: ^4.8.0
   flutter_riverpod: ^2.4.0
+  better_player_plus: ^1.0.8
 
 dependency_overrides:
   analyzer: ^6.2.0

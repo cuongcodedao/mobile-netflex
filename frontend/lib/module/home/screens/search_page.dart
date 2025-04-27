@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/models/film/film.dart';
 import 'package:frontend/module/home/widgets/item_search.dart';
@@ -17,10 +19,16 @@ class _SearchPageState extends State<SearchPage> {
   TextEditingController controller = TextEditingController();
   List<Film> films = [];
   bool isLoading = false;
+  Timer? _debounce;
 
   void search() {
-    isLoading = true;
-    loadFilm();
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      setState(() {
+        isLoading = true;
+      });
+      loadFilm();
+    });
   }
 
   @override
@@ -63,7 +71,8 @@ class _SearchPageState extends State<SearchPage> {
                   children: List.generate(
                     films.length,
                     (index) => ItemSearch(
-                      urlPoster: films[index].urlPoster,
+                      urlPoster:
+                          "https://phimimg.com/${films[index].urlPoster}",
                       name: films[index].name,
                       onTap: () {
                         Navigator.push(

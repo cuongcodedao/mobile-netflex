@@ -4,7 +4,7 @@ class ApiService {
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl:
-          'https://7ad7-2001-ee1-f404-c0d0-6018-46d-5b5-44e4.ngrok-free.app/',
+          'https://a6ea-2001-ee0-4c5d-f900-1c02-ce6d-315f-f62e.ngrok-free.app/',
     ),
   );
 

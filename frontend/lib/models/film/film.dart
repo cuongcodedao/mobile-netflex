@@ -9,8 +9,8 @@ part 'film.g.dart';
 
 @JsonSerializable()
 class Film {
-  final Tmdb tmdb;
-  final Imdb imdb;
+  final Tmdb? tmdb;
+  final Imdb? imdb;
   @JsonKey(name: "name", defaultValue: "")
   final String name;
   @JsonKey(name: "slug", defaultValue: "")
@@ -55,7 +55,7 @@ class Film {
   final String showtimes;
 
   @JsonKey(name: "year")
-  final int yearOfRelease;
+  final int? yearOfRelease;
 
   final List<String>? actor;
   final List<String>? director;

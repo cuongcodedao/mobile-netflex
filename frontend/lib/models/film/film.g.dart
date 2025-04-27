@@ -7,8 +7,14 @@ part of 'film.dart';
 // **************************************************************************
 
 Film _$FilmFromJson(Map<String, dynamic> json) => Film(
-  tmdb: Tmdb.fromJson(json['tmdb'] as Map<String, dynamic>),
-  imdb: Imdb.fromJson(json['imdb'] as Map<String, dynamic>),
+  tmdb:
+      json['tmdb'] == null
+          ? null
+          : Tmdb.fromJson(json['tmdb'] as Map<String, dynamic>),
+  imdb:
+      json['imdb'] == null
+          ? null
+          : Imdb.fromJson(json['imdb'] as Map<String, dynamic>),
   name: json['name'] as String? ?? '',
   slug: json['slug'] as String? ?? '',
   originName: json['origin_name'] as String? ?? '',
@@ -25,7 +31,7 @@ Film _$FilmFromJson(Map<String, dynamic> json) => Film(
   lang: json['lang'] as String? ?? '',
   notify: json['notify'] as String? ?? '',
   showtimes: json['showtimes'] as String? ?? '',
-  yearOfRelease: (json['year'] as num).toInt(),
+  yearOfRelease: (json['year'] as num?)?.toInt(),
   actor: (json['actor'] as List<dynamic>?)?.map((e) => e as String).toList(),
   director:
       (json['director'] as List<dynamic>?)?.map((e) => e as String).toList(),

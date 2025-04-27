@@ -57,9 +57,9 @@ class _EpisodesAndCollectionSectionState
         ),
         Column(
           children: List.generate(
-            widget.film.listEpisodes.length,
+            widget.film.listEpisodes[0].serverData.length,
             (index) => FilmItem(
-              episode: widget.film.listEpisodes[index],
+              episode: widget.film.listEpisodes[0].serverData[index],
               urlEpisode: widget.film.urlPoster,
               isSelected: (index == widget.episodeSelected),
               onTap: () {
@@ -73,7 +73,7 @@ class _EpisodesAndCollectionSectionState
                       builder:
                           (context) => PlayingFilmPage(
                             film: widget.film,
-                            episode: widget.film.listEpisodes[index],
+                            episode: widget.film.listEpisodes[0].serverData[index],
                             indexSelected: index,
                           ),
                     ),
@@ -85,7 +85,7 @@ class _EpisodesAndCollectionSectionState
                       builder:
                           (context) => PlayingFilmPage(
                             film: widget.film,
-                            episode: widget.film.listEpisodes[index],
+                            episode: widget.film.listEpisodes[0].serverData[index],
                             indexSelected: index,
                           ),
                     ),
