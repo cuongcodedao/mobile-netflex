@@ -65,9 +65,9 @@ class ProfileSelectionScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(30.0),
                               ),
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8.0),
+                                borderRadius: BorderRadius.circular(30.0), // Bo góc cho avatar
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(1.0),
                                   child: Image.asset(
                                     'assets/images/${profile.avatar}',
                                     fit: BoxFit.cover,

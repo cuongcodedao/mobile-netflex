@@ -3,18 +3,21 @@ import 'dart:convert';
 
 class ApiService {
   final Dio _dio = Dio(
-    BaseOptions(baseUrl: 'https://7ad7-2001-ee1-f404-c0d0-6018-46d-5b5-44e4.ngrok-free.app'),
+    BaseOptions(baseUrl: 'https://a6ea-2001-ee0-4c5d-f900-1c02-ce6d-315f-f62e.ngrok-free.app'),
   );
 
   String? _accessToken; // Biến lưu trữ accessToken
 
   ApiService() {
-    // Set cố định accessToken
-    setAccessToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmcxMTMwNUBnbWFpbC5jb20iLCJpYXQiOjE3NDU2NzUzNTcsImV4cCI6MTc0NTc2MTc1N30.dqViLvco-sdgNn7ecFwa56PcCPr0WoX-6ZxFgzPPpuw");
+    // Remove hardcoded accessToken initialization
   }
 
   void setAccessToken(String token) {
     _accessToken = token;
+  }
+
+  String? getAccessToken() {
+    return _accessToken;
   }
 
   // Hàm GET
