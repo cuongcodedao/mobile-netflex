@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/profile_model.dart'; // Import ProfileModel
 import 'package:frontend/module/auth/screens/add_profile_screen.dart';
+import 'package:frontend/module/home/screens/home_screen.dart';
 
 class Profile {
   final String name;
@@ -154,7 +155,12 @@ class ProfileSelectionScreen extends StatelessWidget {
   }
 
   void _goToHomeScreen(BuildContext context, ProfileModel profile) {
-    print('Navigating to home for profile: ${profile.username}');
-    // Navigator.pushNamed(context, '/home', arguments: profile);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+      (context) => HomeScreen(),
+      ),
+    );
   }
 }

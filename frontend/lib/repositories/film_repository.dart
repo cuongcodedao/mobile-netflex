@@ -10,11 +10,7 @@ class FilmRepository {
   FilmRepository(this.apiService);
 
   Future<Film> getFilm(String slug) async {
-    final response = await apiService.get(
-      'api/v1/movie/$slug',
-      token:
-          "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmcxMTMwNUBnbWFpbC5jb20iLCJpYXQiOjE3NDU3NTAwOTQsImV4cCI6MTc0NTgzNjQ5NH0.-J4Wx6QVvQZDngvIbeRPvNfpdl48iOjMc9k23Yh2roA",
-    );
+    final response = await apiService.get('api/v1/movie/$slug');
 
     final result = response.data['result'];
     final film = Film.fromJson(result['movie']);
@@ -25,7 +21,7 @@ class FilmRepository {
             .toList();
 
     film.listEpisodes = episodes;
-    print("So tap cua phim: "+ film.listEpisodes.length.toString());
+    print("So tap cua phim: " + film.listEpisodes.length.toString());
     return film;
   }
 
@@ -34,8 +30,6 @@ class FilmRepository {
       final response = await apiService.get(
         'api/v1/movie/search',
         data: {"keyword": keyword},
-        token:
-            "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmcxMTMwNUBnbWFpbC5jb20iLCJpYXQiOjE3NDU3NTAwOTQsImV4cCI6MTc0NTgzNjQ5NH0.-J4Wx6QVvQZDngvIbeRPvNfpdl48iOjMc9k23Yh2roA",
       );
 
       print("search: " + response.data['result'].toString());
@@ -58,12 +52,7 @@ class FilmRepository {
   }
 
   Future<FilmPage> getFilmPage(int page) async {
-    final response = await apiService.get(
-      'api/v1/movie',
-      data: {"page": page},
-      token:
-          "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmcxMTMwNUBnbWFpbC5jb20iLCJpYXQiOjE3NDU3NTAwOTQsImV4cCI6MTc0NTgzNjQ5NH0.-J4Wx6QVvQZDngvIbeRPvNfpdl48iOjMc9k23Yh2roA",
-    );
+    final response = await apiService.get('api/v1/movie', data: {"page": page});
 
     final result = response.data['result'];
     print("film page" + result.toString());
