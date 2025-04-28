@@ -24,10 +24,7 @@ class FeatureBanner extends StatelessWidget {
                 value = pageController.page! - index;
                 value = (1 - (value.abs() * 0.3)).clamp(0.8, 1.0);
               }
-              return Transform.scale(
-                scale: value,
-                child: child,
-              );
+              return Transform.scale(scale: value, child: child);
             },
             child: GestureDetector(
               onTap: films[index].onTap,
@@ -35,7 +32,7 @@ class FeatureBanner extends StatelessWidget {
                 children: [
                   // Ảnh nền của phim
                   Padding(
-                    padding: const EdgeInsets.all( 0.0),
+                    padding: const EdgeInsets.all(0.0),
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
@@ -74,25 +71,26 @@ class FeatureBanner extends StatelessWidget {
                         Wrap(
                           spacing: 8.0,
                           runSpacing: 4.0,
-                          children: films[index].genres.map((genre) {
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white24,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Text(
-                                genre,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            );
-                          }).toList(),
+                          children:
+                              films[index].genres.map((genre) {
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white24,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Text(
+                                    genre,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
                         ),
                         const SizedBox(height: 16),
                         // Hàng icon
@@ -158,6 +156,7 @@ class FeatureBanner extends StatelessWidget {
     );
   }
 }
+
 class BannerFilm {
   final String imageUrl;
   final List<String> genres; // Thay đổi từ String genre thành List<String>

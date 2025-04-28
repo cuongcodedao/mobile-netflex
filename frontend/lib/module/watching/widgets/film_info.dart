@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/models/film.dart';
+import 'package:frontend/models/film/film.dart';
 import 'package:frontend/module/watching/screens/playing_film_page.dart';
 import 'package:frontend/module/watching/widgets/button_large.dart';
 
@@ -48,7 +48,7 @@ class FilmInfo extends StatelessWidget {
                     builder:
                         (context) => PlayingFilmPage(
                           film: film,
-                          episode: film.listEpisolds[0],
+                          episode: film.listEpisodes[0].serverData[0],
                           indexSelected: 0,
                         ),
                   ),

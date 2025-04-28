@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/models/episode.dart';
-import 'package:frontend/models/film.dart';
-import 'package:frontend/module/watching/widgets/custome_play_video.dart';
+import 'package:frontend/models/episode/episode_data.dart';
+import 'package:frontend/models/film/film.dart';
 import 'package:frontend/module/watching/widgets/episodes_and_collection_section.dart';
-import 'package:video_player/video_player.dart';
+import 'package:better_player_plus/better_player_plus.dart';
 
 class PlayingFilmPage extends StatefulWidget {
   final Film film;
-  final Episode episode;
+  final EpisodeData episode;
   final int indexSelected;
   const PlayingFilmPage({
-    super.key, 
+    super.key,
     required this.film,
     required this.episode,
-    required this.indexSelected
+    required this.indexSelected,
   });
 
   @override
@@ -21,8 +20,7 @@ class PlayingFilmPage extends StatefulWidget {
 }
 
 class _PlayingFilmPageState extends State<PlayingFilmPage> {
-  VideoPlayerController? _controller;
-  Future<void>? _initializeVideoPlayerFuture;
+  BetterPlayerController? _betterPlayerController;
 
   final TextStyle textLarge = TextStyle(
     fontSize: 23,
@@ -39,18 +37,30 @@ class _PlayingFilmPageState extends State<PlayingFilmPage> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(
-      widget.episode.linkM3u8,
+    print("So tap cua phim: "+widget.film.listEpisodes.length.toString());
+    BetterPlayerDataSource dataSource = BetterPlayerDataSource(
+      BetterPlayerDataSourceType.network,
+      widget.episode.link_m3u8,
+      videoFormat: BetterPlayerVideoFormat.hls,
     );
-    _initializeVideoPlayerFuture = _controller!.initialize().then((_) {
-      setState(() {});
-      _controller!.play();
-    });
+    _betterPlayerController = BetterPlayerController(
+      BetterPlayerConfiguration(
+        aspectRatio: 16 / 9,
+        autoPlay: true,
+        fit: BoxFit.contain,
+        controlsConfiguration: BetterPlayerControlsConfiguration(
+          enableFullscreen: true,
+          enablePlayPause: true,
+          enableMute: true,
+        ),
+      ),
+      betterPlayerDataSource: dataSource,
+    );
   }
 
   @override
   void dispose() {
-    _controller?.dispose();
+    _betterPlayerController?.dispose();
     super.dispose();
   }
 
@@ -62,30 +72,15 @@ class _PlayingFilmPageState extends State<PlayingFilmPage> {
         child: Column(
           children: [
             Center(
-              child:
-              _controller == null
-              ? SizedBox(
-                  height: 150,
-                  child: Center(
-                    child: CircularProgressIndicator()
-                  )
-                )
-              : FutureBuilder(
-                future: _initializeVideoPlayerFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return CustomePlayVideo(
-                      controller: _controller!,
-                    );
-                  } 
-                  else {
-                    return SizedBox( 
+              child: _betterPlayerController == null
+                  ? SizedBox(
                       height: 150,
                       child: Center(child: CircularProgressIndicator()),
-                    );
-                  }
-                },
-              ),
+                    )
+                  : AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: BetterPlayer(controller: _betterPlayerController!),
+                    ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
@@ -117,7 +112,7 @@ class _PlayingFilmPageState extends State<PlayingFilmPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical:20, horizontal: 15),
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
               child: EpisodesAndCollectionSection(
                 film: widget.film,
                 episodeSelected: widget.indexSelected,

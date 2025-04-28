@@ -21,15 +21,23 @@ class ApiService {
   }
 
   // Hàm GET
-  Future<Response> get(String endpoint) async {
-    return await _dio.get(
-      endpoint,
-      options: Options(
-        headers: {
-          if (_accessToken != null) 'Authorization': 'Bearer $_accessToken',
-        },
-      ),
-    );
+  Future<Response> get(
+    String endpoint, {
+    Map<String, dynamic>? data,
+    String? token,
+  }) async {
+    try {
+      final response = await _dio.get(
+        endpoint,
+        queryParameters: data,
+        options: Options(
+          headers: token != null ? {'Authorization': 'Bearer $_accessToken'} : {},
+        ),
+      );
+      return response;
+    } on DioException catch (e) {
+      throw Exception('POST request failed: ${e.message}');
+    }
   }
 
   // Hàm POST

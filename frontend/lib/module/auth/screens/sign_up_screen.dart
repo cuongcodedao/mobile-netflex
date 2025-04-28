@@ -65,12 +65,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
 
     if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
       return;
     }
-
+    
     try {
       final authRepository = AuthRepository(ApiService());
       final user = await authRepository.registerAccount(
@@ -105,15 +105,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
         backgroundColor: Colors.white, // Nền AppBar trắng
         foregroundColor: Colors.black, // Màu chữ/icon AppBar đen
         elevation: 0, // Bỏ bóng dưới AppBar
-        leading: IconButton( // Nút back
+        leading: IconButton(
+          // Nút back
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      resizeToAvoidBottomInset: true, // Cho phép thay đổi kích thước khi bàn phím hiện
+      resizeToAvoidBottomInset:
+          true, // Cho phép thay đổi kích thước khi bàn phím hiện
       body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(), // Ẩn bàn phím khi chạm ra ngoài
-        child: SingleChildScrollView( // Cho phép cuộn nếu nội dung quá dài
+        onTap:
+            () =>
+                FocusScope.of(
+                  context,
+                ).unfocus(), // Ẩn bàn phím khi chạm ra ngoài
+        child: SingleChildScrollView(
+          // Cho phép cuộn nếu nội dung quá dài
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -156,7 +163,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 controller: _lastNameController,
                 hintText: "Last Name",
                 focusNode: _lastNameFocusNode,
-                textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.name,
                 onSubmitted: (_) => FocusScope.of(context).requestFocus(_passwordFocusNode),
                 backgroundColor: Colors.white,
@@ -174,7 +180,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 isPassword: true,
                 focusNode: _passwordFocusNode,
                 textInputAction: TextInputAction.next,
-                onSubmitted: (_) => FocusScope.of(context).requestFocus(_confirmPasswordFocusNode),
+                onSubmitted:
+                    (_) => FocusScope.of(
+                      context,
+                    ).requestFocus(_confirmPasswordFocusNode),
                 backgroundColor: Colors.white,
                 textColor: Colors.black,
                 hintColor: Colors.grey,
@@ -219,7 +228,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     "Need help?",
                     style: TextStyle(
                       color: Colors.black, // Chữ trắng (hơi mờ để phân biệt)
-                      fontSize: 18, 
+                      fontSize: 18,
                       fontWeight: FontWeight.bold, // Chữ đậm
                     ),
                     textAlign: TextAlign.center,
@@ -267,3 +276,4 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 }
+

@@ -72,9 +72,7 @@ class HorizontalFilmList extends StatelessWidget {
                 return Container(
                   color: Colors.black,
                   child: const Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                    ),
+                    child: CircularProgressIndicator(color: Colors.white),
                   ),
                 );
               },
