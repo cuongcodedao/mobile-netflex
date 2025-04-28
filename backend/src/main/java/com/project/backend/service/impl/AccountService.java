@@ -22,6 +22,7 @@ import com.project.backend.utils.JWTUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -54,6 +55,7 @@ public class AccountService implements IAccountService {
     }
 
     @Override
+    @PostAuthorize("returnObject.id == authentication.id")
     public AccountResponse getAccountById(Long id) {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
@@ -69,7 +71,7 @@ public class AccountService implements IAccountService {
         }
         Account account = accountMapper.toAccount(accountCreationRequest);
         account.setPassword(passwordEncoder.encode(accountCreationRequest.getPassword()));
-        Plan plan = planRepository.findById(accountCreationRequest.getPlanId())
+        Plan plan = planRepository.findById("basic-plan")
                 .orElseThrow(() -> new RuntimeException("Plan not found"));
         account.setCreatedAt(LocalDateTime.now());
         account.setCurrentPlan(plan);
@@ -97,8 +99,11 @@ public class AccountService implements IAccountService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(userDetails.getUsername());
         RefreshToken refreshToken = jwtUtils.createRefreshToken(userDetails.getUsername());
+        Account account = accountRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new RuntimeException("Account not found"));
 
         return AuthResponse.builder()
+                .account(accountMapper.toAccountResponse(account))
                 .accessToken(jwt)
                 .refreshToken(refreshToken.getRefreshToken())
                 .tokenType("Bearer")
@@ -124,6 +129,7 @@ public class AccountService implements IAccountService {
     }
 
     @Override
+    @PostAuthorize("returnObject.id == authentication.id")
     public AccountResponse updateAccount(AccountUpdateRequest accountUpdateRequest) {
         Account account = accountRepository.findById(accountUpdateRequest.getId())
                 .orElseThrow(() -> new RuntimeException("Account not found"));

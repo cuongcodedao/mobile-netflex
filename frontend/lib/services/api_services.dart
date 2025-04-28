@@ -1,12 +1,24 @@
 import 'package:dio/dio.dart';
+import 'dart:convert';
 
 class ApiService {
   final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl:
-          'https://a6ea-2001-ee0-4c5d-f900-1c02-ce6d-315f-f62e.ngrok-free.app/',
-    ),
+    BaseOptions(baseUrl: 'https://a6ea-2001-ee0-4c5d-f900-1c02-ce6d-315f-f62e.ngrok-free.app'),
   );
+
+  String? _accessToken; // Biến lưu trữ accessToken
+
+  ApiService() {
+    // Remove hardcoded accessToken initialization
+  }
+
+  void setAccessToken(String token) {
+    _accessToken = token;
+  }
+
+  String? getAccessToken() {
+    return _accessToken;
+  }
 
   // Hàm GET
   Future<Response> get(
@@ -19,7 +31,7 @@ class ApiService {
         endpoint,
         queryParameters: data,
         options: Options(
-          headers: token != null ? {'Authorization': 'Bearer $token'} : {},
+          headers: token != null ? {'Authorization': 'Bearer $_accessToken'} : {},
         ),
       );
       return response;
@@ -28,13 +40,30 @@ class ApiService {
     }
   }
 
-  // ✅ Hàm POST
-  Future<Response> post(String endpoint, Map<String, dynamic> data) async {
-    try {
-      final response = await _dio.post(endpoint, data: data);
-      return response;
-    } on DioException catch (e) {
-      throw Exception('POST request failed: ${e.message}');
-    }
+  // Hàm POST
+Future<Response> post(String endpoint, Map<String, dynamic> data, {Options? options}) async {
+  try {
+    print('Request URL: ${_dio.options.baseUrl}$endpoint');
+    print('Request headers: ${options?.headers ?? {'Authorization': 'Bearer $_accessToken', 'Content-Type': 'application/json'}}');
+    print('Request body: $data');
+
+    final response = await _dio.post(
+      endpoint,
+      data: jsonEncode(data), // ✨ ép thành JSON string
+      options: options ??
+          Options(
+            headers: {
+              if (_accessToken != null) 'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json', // ✨ thêm content type
+            },
+          ),
+    );
+
+    print('Response status code: ${response.statusCode}');
+    print('Response data: ${response.data}');
+    return response;
+  } on DioException catch (e) {
+    throw Exception('POST request failed: ${e.message}');
   }
+}
 }

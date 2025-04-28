@@ -5,7 +5,9 @@ import com.project.backend.dto.request.AccountUpdateRequest;
 import com.project.backend.dto.response.AccountResponse;
 import com.project.backend.dto.response.TemplateResponse;
 import com.project.backend.service.IAccountService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,7 +36,7 @@ public class AccountController {
 
 
     @PutMapping("/{id}")
-    public TemplateResponse<AccountResponse> updateAccount(@RequestBody AccountUpdateRequest accountUpdateRequest) {
+    public TemplateResponse<AccountResponse> updateAccount(@RequestBody @Valid AccountUpdateRequest accountUpdateRequest) {
         AccountResponse response = accountService.updateAccount(accountUpdateRequest);
         return TemplateResponse.<AccountResponse>builder()
                 .result(response)
@@ -45,13 +47,6 @@ public class AccountController {
     public TemplateResponse<Void> deleteAccount(@PathVariable Long id) {
         accountService.deleteAccount(id);
         return TemplateResponse.<Void>builder()
-                .build();
-    }
-    @GetMapping("/check-email")
-    public TemplateResponse<Boolean> checkEmailExists(@RequestParam String email) {
-        boolean exists = accountService.isEmailExists(email);
-        return TemplateResponse.<Boolean>builder()
-                .result(exists)
                 .build();
     }
 

@@ -1,24 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/models/user_model.dart';
+import 'package:frontend/providers/auth_provider.dart';
+import 'package:frontend/providers/profile_provider.dart';
 import '../widgets/custom_textfield.dart';
 import '../widgets/custom_button.dart';
 import 'sign_up_screen.dart';
 import 'profile_selection_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class LoginScreen extends ConsumerStatefulWidget {
+  const LoginScreen({super.key, this.email});
+
+  final String? email;
+
   static const routeName = '/login';
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _emailController = TextEditingController();
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  late final TextEditingController _emailController;
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
 
-  void _handleLogin() {
+  @override
+  void initState() {
+    super.initState();
+    _emailController = TextEditingController(
+      text: widget.email ?? '',
+    ); // Pre-fill email if provided
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    super.dispose();
+  }
+
+  void _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
@@ -29,29 +53,33 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    // Xử lý đăng nhập
-    print('Email: $email, Password: $password');
-
-    // test nếu pass và name là 123 thì chuyển sang màn hinh ProfileSelectionScreen
-    if (email == "123" && password == "123") {
-      MaterialPageRoute route = MaterialPageRoute(
-        builder: (context) => const ProfileSelectionScreen(),
+    try {
+      final authRepository = ref.read(authRepositoryProvider);
+      final loginResult = await authRepository.login(
+        email: email,
+        password: password,
       );
-      Navigator.push(context, route);
-    } else {
-      ScaffoldMessenger.of(
+      final accountId = loginResult['accountId'] as int; // Lấy accountId từ kết quả trả về
+      print('Login successful, accountId: $accountId');
+      // Fetch profiles using accountId
+      print('Attempting to fetch profiles for accountId: $accountId'); // Log trước khi gọi profileProvider
+      final profiles = await ref.read(profileProvider(accountId).future);
+      print('Fetched profiles: $profiles'); // Log sau khi lấy danh sách profile
+      // Navigate to ProfileSelectionScreen with profiles và accountId
+      Navigator.push(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Login Failed')));
+        MaterialPageRoute(
+          builder: (context) => ProfileSelectionScreen(
+            profiles: profiles,
+            accountId: accountId, // Truyền accountId
+          ),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login failed: $e')),
+      );
     }
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _emailFocusNode.dispose();
-    _passwordFocusNode.dispose();
-    // super.dispose();
   }
 
   @override
@@ -137,7 +165,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     CustomButton(
                       text: "New to Netflex? Sign up now",
                       onPressed: () {
-                        Navigator.pushNamed(context, SignUpScreen.routeName);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SignUpScreen()),
+                        );
                       },
                       backgroundColor: Colors.transparent,
                       textColor: Colors.white,

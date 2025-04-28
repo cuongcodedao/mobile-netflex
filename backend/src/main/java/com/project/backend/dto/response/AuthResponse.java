@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class AuthResponse {
+    private AccountResponse account;
     private String accessToken;
     private String refreshToken;
     private String tokenType = "Bearer";

@@ -3,6 +3,7 @@ package com.project.backend.controller;
 import com.project.backend.dto.FavoriteDTO;
 import com.project.backend.dto.response.TemplateResponse;
 import com.project.backend.service.IFavoriteService;
+import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class FavoriteController {
     }
 
     @PostMapping("")
-    public TemplateResponse<FavoriteDTO> addToFavorite(@RequestBody FavoriteDTO favoriteDTO) {
+    public TemplateResponse<FavoriteDTO> addToFavorite(@RequestBody @Valid FavoriteDTO favoriteDTO) {
         FavoriteDTO favorite = favoriteService.addToFavorite(favoriteDTO);
         return TemplateResponse.<FavoriteDTO>builder()
                 .result(favorite)
