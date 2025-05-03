@@ -20,7 +20,6 @@ class FilmItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: InkWell(
-        onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
@@ -31,16 +30,13 @@ class FilmItem extends StatelessWidget {
               Stack(
                 alignment: Alignment.center,
                 children: [
-                  Container(
-                    height: 100,
-                    width: 160,
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: FittedBox(
-                      fit: BoxFit.fill,
-                      child: Image.network(urlEpisode),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(5),
+                    child: Image.network(
+                      urlEpisode,
+                      height: 100,
+                      width: 160,
+                      fit: BoxFit.cover,
                     ),
                   ),
                   Icon(Icons.circle_outlined, size: 60, color: Colors.white),
