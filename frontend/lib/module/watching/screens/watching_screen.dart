@@ -8,10 +8,7 @@ import 'package:frontend/services/api_services.dart';
 
 class WatchingScreen extends StatefulWidget {
   final String slug;
-  const WatchingScreen({
-    super.key,
-    required this.slug
-  });
+  const WatchingScreen({super.key, required this.slug});
 
   @override
   State<WatchingScreen> createState() => _WatchingScreenState();
@@ -31,12 +28,13 @@ class _WatchingScreenState extends State<WatchingScreen> {
 
   Future<void> loadFilm() async {
     try {
-      Film filmt = await filmRepository.getFilm(widget.slug);;
+      Film filmt = await filmRepository.getFilm(widget.slug);
+      ;
       setState(() {
         film = filmt;
       });
-      if(film != null){
-        print("So tap cua phim: "+ film!.listEpisodes.length.toString());
+      if (film != null) {
+        print("So tap cua phim: " + film!.listEpisodes.length.toString());
       }
     } catch (e) {
       print('Error loading film: $e');
@@ -71,21 +69,12 @@ class _WatchingScreenState extends State<WatchingScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
               child: SizedBox(
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: ActionsButton(text: "My List", icon: Icons.add),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: ActionsButton(text: "Rate", icon: Icons.handshake),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: ActionsButton(text: "Share", icon: Icons.share),
-                    ),
+                    ActionsButton(text: "My List", icon: Icons.add),
+                    ActionsButton(text: "Rate", icon: Icons.handshake),
+                    ActionsButton(text: "Share", icon: Icons.share),
                   ],
                 ),
               ),

@@ -37,7 +37,7 @@ class _PlayingFilmPageState extends State<PlayingFilmPage> {
   @override
   void initState() {
     super.initState();
-    print("So tap cua phim: "+widget.film.listEpisodes.length.toString());
+    print("So tap cua phim: " + widget.film.listEpisodes.length.toString());
     BetterPlayerDataSource dataSource = BetterPlayerDataSource(
       BetterPlayerDataSourceType.network,
       widget.episode.link_m3u8,
@@ -72,15 +72,18 @@ class _PlayingFilmPageState extends State<PlayingFilmPage> {
         child: Column(
           children: [
             Center(
-              child: _betterPlayerController == null
-                  ? SizedBox(
-                      height: 150,
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  : AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: BetterPlayer(controller: _betterPlayerController!),
-                    ),
+              child:
+                  _betterPlayerController == null
+                      ? SizedBox(
+                        height: 150,
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                      : AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: BetterPlayer(
+                          controller: _betterPlayerController!,
+                        ),
+                      ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),

@@ -5,6 +5,7 @@ class StorageService {
   // Lưu token
   Future<void> saveTokens(Token token) async {
     final prefs = await SharedPreferences.getInstance();
+    print("Save Access token ${token.accessToken}");
     await prefs.setString('accessToken', token.accessToken);
     await prefs.setString('refreshToken', token.refreshToken);
     await prefs.setString('tokenToken', token.tokenType);

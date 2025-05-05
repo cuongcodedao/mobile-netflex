@@ -10,8 +10,11 @@ class FilmRepository {
   FilmRepository(this.apiService);
 
   Future<Film> getFilm(String slug) async {
-    final response = await apiService.get(
+    String? accessToken = await StorageService().getAccessToken();
+    final response = await apiService.get1(
       '/api/v1/movie/$slug',
+      // token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmdAZ21haWwuY29tIiwiaWF0IjoxNzQ2NDE4NTAwLCJleHAiOjE3NDY1MDQ5MDB9.CuFycmZcaXTohc2OFtNLDPQMqOHG8CztbbVf6cd9G8o",
+        token: accessToken
     );
 
     final result = response.data['result'];
@@ -29,9 +32,12 @@ class FilmRepository {
 
   Future<List<Film>> getSearchFilm(String keyword) async {
     try {
-      final response = await apiService.get(
+      String? accessToken = await StorageService().getAccessToken();
+      final response = await apiService.get1(
         '/api/v1/movie/search',
         data: {"keyword": keyword},
+      // token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmdAZ21haWwuY29tIiwiaWF0IjoxNzQ2NDE4NTAwLCJleHAiOjE3NDY1MDQ5MDB9.CuFycmZcaXTohc2OFtNLDPQMqOHG8CztbbVf6cd9G8o",
+        token: accessToken
       );
 
       print("search: " + response.data['result'].toString());
@@ -54,9 +60,12 @@ class FilmRepository {
   }
 
   Future<FilmPage> getFilmPage(int page) async {
-    final response = await apiService.get(
+    String? accessToken = await StorageService().getAccessToken();
+    final response = await apiService.get1(
       '/api/v1/movie',
       data: {"page": page},
+      // token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmdAZ21haWwuY29tIiwiaWF0IjoxNzQ2NDE4NTAwLCJleHAiOjE3NDY1MDQ5MDB9.CuFycmZcaXTohc2OFtNLDPQMqOHG8CztbbVf6cd9G8o",
+      token: accessToken
     );
 
     final result = response.data['result'];

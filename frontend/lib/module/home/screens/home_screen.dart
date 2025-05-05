@@ -42,7 +42,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(title: Text("Home Screen"), actions: [Icon(Icons.delete)]),
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        title: Text("Home Screen", style: TextStyle(color: Colors.white)),
+        // actions: [Icon(Icons.delete)]
+      ),
       body: _widgetOptions[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed, // <- QUAN TRỌNG
