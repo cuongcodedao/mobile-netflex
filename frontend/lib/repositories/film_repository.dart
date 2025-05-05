@@ -1,8 +1,8 @@
-import 'package:dio/dio.dart';
 import 'package:frontend/models/episode/episode.dart';
 import 'package:frontend/models/film/film.dart';
 import 'package:frontend/models/film/film_page.dart';
 import 'package:frontend/services/api_services.dart';
+import 'package:frontend/services/storage_service.dart';
 
 class FilmRepository {
   final ApiService apiService;
@@ -10,7 +10,9 @@ class FilmRepository {
   FilmRepository(this.apiService);
 
   Future<Film> getFilm(String slug) async {
-    final response = await apiService.get('api/v1/movie/$slug');
+    final response = await apiService.get(
+      '/api/v1/movie/$slug',
+    );
 
     final result = response.data['result'];
     final film = Film.fromJson(result['movie']);
@@ -28,7 +30,7 @@ class FilmRepository {
   Future<List<Film>> getSearchFilm(String keyword) async {
     try {
       final response = await apiService.get(
-        'api/v1/movie/search',
+        '/api/v1/movie/search',
         data: {"keyword": keyword},
       );
 
@@ -52,7 +54,10 @@ class FilmRepository {
   }
 
   Future<FilmPage> getFilmPage(int page) async {
-    final response = await apiService.get('api/v1/movie', data: {"page": page});
+    final response = await apiService.get(
+      '/api/v1/movie',
+      data: {"page": page},
+    );
 
     final result = response.data['result'];
     print("film page" + result.toString());

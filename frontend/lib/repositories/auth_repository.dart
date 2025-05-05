@@ -1,5 +1,5 @@
 import 'dart:convert'; // Import jsonEncode
-import 'package:dio/dio.dart'; // Import Options từ thư viện dio
+import 'package:dio/dio.dart'; // Import Options từ thư viện dioauthrep
 import 'package:frontend/models/token/token.dart';
 import 'package:frontend/models/user_model.dart';
 
@@ -13,16 +13,14 @@ class AuthRepository {
 
   AuthRepository(this.apiService);
 
-  Future<Token> refreshToken(String refreshToken) async{
+  Future<Token> refreshToken(String refreshToken) async {
     try {
       final response = await apiService.post(
         '/api/v1/auth/refresh-token',
         {"refreshToken": refreshToken},
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
-      final token = Token.fromJson(
-        response.data['result'],
-      );
+      final token = Token.fromJson(response.data['result']);
       return token;
     } catch (e) {
       print('Refresh token error: $e');
@@ -96,6 +94,7 @@ class AuthRepository {
           data['account']['id'] as int; // Đảm bảo accountId không phải null
       final accessToken = data['accessToken'];
       final refreshToken = data['refreshToken'];
+      print("Access token: ${token.accessToken}");
       StorageService().saveTokens(token); // Luu accessToken va refreshToken
 
       // Set the accessToken in ApiService after successful login

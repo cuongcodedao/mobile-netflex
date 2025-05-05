@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/film/film_page.dart';
 import 'package:frontend/module/home/widgets/feature_banner.dart';
 import 'package:frontend/module/home/widgets/horizontal_film_list.dart';
 import 'package:frontend/module/watching/screens/watching_screen.dart';
+import 'package:frontend/providers/film_provider.dart';
 import 'package:frontend/repositories/film_repository.dart';
 import 'package:frontend/services/api_services.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   late final FilmRepository filmRepository;
   FilmPage? filmPage;
   bool isLoading = true;
@@ -22,7 +24,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    filmRepository = FilmRepository(ApiService()); // inject service
+    filmRepository = ref.read(filmRepositoryProvider);
+    // filmRepository = FilmRepository(ApiService()); // inject service
     loadFilmPage();
   }
 

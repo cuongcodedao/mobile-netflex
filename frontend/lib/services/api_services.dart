@@ -1,11 +1,9 @@
 import 'package:dio/dio.dart';
 import 'dart:convert';
 
-import 'package:frontend/services/storage_service.dart';
-
 class ApiService {
   final Dio _dio = Dio(
-    BaseOptions(baseUrl: 'https://6e6d-14-233-84-107.ngrok-free.app'),
+    BaseOptions(baseUrl: 'https://2ff9-117-2-255-218.ngrok-free.app'),
   );
 
   String? _accessToken; // Biến lưu trữ accessToken
@@ -23,7 +21,12 @@ class ApiService {
   }
 
   // Hàm GET
-  Future<Response> get(String endpoint, {Map<String, dynamic>? data}) async {
+  Future<Response> get(
+    String endpoint, {
+    Map<String, dynamic>? data,
+  }) async {
+    if (_accessToken != null) print("Co nhan Access Token ${_accessToken}");
+    else print("Get khong nhan acccesToken");
     return await _dio.get(
       endpoint,
       options: Options(

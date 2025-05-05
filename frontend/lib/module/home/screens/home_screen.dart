@@ -1,32 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/film/film_page.dart';
 import 'package:frontend/module/home/screens/home_page.dart';
 import 'package:frontend/module/home/screens/search_page.dart';
 import 'package:frontend/module/home/widgets/horizontal_film_list.dart';
 import 'package:frontend/module/home/widgets/feature_banner.dart';
 import 'package:frontend/module/watching/screens/watching_screen.dart';
+import 'package:frontend/providers/film_provider.dart';
 import 'package:frontend/repositories/film_repository.dart';
 import 'package:frontend/services/api_services.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  late final FilmRepository filmRepository;
-  FilmPage? filmPage;
-  bool isLoading = true;
-
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    filmRepository = FilmRepository(ApiService()); // inject service
-    loadFilmPage();
   }
 
   static const List<Widget> _widgetOptions = <Widget>[
@@ -42,21 +38,8 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Future<void> loadFilmPage() async {
-    try {
-      filmPage = await filmRepository.getFilmPage(1); // truyen lug
-    } catch (e) {
-      print('Error loading film page: $e');
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(title: Text("Home Screen"), actions: [Icon(Icons.delete)]),
