@@ -65,4 +65,12 @@ public class MovieController {
                 .result(response)
                 .build();
     }
+
+    @GetMapping(value = "/favorite/{profileId}")
+    public TemplateResponse<List<Movie>> getMoviesByUserFavorites(@PathVariable("profileId") Long profileId) throws IOException {
+        List<Movie> response = movieService.getMoviesByUserFavorites(profileId);
+        return TemplateResponse.<List<Movie>>builder()
+                .result(response)
+                .build();
+    }
 }

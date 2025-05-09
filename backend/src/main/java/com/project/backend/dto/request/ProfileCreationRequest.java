@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.w3c.dom.stylesheets.LinkStyle;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -23,4 +26,7 @@ public class ProfileCreationRequest {
     @NotNull(message = "Account ID is required!")
     @JsonProperty("account_id")
     Long accountId;
+
+    List<String> favorite_genres;
+
 }
