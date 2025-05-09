@@ -16,4 +16,5 @@ public interface IMovieService {
     List<Movie> getAllMoviesByYear(String year) throws IOException;
     List<Movie> getAllMoviesByCountrySlug(String slug) throws IOException;
     List<Movie> searchMovie(String keyword) throws IOException;
+    List<Movie> getMoviesByFavoriteSlugs(List<String> favoriteSlugs);
 }

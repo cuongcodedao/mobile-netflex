@@ -27,7 +27,6 @@ public class Profile {
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Favorite> favorites;
 
-
     @ManyToOne
     @JoinColumn(nullable = false)
     Account account;

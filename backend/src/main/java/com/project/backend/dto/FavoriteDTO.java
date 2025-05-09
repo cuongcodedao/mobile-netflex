@@ -10,7 +10,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FavoriteDTO {
     Long id;
-    String movieSlug;
+    String categorySlug;
     Long profileId;
-
 }
