@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class HistoryResponse {
     Long id;
-    @JsonProperty("movie_slug")
     Movie movie;
     @JsonProperty("watch_duration")
     int watchDuration;
