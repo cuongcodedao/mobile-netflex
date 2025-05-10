@@ -13,6 +13,7 @@ public enum ErrorCode {
     USER_NOT_FOUND(1005, "User not found", HttpStatus.NOT_FOUND),
     HTTP_METHOD_NOT_SUPPORTED(1006, "Http method not supported", HttpStatus.METHOD_NOT_ALLOWED),
     UNAUTHENTICATED(1007, "Unauthenticated", HttpStatus.UNAUTHORIZED),
+    BAD_CREDENTIALS(1008, "Bad credentials", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1008, "Unauthorized", HttpStatus.FORBIDDEN),
     INVALID_DOB(1009, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
     TOKEN_REVOKED(1010, "Token revoked", HttpStatus.UNAUTHORIZED),

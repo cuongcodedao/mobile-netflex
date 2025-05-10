@@ -3,9 +3,11 @@ package com.project.backend.exception;
 
 import com.project.backend.dto.response.TemplateResponse;
 import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -30,6 +32,16 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(ErrorCode.UNCATEGORIZED_EXCEPTION.getHttpStatusCode()).body(apiResponse);
     }
+
+    @ExceptionHandler(value = BadCredentialsException.class)
+    ResponseEntity<TemplateResponse> handlingBadCredentialsException(BadCredentialsException exception){
+        TemplateResponse apiResponse = new TemplateResponse();
+        apiResponse.setCode(ErrorCode.BAD_CREDENTIALS.getCode());
+        apiResponse.setMessage(ErrorCode.BAD_CREDENTIALS.getMessage());
+
+        return ResponseEntity.status(ErrorCode.BAD_CREDENTIALS.getHttpStatusCode()).body(apiResponse);
+    }
+
 
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<TemplateResponse> handlingAppException(AppException exception){
