@@ -2,6 +2,7 @@ package com.project.backend.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.project.backend.dto.response.Movie;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 public class HistoryDTO {
     Long id;
     @JsonProperty("movie_slug")
-    String movieSlug;
+    Movie movie;
     @JsonProperty("watch_duration")
     int watchDuration;
 
