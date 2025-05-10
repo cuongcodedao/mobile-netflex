@@ -19,6 +19,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late final FilmRepository filmRepository;
   FilmPage? filmPage;
+  List<Film> newFilms = [];
+  List<Film> topFilms = [];
   List<Film> forYouFilms = [];
   bool isLoading = true;
   bool isLoadingFail = false;
@@ -29,6 +31,7 @@ class _HomePageState extends State<HomePage> {
     filmRepository = FilmRepository(ApiService()); // inject service
     loadFilmPage();
     loadForYouFilms();
+    loadNewFilms();
   }
 
   Future<void> loadFilmPage() async {
@@ -46,6 +49,15 @@ class _HomePageState extends State<HomePage> {
     try {
       final profileId = widget.profile.id; // Access profile ID using widget.profile.id
       forYouFilms = await filmRepository.getListFilmByFavorite(profileId!); // Add null check
+      setState(() {});
+    } catch (e) {
+      print('Error loading For You films: $e');
+    }
+  }
+
+  Future<void> loadNewFilms() async {
+    try {
+      newFilms = await filmRepository.getNewFilms(); // Add null check
       setState(() {});
     } catch (e) {
       print('Error loading For You films: $e');
@@ -73,10 +85,10 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 16),
           FeatureBanner(
             films: List.generate(
-              filmPage!.items.length,
+              newFilms.length,
               (index) => BannerFilm(
-                imageUrl: filmPage!.items[index].urlPoster,
-                genres: ['Action', 'Adventure'],
+                imageUrl: "https://phimimg.com/${newFilms[index].urlPoster}",
+                genres: (newFilms[index].category?.map((e) => e.name).whereType<String>().toList()) ?? [],
                 onAddToList: () => print('Add to My List Film 1'),
                 onPlay: () {
                   Navigator.push(
