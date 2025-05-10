@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +21,7 @@ public class HistoryService implements IHistoryService {
     private final HistoryRepository historyRepository;
     private final ProfileRepository profileRepository;
     private final HistoryMapper historyMapper;
+    private final MovieService movieService;
 
     @Override
     public HistoryDTO create(HistoryDTO historyRequest) {
@@ -50,10 +52,19 @@ public class HistoryService implements IHistoryService {
 
     @Override
     public List<HistoryDTO> getAllHistoriesByProfileId(Long profileId) {
-        return historyRepository.findAllByProfileId(profileId)
+        List<HistoryDTO> historyDTOS =  historyRepository.findAllByProfileId(profileId)
                 .stream()
-                .map(historyMapper::toHistoryDTO)
+                .map(history -> {
+                    HistoryDTO historyDTO = historyMapper.toHistoryDTO(history);
+                    try {
+                        historyDTO.setMovie(movieService.getMovieBySlug(history.getMovieSlug()).getMovie());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return historyDTO;
+                })
                 .toList();
+        return historyDTOS;
     }
 
     @Override
