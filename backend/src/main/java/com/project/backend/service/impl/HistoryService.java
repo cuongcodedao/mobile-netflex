@@ -29,11 +29,28 @@ public class HistoryService implements IHistoryService {
     public HistoryResponse create(HistoryCreationRequest historyRequest) {
         Profile profile = profileRepository.findById(historyRequest.getProfileId())
                 .orElseThrow(() -> new RuntimeException("Profile not found"));
-
+        History existHistory = historyRepository.findByMovieSlugAndProfileIdAndEpisode(historyRequest.getMovieSlug(), profile.getId(), historyRequest.getEpisode());
+        if (existHistory != null) {
+            existHistory.setWatchDuration(historyRequest.getWatchDuration());
+            existHistory = historyRepository.save(existHistory);
+            HistoryResponse historyResponse =  historyMapper.toHistoryDTO(existHistory);
+            try {
+                historyResponse.setMovie(movieService.getMovieBySlug(historyRequest.getMovieSlug()).getMovie());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return historyResponse;
+        }
         History history = historyMapper.toHistory(historyRequest);
         history.setProfile(profile);
         history = historyRepository.save(history);
-        return historyMapper.toHistoryDTO(history);
+        HistoryResponse historyResponse =  historyMapper.toHistoryDTO(history);
+        try {
+            historyResponse.setMovie(movieService.getMovieBySlug(historyRequest.getMovieSlug()).getMovie());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return historyResponse;
     }
 
 
