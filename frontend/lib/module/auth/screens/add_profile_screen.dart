@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/module/notify/screens/error-notify.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_textfield.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,7 +7,7 @@ import 'package:frontend/module/auth/screens/profile_selection_screen.dart';
 import 'package:frontend/providers/profile_provider.dart';
 import 'package:frontend/models/film/category.dart';
 import 'package:frontend/providers/category_provider.dart';
-
+import 'package:dio/dio.dart';
 class AddProfileScreen extends ConsumerStatefulWidget {
   static const routeName = '/add-profile';
 
@@ -68,15 +69,19 @@ class _AddProfileScreenState extends ConsumerState<AddProfileScreen> {
     final isKid = _isKid ?? false;
 
     if (name.isEmpty || _selectedAvatar == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng điền đầy đủ thông tin và chọn avatar')),
+            showErrorNotify(
+        context,
+        'Thiếu thông tin',
+        'Vui lòng nhập tên và chọn avatar.',
       );
       return;
     }
 
     if (_selectedGenres.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng chọn ít nhất một thể loại phim yêu thích')),
+      showErrorNotify(
+        context,
+        'Thiếu thể loại',
+        'Vui lòng chọn ít nhất một thể loại phim yêu thích.',
       );
       return;
     }
@@ -103,12 +108,43 @@ class _AddProfileScreenState extends ConsumerState<AddProfileScreen> {
         ),
       );
     } catch (e) {
-      print('Error adding profile: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Không thể thêm profile: ${e.toString()}')),
-      );
+      _handleAddError(e);
     }
   }
+  // Hàm xử lý lỗi đăng nhập
+void _handleAddError(dynamic e) {
+  //print('Login error: $e');
+  String errorMessage = 'An unknown error occurred';
+
+  if (e is DioException) {
+    print('DioException: ${e.message}');
+    if (e.response != null) {
+      print('Response data: ${e.response?.data}');
+
+      final responseData = e.response?.data;
+      if (responseData is Map<String, dynamic>) {
+        if (responseData.containsKey('code')) {
+          errorMessage = responseData['code'].toString();
+        } else {
+          errorMessage = 'An unknown error occurred';
+        }
+          
+      } else if (responseData != null) {
+        errorMessage = responseData.toString();
+      }
+    } else {
+      errorMessage = e.message ?? 'An unknown Dio error occurred';
+    }
+  } 
+  if (errorMessage == '1013') {
+    errorMessage = 'Chỉ có tối đa 3 profile cho mỗi tài khoản thường';
+  }
+  showErrorNotify(
+    context,
+    'Thêm profile thất bại',
+    errorMessage,
+  );
+}
 
   bool? _isKid;
 

@@ -3,7 +3,7 @@ import 'dart:convert';
 
 class ApiService {
   final Dio _dio = Dio(
-    BaseOptions(baseUrl: 'http://10.0.2.2:8080'),
+    BaseOptions(baseUrl: 'https://c2c4-117-2-255-218.ngrok-free.app'),
   );
   String? _accessToken; // Biến lưu trữ accessToken
 
@@ -54,7 +54,7 @@ class ApiService {
     }
   }
 
-  // Hàm POST
+// Hàm POST
   Future<Response> post(
     String endpoint,
     Map<String, dynamic> data, {
@@ -62,21 +62,17 @@ class ApiService {
   }) async {
     try {
       print('Request URL: ${_dio.options.baseUrl}$endpoint');
-      print(
-        'Request headers: ${options?.headers ?? {'Authorization': 'Bearer $_accessToken', 'Content-Type': 'application/json'}}',
-      );
+      print('Request headers: ${options?.headers ?? {'Authorization': 'Bearer $_accessToken', 'Content-Type': 'application/json'}}');
       print('Request body: $data');
 
       final response = await _dio.post(
         endpoint,
-        data: jsonEncode(data), // ✨ ép thành JSON string
-        options:
-            options ??
+        data: data, // Để Dio tự chuyển Map thành JSON
+        options: options ??
             Options(
               headers: {
-                if (_accessToken != null)
-                  'Authorization': 'Bearer $_accessToken',
-                'Content-Type': 'application/json', // ✨ thêm content type
+                if (_accessToken != null) 'Authorization': 'Bearer $_accessToken',
+                'Content-Type': 'application/json',
               },
             ),
       );
@@ -85,7 +81,8 @@ class ApiService {
       print('Response data: ${response.data}');
       return response;
     } on DioException catch (e) {
-      throw Exception('POST request failed: ${e.message}');
+      // Ném lại DioException để xử lý ở phần gọi hàm
+      throw e;
     }
   }
 }

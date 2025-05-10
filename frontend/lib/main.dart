@@ -5,7 +5,7 @@ import 'package:frontend/module/auth/screens/get_started_screen.dart';
 import 'package:frontend/module/home/screens/home_screen.dart';
 import 'package:frontend/module/home/screens/my_list_page.dart';
 import 'package:frontend/module/watching/screens/watching_screen.dart';
-
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() {
   runApp(const ProviderScope(child: MyApp())); // Thêm ProviderScope bao bọc ứng dụng
 }

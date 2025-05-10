@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/module/notify/screens/error-notify.dart';
 import 'package:frontend/repositories/auth_repository.dart';
 import 'package:frontend/services/api_services.dart';
 import '../widgets/custom_textfield.dart'; // Điều chỉnh đường dẫn nếu cần
 import '../widgets/custom_button.dart'; // Điều chỉnh đường dẫn nếu cần
 import 'login_screen.dart'; // Import LoginScreen để điều hướng
+import 'package:dio/dio.dart';
 
 class SignUpScreen extends StatefulWidget {
   final String? email; // Optional email parameter
@@ -58,16 +60,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final lastName = _lastNameController.text.trim();
 
     if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty || firstName.isEmpty || lastName.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
-      );
+      showErrorNotify(context, 'Thiếu thông tin', 'Vui lòng nhập đầy đủ thông tin.');
       return;
     }
 
     if (password != confirmPassword) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
+      showErrorNotify(context, 'Mật khẩu không khớp', 'Vui lòng nhập lại mật khẩu.');
       return;
     }
     
@@ -83,19 +81,54 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Sign Up Successful! Welcome, ${user.firstName}')),
       );
-
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => LoginScreen(email: email)),
       );
     } catch (e) {
-      print('Sign Up Error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sign Up Failed. Please try again.')),
-      );
+      _handleSignupError(e);
     }
   }
+// Hàm xử lý lỗi đăng nhập
+void _handleSignupError(dynamic e) {
+  //print('Login error: $e');
+  String errorMessage = 'An unknown error occurred';
 
+  if (e is DioException) {
+    print('DioException: ${e.message}');
+    if (e.response != null) {
+      print('Response data: ${e.response?.data}');
+
+      final responseData = e.response?.data;
+      if (responseData is Map<String, dynamic>) {
+        if (responseData.containsKey('code')) {
+          errorMessage = responseData['code'].toString();
+        } else {
+          errorMessage = 'An unknown error occurred';
+        }
+          
+      } else if (responseData != null) {
+        errorMessage = responseData.toString();
+      }
+    } else {
+      errorMessage = e.message ?? 'An unknown Dio error occurred';
+    }
+  } 
+  if (errorMessage == '1008') {
+    errorMessage = 'Sai mật khẩu, vui lòng thử lại';
+  }
+  if (errorMessage == '1001') {
+    errorMessage = 'Email đã tồn tại';
+  }
+  if (errorMessage == '9999') {
+    errorMessage = 'Mật khẩu phải có ít nhất 8 ký tự';
+  }
+  showErrorNotify(
+    context,
+    'Đăng ký thất bại',
+    errorMessage,
+  );
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
