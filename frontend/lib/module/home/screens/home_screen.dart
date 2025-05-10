@@ -22,11 +22,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   List<Widget> get _widgetOptions => [
-        HomePage(profile: widget.profile),
-        const Text('🔍 Search', style: TextStyle(fontSize: 24, color: Colors.white)),
-        const SearchPage(),
-        const Text('Setting Page', style: TextStyle(fontSize: 24, color: Colors.white)),
-      ];
+    HomePage(profile: widget.profile),
+    const Text(
+      '🔍 Search',
+      style: TextStyle(fontSize: 24, color: Colors.white),
+    ),
+    const SearchPage(),
+    const Text(
+      'Setting Page',
+      style: TextStyle(fontSize: 24, color: Colors.white),
+    ),
+  ];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -43,7 +49,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         title: Text("Home Screen", style: TextStyle(color: Colors.white)),
         // actions: [Icon(Icons.delete)]
       ),
-      body: _widgetOptions[_selectedIndex],
+      body: IndexedStack(index: _selectedIndex, children: _widgetOptions),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed, // <- QUAN TRỌNG
         backgroundColor: Colors.black,
