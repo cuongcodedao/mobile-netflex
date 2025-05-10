@@ -1,6 +1,7 @@
 package com.project.backend.controller;
 
-import com.project.backend.dto.HistoryDTO;
+import com.project.backend.dto.request.HistoryCreationRequest;
+import com.project.backend.dto.response.HistoryResponse;
 import com.project.backend.dto.response.TemplateResponse;
 import com.project.backend.service.IHistoryService;
 import jakarta.validation.Valid;
@@ -16,28 +17,21 @@ public class HistoryController {
     private final IHistoryService historyService;
 
     @GetMapping("/profile/{profileId}")
-    public TemplateResponse<List<HistoryDTO>> getAllHistoriesByProfileId(@PathVariable Long profileId) {
-        return TemplateResponse.<List<HistoryDTO>>builder()
+    public TemplateResponse<List<HistoryResponse>> getAllHistoriesByProfileId(@PathVariable Long profileId) {
+        return TemplateResponse.<List<HistoryResponse>>builder()
                 .result(historyService.getAllHistoriesByProfileId(profileId))
                 .build();
     }
 
     @PostMapping("")
-    public TemplateResponse<HistoryDTO> createHistory(@RequestBody @Valid HistoryDTO historyRequest) {
-        HistoryDTO response = historyService.create(historyRequest);
-        return TemplateResponse.<HistoryDTO>builder()
+    public TemplateResponse<HistoryResponse> createHistory(@RequestBody @Valid HistoryCreationRequest historyRequest) {
+        HistoryResponse response = historyService.create(historyRequest);
+        return TemplateResponse.<HistoryResponse>builder()
                 .result(response)
                 .build();
     }
 
-    @PutMapping("/{id}")
-    public TemplateResponse<HistoryDTO> updateHistory(@PathVariable Long id, @RequestBody @Valid HistoryDTO historyRequest) {
-        historyRequest.setId(id);
-        HistoryDTO response = historyService.update(historyRequest);
-        return TemplateResponse.<HistoryDTO>builder()
-                .result(response)
-                .build();
-    }
+
 
     @DeleteMapping("/{id}")
     public TemplateResponse<Void> deleteHistory(@PathVariable Long id) {

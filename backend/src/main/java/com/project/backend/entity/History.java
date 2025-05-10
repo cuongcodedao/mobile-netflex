@@ -25,6 +25,8 @@ public class History {
 
     private String movieSlug;
 
+    private int episode;
+
     private LocalDateTime lastWatch;
     private int watchDuration;
     private boolean finished;

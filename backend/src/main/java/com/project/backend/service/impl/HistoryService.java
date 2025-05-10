@@ -1,6 +1,8 @@
 package com.project.backend.service.impl;
 
-import com.project.backend.dto.HistoryDTO;
+
+import com.project.backend.dto.request.HistoryCreationRequest;
+import com.project.backend.dto.response.HistoryResponse;
 import com.project.backend.entity.History;
 import com.project.backend.entity.Profile;
 import com.project.backend.mapper.HistoryMapper;
@@ -24,7 +26,7 @@ public class HistoryService implements IHistoryService {
     private final MovieService movieService;
 
     @Override
-    public HistoryDTO create(HistoryDTO historyRequest) {
+    public HistoryResponse create(HistoryCreationRequest historyRequest) {
         Profile profile = profileRepository.findById(historyRequest.getProfileId())
                 .orElseThrow(() -> new RuntimeException("Profile not found"));
 
@@ -34,15 +36,6 @@ public class HistoryService implements IHistoryService {
         return historyMapper.toHistoryDTO(history);
     }
 
-    @Override
-    public HistoryDTO update(HistoryDTO historyRequest) {
-        History history = historyRepository.findById(historyRequest.getId())
-                .orElseThrow(() -> new RuntimeException("History not found"));
-
-        historyMapper.updateHistory(history, historyRequest);
-        history = historyRepository.save(history);
-        return historyMapper.toHistoryDTO(history);
-    }
 
     @Override
     public void delete(Long id) {
@@ -51,11 +44,11 @@ public class HistoryService implements IHistoryService {
     }
 
     @Override
-    public List<HistoryDTO> getAllHistoriesByProfileId(Long profileId) {
-        List<HistoryDTO> historyDTOS =  historyRepository.findAllByProfileId(profileId)
+    public List<HistoryResponse> getAllHistoriesByProfileId(Long profileId) {
+        List<HistoryResponse> historyDTOS =  historyRepository.findAllByProfileId(profileId)
                 .stream()
                 .map(history -> {
-                    HistoryDTO historyDTO = historyMapper.toHistoryDTO(history);
+                    HistoryResponse historyDTO = historyMapper.toHistoryDTO(history);
                     try {
                         historyDTO.setMovie(movieService.getMovieBySlug(history.getMovieSlug()).getMovie());
                     } catch (IOException e) {
