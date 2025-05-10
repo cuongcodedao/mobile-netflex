@@ -73,4 +73,29 @@ class FilmRepository {
     final film = FilmPage.fromJson(result);
     return film;
   }
+  Future<List<Film>> getListFilmByFavorite(int profileId) async {
+    try {
+      String? accessToken = await StorageService().getAccessToken();
+      final response = await apiService.get1(
+        '/api/v1/movie/favorite/$profileId',
+      // token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmdAZ21haWwuY29tIiwiaWF0IjoxNzQ2NDE4NTAwLCJleHAiOjE3NDY1MDQ5MDB9.CuFycmZcaXTohc2OFtNLDPQMqOHG8CztbbVf6cd9G8o",
+        token: accessToken
+      );
+
+
+      final List<dynamic> results = response.data['result'] ?? [];
+      List<Film> films = [];
+      for (int i = 0; i < results.length; ++i) {
+        films.add(Film.fromJson(results[i]));
+      }
+      print(films[0].urlPoster);
+
+      print("Số phim tìm được: ${films.length}");
+      return films;
+    } catch (e) {
+      print("Lỗi khi tìm kiếm phim: $e");
+      return [];
+    }
+  }
+  
 }

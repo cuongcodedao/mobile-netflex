@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/film/film_page.dart';
+import 'package:frontend/models/film/film.dart';
 import 'package:frontend/module/home/widgets/feature_banner.dart';
 import 'package:frontend/module/home/widgets/horizontal_film_list.dart';
 import 'package:frontend/module/watching/screens/watching_screen.dart';
 import 'package:frontend/repositories/film_repository.dart';
 import 'package:frontend/services/api_services.dart';
+import 'package:frontend/models/profile_model.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final ProfileModel profile;
+  const HomePage({super.key, required this.profile});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -16,15 +19,16 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late final FilmRepository filmRepository;
   FilmPage? filmPage;
+  List<Film> forYouFilms = [];
   bool isLoading = true;
   bool isLoadingFail = false;
 
   @override
   void initState() {
     super.initState();
-    // filmRepository = ref.read(filmRepositoryProvider);
     filmRepository = FilmRepository(ApiService()); // inject service
     loadFilmPage();
+    loadForYouFilms();
   }
 
   Future<void> loadFilmPage() async {
@@ -35,6 +39,16 @@ class _HomePageState extends State<HomePage> {
       print('Error loading film page: $e');
     } finally {
       setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> loadForYouFilms() async {
+    try {
+      final profileId = widget.profile.id; // Access profile ID using widget.profile.id
+      forYouFilms = await filmRepository.getListFilmByFavorite(profileId!); // Add null check
+      setState(() {});
+    } catch (e) {
+      print('Error loading For You films: $e');
     }
   }
 
@@ -105,13 +119,13 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          // Danh sách UMBRELLA ACADEMY
+          // Danh sách For You
           HorizontalFilmList(
-            listTitle: 'UMBRELLA ACADEMY',
+            listTitle: 'For You',
             films: List.generate(
-              filmPage!.items.length,
+              forYouFilms.length,
               (index) => FilmItem(
-                imageUrl: filmPage!.items[index].urlPoster,
+                imageUrl: "https://phimimg.com/${forYouFilms[index].urlPoster}",
                 labelType: FilmLabelType.top,
               ),
             ),
