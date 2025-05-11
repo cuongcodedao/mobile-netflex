@@ -15,10 +15,11 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class HistoryResponse {
     Long id;
-    Movie movie;
+    EpisodeReponse episode;
     @JsonProperty("watch_duration")
     int watchDuration;
 
+    int episodeIndex;
     @NotNull
     @JsonProperty("profile_id")
     Long profileId;

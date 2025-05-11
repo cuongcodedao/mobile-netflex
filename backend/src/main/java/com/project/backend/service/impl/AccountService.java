@@ -3,6 +3,7 @@ package com.project.backend.service.impl;
 import com.project.backend.dto.UserDetailsImpl;
 import com.project.backend.dto.request.AccountCreationRequest;
 import com.project.backend.dto.request.AccountUpdateRequest;
+import com.project.backend.dto.request.LogoutRequest;
 import com.project.backend.dto.request.SignInRequest;
 import com.project.backend.dto.response.AccountResponse;
 import com.project.backend.dto.response.AuthResponse;
@@ -10,6 +11,7 @@ import com.project.backend.entity.AccessLog;
 import com.project.backend.entity.Account;
 import com.project.backend.entity.Plan;
 import com.project.backend.entity.RefreshToken;
+import com.project.backend.enums.DeviceType;
 import com.project.backend.exception.AppException;
 import com.project.backend.exception.ErrorCode;
 import com.project.backend.exception.UserAlreadyExistsException;
@@ -23,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -96,12 +99,23 @@ public class AccountService implements IAccountService {
         if(cnt>=userDetails.getCurrentPlan().getMaxNumberOfDeviceActive()){
             throw new AppException(ErrorCode.EXCEEDS_MAX_DEVICE_ACTIVE);
         }
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(userDetails.getUsername());
         RefreshToken refreshToken = jwtUtils.createRefreshToken(userDetails.getUsername());
         Account account = accountRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
+        AccessLog accessLog = AccessLog.builder()
+                .account(account)
+                .deviceId(signInRequest.getDeviceId())
+                .active(true)
+                .lastLogin(LocalDateTime.now())
+                .deviceName(signInRequest.getDeviceName())
+                .deviceType(DeviceType.MOBILE)
+                .build();
+
+        accessLogRepository.save(accessLog);
         return AuthResponse.builder()
                 .account(accountMapper.toAccountResponse(account))
                 .accessToken(jwt)
@@ -128,6 +142,19 @@ public class AccountService implements IAccountService {
         return accountRepository.existsByEmail(email);
     }
 
+    @PreAuthorize("@userDetailsServiceImpl.loadUserByUsername(authentication.name).username == #logoutRequest.email")
+    @Override
+    public void logout(LogoutRequest logoutRequest) {
+        Account account = accountRepository.findByEmail(logoutRequest.getEmail());
+        if (account == null) {
+            throw new RuntimeException("Account not found");
+        }
+        AccessLog accessLog = accessLogRepository.findById(logoutRequest.getAccessLogId())
+                .orElseThrow(() -> new RuntimeException("Access log not found"));
+        accessLog.setActive(false);
+        jwtUtils.deleteRefreshToken(logoutRequest.getRefreshToken());
+    }
+
     @Override
     @PostAuthorize("returnObject.id == authentication.id")
     public AccountResponse updateAccount(AccountUpdateRequest accountUpdateRequest) {
@@ -145,6 +172,8 @@ public class AccountService implements IAccountService {
         account.setEnabled(false);
         accountRepository.save(account);
     }
+
+
 
 
 

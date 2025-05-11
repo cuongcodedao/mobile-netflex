@@ -1,6 +1,7 @@
 package com.project.backend.controller;
 
 import com.project.backend.dto.request.AccountCreationRequest;
+import com.project.backend.dto.request.LogoutRequest;
 import com.project.backend.dto.request.RefreshTokenRequest;
 import com.project.backend.dto.request.SignInRequest;
 import com.project.backend.dto.response.AccountResponse;
@@ -46,6 +47,13 @@ public class AuthController {
         boolean exists = accountService.isEmailExists(email);
         return TemplateResponse.<Boolean>builder()
                 .result(exists)
+                .build();
+    }
+
+    @PostMapping("/logout")
+    public TemplateResponse<Void> logout(@RequestBody @Valid LogoutRequest logoutRequest) {
+        accountService.logout(logoutRequest);
+        return TemplateResponse.<Void>builder()
                 .build();
     }
 }

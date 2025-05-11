@@ -5,16 +5,22 @@ import com.project.backend.dto.response.APIMovieListResponse;
 import com.project.backend.dto.response.APIMovieResponse;
 import com.project.backend.dto.response.APIResponse;
 import com.project.backend.dto.response.Movie;
+import org.springframework.scheduling.annotation.Async;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public interface IMovieService {
     APIMovieResponse getMovieBySlug(String slug) throws IOException;
+
+    @Async
+    CompletableFuture<APIMovieResponse> getMovieBySlugAsync(String slug) throws IOException;
+
     APIMovieListResponse getMovieList(int page) throws IOException;
     List<Movie> getAllMoviesByGenreSlug(String slug) throws IOException;
     List<Movie> getAllMoviesByYear(String year) throws IOException;
     List<Movie> getAllMoviesByCountrySlug(String slug) throws IOException;
     List<Movie> searchMovie(String keyword) throws IOException;
-    List<Movie> getMoviesByFavoriteSlugs(List<String> favoriteSlugs);
+    List<Movie> getMoviesByUserFavorites(Long profileId) throws JsonProcessingException;
 }

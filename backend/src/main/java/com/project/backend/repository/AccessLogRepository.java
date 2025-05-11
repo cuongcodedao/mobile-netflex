@@ -13,4 +13,5 @@ public interface AccessLogRepository extends JpaRepository<AccessLog, Long> {
     @Query("SELECT a FROM AccessLog a WHERE a.account.id = :accountId and a.deviceId = :deviceId")
     List<AccessLog> findByAccountIdAndDeviceId(@Param("accountId") Long accountId, @Param("deviceId") String deviceId);
 
+
 }

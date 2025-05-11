@@ -2,6 +2,7 @@ package com.project.backend.service;
 
 import com.project.backend.dto.request.AccountCreationRequest;
 import com.project.backend.dto.request.AccountUpdateRequest;
+import com.project.backend.dto.request.LogoutRequest;
 import com.project.backend.dto.request.SignInRequest;
 import com.project.backend.dto.response.AccountResponse;
 import com.project.backend.dto.response.AuthResponse;
@@ -18,4 +19,5 @@ public interface IAccountService {
     AuthResponse login(SignInRequest signInRequest);
     AuthResponse refreshToken(String refreshToken);
     boolean isEmailExists(String email);
+    void logout(LogoutRequest logoutRequest);
 }
