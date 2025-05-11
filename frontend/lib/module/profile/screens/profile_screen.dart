@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/module/history/screens/history_screen.dart';
+import 'package:frontend/module/home/screens/my_list_page.dart';
 import 'package:frontend/module/profile/widgets/button_avata.dart';
 import 'package:frontend/module/profile/widgets/button_icon.dart';
 
@@ -17,7 +19,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: Icon(Icons.arrow_back, color: Colors.white),
         title: Text("Profile & More", style: TextStyle(color: Colors.white)),
       ),
       body: SingleChildScrollView(
@@ -27,13 +28,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
-                height: 150,
+                height: 30,
                 child: ListView.separated(
                   itemCount: 10,
                   scrollDirection: Axis.horizontal,
-                  separatorBuilder: (context, index) => SizedBox(width: 20),
+                  separatorBuilder: (context, index) => SizedBox(width: 30),
                   itemBuilder: (context, index) {
-                    return ButtonAvata();
+                    return CircleAvatar(
+                      radius: 25,
+                      backgroundImage: AssetImage("assets/images/avatar-1.png"),
+                    );
                   },
                 ),
               ),
@@ -57,7 +61,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 icon: Icons.notifications,
                 onTap: () {},
               ),
-              ButtonIcon(text: "My list", icon: Icons.list, onTap: () {}),
+              ButtonIcon(
+                text: "My list",
+                icon: Icons.list,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => MyListPage()),
+                  );
+                }
+              ),
+              ButtonIcon(
+                text: "History",
+                icon: Icons.list,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => HistoryScreen()),
+                  );
+                },
+              ),
               ButtonIcon(
                 text: "App Settings",
                 icon: Icons.settings,

@@ -26,7 +26,9 @@ class ItemMyList extends StatelessWidget {
             height: 300,
             child: FittedBox(
               fit: BoxFit.fitWidth,
-              child: Image.network("https://marketplace.canva.com/EAFTl0ixW_k/1/0/1131w/canva-black-white-minimal-alone-movie-poster-YZ-0GJ13Nc8.jpg"),
+              child: Image.network(
+                "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/movie-poster-template-design-21a1c803fe4ff4b858de24f5c91ec57f_screen.jpg?ts=1636996180",
+              ),
             ),
           ),
           title: Text(
@@ -35,8 +37,7 @@ class ItemMyList extends StatelessWidget {
             style: TextStyle(fontSize: 24, color: Colors.white),
           ),
         ),
-      )
-      ,
+      ),
     );
   }
 }
