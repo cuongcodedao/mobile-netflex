@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/models/profile_model.dart'; // Import ProfileModel
+import 'package:frontend/models/profile/profile_model.dart'; // Import ProfileModel
 import 'package:frontend/module/auth/screens/add_profile_screen.dart';
 import 'package:frontend/module/home/screens/home_screen.dart';
+import 'package:frontend/services/storage_service.dart';
 
 class Profile {
   final String name;
@@ -155,6 +156,8 @@ class ProfileSelectionScreen extends StatelessWidget {
   }
 
   void _goToHomeScreen(BuildContext context, ProfileModel profile) {
+    StorageService().saveProfileId(profile.id!);
+    print("Id Profile :" + profile.id!.toString());
     Navigator.push(
       context,
       MaterialPageRoute(

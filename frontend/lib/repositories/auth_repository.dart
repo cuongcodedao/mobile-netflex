@@ -1,10 +1,10 @@
 import 'dart:convert'; // Import jsonEncode
 import 'package:dio/dio.dart'; // Import Options từ thư viện dioauthrep
 import 'package:frontend/models/token/token.dart';
-import 'package:frontend/models/user_model.dart';
+import 'package:frontend/models/auth/user_model.dart';
 
 import 'dart:developer';
-import 'package:frontend/models/auth.dart'; // đổi tên file thành auth.dart
+import 'package:frontend/models/auth/auth.dart'; // đổi tên file thành auth.dart
 import 'package:frontend/services/api_services.dart';
 import 'package:frontend/services/storage_service.dart';
 

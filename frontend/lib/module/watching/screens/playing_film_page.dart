@@ -3,6 +3,8 @@ import 'package:frontend/models/episode/episode_data.dart';
 import 'package:frontend/models/film/film.dart';
 import 'package:frontend/module/watching/widgets/episodes_and_collection_section.dart';
 import 'package:better_player_plus/better_player_plus.dart';
+import 'package:frontend/repositories/history_repository.dart';
+import 'package:frontend/services/api_services.dart';
 
 class PlayingFilmPage extends StatefulWidget {
   final Film film;
@@ -61,7 +63,38 @@ class _PlayingFilmPageState extends State<PlayingFilmPage> {
   @override
   void dispose() {
     _betterPlayerController?.dispose();
+    _saveWatchingProgress();
     super.dispose();
+  }
+
+  void _saveWatchingProgress() async {
+    final videoPlayerController =
+        _betterPlayerController?.videoPlayerController;
+    final position = await videoPlayerController?.position;
+    final duration = await videoPlayerController?.value.duration;
+    final watchingDuration = position?.inSeconds ?? 0;
+    bool isFinished = true;
+
+    if (position != null && duration != null) {
+      final hasEnded = position >= duration;
+      if (hasEnded) {
+        isFinished = true;
+      } else {
+        isFinished = false;
+      }
+    }
+
+    // Gọi API hoặc lưu local ở đây
+    bool set = await HistoryRepository(ApiService()).addFilmHistory(
+      widget.film.slug,
+      widget.indexSelected,
+      isFinished,
+      watchingDuration,
+    );
+    if (set)
+      print("save film success");
+    else
+      print("save film fail");
   }
 
   @override

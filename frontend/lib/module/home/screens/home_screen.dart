@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/models/profile_model.dart';
+import 'package:frontend/models/profile/profile_model.dart';
 import 'package:frontend/module/home/screens/home_page.dart';
 import 'package:frontend/module/home/screens/search_page.dart';
+import 'package:frontend/module/home/widgets/horizontal_film_list.dart';
+import 'package:frontend/module/home/widgets/feature_banner.dart';
+import 'package:frontend/module/profile/screens/profile_screen.dart';
+import 'package:frontend/module/profile/widgets/button_avata.dart';
+import 'package:frontend/module/watching/screens/watching_screen.dart';
+import 'package:frontend/providers/film_provider.dart';
+import 'package:frontend/repositories/film_repository.dart';
+import 'package:frontend/services/api_services.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   final ProfileModel profile;
@@ -47,7 +55,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: Text("Home Screen", style: TextStyle(color: Colors.white)),
-        // actions: [Icon(Icons.delete)]
+        actions: [
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfileScreen()),
+              );
+            },
+            child: CircleAvatar(
+              radius: 24,
+              backgroundImage: AssetImage("assets/images/avatar-1.png"),
+            ),
+          ),
+        ],
       ),
       body: IndexedStack(index: _selectedIndex, children: _widgetOptions),
       bottomNavigationBar: BottomNavigationBar(
