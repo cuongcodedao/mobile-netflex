@@ -2,6 +2,7 @@ package com.project.backend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.Getter;
 
 import java.util.List;
 
@@ -30,22 +31,3 @@ class Imdb {
 }
 
 
-
-@Data
-class Episode {
-    private String server_name;
-
-    @JsonProperty("server_data")
-    private List<ServerData> serverData;
-
-}
-
-@Data
-class ServerData {
-    private String name;
-    private String slug;
-    private String filename;
-    private String link_embed;
-    private String link_m3u8;
-
-}

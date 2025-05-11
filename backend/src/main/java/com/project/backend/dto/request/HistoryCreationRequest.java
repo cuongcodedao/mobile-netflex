@@ -21,7 +21,7 @@ public class HistoryCreationRequest {
     @JsonProperty("watch_duration")
     int watchDuration;
 
-    int episode;
+    int episodeIndex;
 
     @NotNull
     @JsonProperty("profile_id")
