@@ -13,7 +13,7 @@ import java.util.List;
 public interface IAccountService {
     void deleteAccount(Long id);
     AccountResponse getAccountById(Long id);
-    AccountResponse updateAccount(AccountUpdateRequest accountUpdateRequest);
+    AccountResponse updateAccount(Long id, AccountUpdateRequest accountUpdateRequest);
     List<AccountResponse> getAllAccounts();
     AccountResponse createAccount(AccountCreationRequest accountCreationRequest) throws UserAlreadyExistsException;
     AuthResponse login(SignInRequest signInRequest);

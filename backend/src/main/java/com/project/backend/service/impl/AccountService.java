@@ -58,7 +58,7 @@ public class AccountService implements IAccountService {
     }
 
     @Override
-    @PostAuthorize("returnObject.id == authentication.id")
+    @PostAuthorize("returnObject.id == authentication.principal.id")
     public AccountResponse getAccountById(Long id) {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
@@ -156,9 +156,9 @@ public class AccountService implements IAccountService {
     }
 
     @Override
-    @PostAuthorize("returnObject.id == authentication.id")
-    public AccountResponse updateAccount(AccountUpdateRequest accountUpdateRequest) {
-        Account account = accountRepository.findById(accountUpdateRequest.getId())
+    @PostAuthorize("returnObject.id == authentication.principal.id")
+    public AccountResponse updateAccount(Long accountId, AccountUpdateRequest accountUpdateRequest) {
+        Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
         account.setUpdatedAt(LocalDateTime.now());
         accountMapper.updateAccount(account, accountUpdateRequest);
