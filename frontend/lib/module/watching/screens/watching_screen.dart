@@ -5,6 +5,7 @@ import 'package:frontend/module/watching/widgets/actions_button.dart';
 import 'package:frontend/module/watching/widgets/button_large.dart';
 import 'package:frontend/module/watching/widgets/episodes_and_collection_section.dart';
 import 'package:frontend/repositories/film_repository.dart';
+import 'package:frontend/repositories/my_list_repository.dart';
 import 'package:frontend/services/api_services.dart';
 
 class WatchingScreen extends StatefulWidget {
@@ -158,10 +159,26 @@ class _WatchingScreenState extends State<WatchingScreen> {
                     const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: const [
-                        ActionsButton(text: "My List", icon: Icons.add),
-                        ActionsButton(text: "Rate", icon: Icons.star_outline),
-                        ActionsButton(text: "Share", icon: Icons.share),
+                      children: [
+                        ActionsButton(
+                          text: "My List",
+                          icon: Icons.add,
+                          onTap: (){
+                            MyListRepository(
+                              ApiService(),
+                            ).addMyListFilm(film!.slug);
+                          },  
+                        ),
+                        ActionsButton(
+                          text: "Rate",
+                          icon: Icons.star_outline,
+                          onTap: (){},
+                        ),
+                        ActionsButton(
+                          text: "Share",
+                          icon: Icons.share,
+                          onTap: (){},
+                        ),
                       ],
                     ),
                   ],

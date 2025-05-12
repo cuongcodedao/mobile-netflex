@@ -3,12 +3,18 @@ import 'package:flutter/material.dart';
 class ActionsButton extends StatelessWidget {
   final String text;
   final IconData icon;
-  const ActionsButton({super.key, required this.text, required this.icon});
+  final VoidCallback onTap;
+  const ActionsButton({
+    super.key,
+    required this.text,
+    required this.icon,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: onTap,
       child: SizedBox(
         width: 80,
         child: Column(

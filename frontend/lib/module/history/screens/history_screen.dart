@@ -82,7 +82,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           if (episode == null) return const SizedBox.shrink();
 
                           return ItemFilmContinue(
-                            linearProgress: film.watchDuration / 100, // Ví dụ
+                            linearProgress: film.progress,
                             url: episode.posterUrl,
                             nameEspsode: episode.name,
                             onTap: () {

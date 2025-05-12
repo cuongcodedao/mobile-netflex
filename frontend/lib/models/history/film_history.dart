@@ -14,6 +14,8 @@ class FilmHistory {
   final String movieSlug;
   @JsonKey(name: 'watch_duration', defaultValue: 0)
   final int watchDuration;
+  @JsonKey(name: 'progress', defaultValue: 0.0)
+  final double progress;
   @JsonKey(name: 'episode')
   final EpisodeHistory? episodeHistory;
   @JsonKey(name: 'profile_id', defaultValue: 0)
@@ -33,6 +35,7 @@ class FilmHistory {
     required this.watchDuration,
     required this.episodeHistory,
     required this.profileId,
+    required this.progress,
     required this.lastWatch,
   });
 
@@ -40,28 +43,28 @@ class FilmHistory {
       _$FilmHistoryFromJson(json);
 
   Map<String, dynamic> toJson() => _$FilmHistoryToJson(this);
-
 }
-DateTime _dateTimeFromList(List<dynamic> list) {
-    return DateTime(
-      list[0] as int,
-      list[1] as int,
-      list[2] as int,
-      list[3] as int,
-      list[4] as int,
-      list[5] as int,
-      list[6] ~/ 1000000, // chuyển microseconds thành milliseconds
-    );
-  }
 
-  List<dynamic> _dateTimeToList(DateTime dt) {
-    return [
-      dt.year,
-      dt.month,
-      dt.day,
-      dt.hour,
-      dt.minute,
-      dt.second,
-      dt.millisecond * 1000, // trả về microseconds như backend yêu cầu
-    ];
-  }
+DateTime _dateTimeFromList(List<dynamic> list) {
+  return DateTime(
+    list[0] as int,
+    list[1] as int,
+    list[2] as int,
+    list[3] as int,
+    list[4] as int,
+    list[5] as int,
+    list[6] ~/ 1000000, // chuyển microseconds thành milliseconds
+  );
+}
+
+List<dynamic> _dateTimeToList(DateTime dt) {
+  return [
+    dt.year,
+    dt.month,
+    dt.day,
+    dt.hour,
+    dt.minute,
+    dt.second,
+    dt.millisecond * 1000, // trả về microseconds như backend yêu cầu
+  ];
+}
