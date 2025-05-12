@@ -26,5 +26,7 @@ public class HistoryResponse {
     @JsonProperty("last_watch")
     LocalDateTime lastWatch;
 
+    float progress;
+
     boolean finished;
 }

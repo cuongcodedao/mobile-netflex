@@ -78,6 +78,7 @@ public class AccountService implements IAccountService {
                 .orElseThrow(() -> new RuntimeException("Plan not found"));
         account.setCreatedAt(LocalDateTime.now());
         account.setCurrentPlan(plan);
+        account.setEnabled(true);
         account = accountRepository.save(account);
         return accountMapper.toAccountResponse(account);
     }
@@ -105,6 +106,10 @@ public class AccountService implements IAccountService {
         RefreshToken refreshToken = jwtUtils.createRefreshToken(userDetails.getUsername());
         Account account = accountRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new RuntimeException("Account not found"));
+
+        if(!account.isEnabled()) {
+            throw new AppException(ErrorCode.ACCOUNT_DISABLED);
+        }
 
         AccessLog accessLog = AccessLog.builder()
                 .account(account)
@@ -162,6 +167,10 @@ public class AccountService implements IAccountService {
                 .orElseThrow(() -> new RuntimeException("Account not found"));
         account.setUpdatedAt(LocalDateTime.now());
         accountMapper.updateAccount(account, accountUpdateRequest);
+        if (accountUpdateRequest.getPassword() != null) {
+            account.setPassword(passwordEncoder.encode(accountUpdateRequest.getPassword()));
+        }
+        accountRepository.save(account);
         return accountMapper.toAccountResponse(account);
     }
 

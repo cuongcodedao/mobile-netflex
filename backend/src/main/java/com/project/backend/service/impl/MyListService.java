@@ -23,13 +23,13 @@ public class MyListService implements IMyListService {
     @Override
     public boolean addToMyList(MyListCreationRequest myListCreationRequest) {
         Profile profile = profileRepository.findById(myListCreationRequest.getProfileId()).orElseThrow(() -> new RuntimeException("Profile not found"));
-        if(profile.getMyMovieList().contains(myListCreationRequest.getSlugMovie())) {
-            return true;
-        }
         StringBuilder myList = null;
         if(profile.getMyMovieList() == null || profile.getMyMovieList().trim().isEmpty()) {
             myList = new StringBuilder();
         } else {
+            if(profile.getMyMovieList().contains(myListCreationRequest.getSlugMovie())) {
+                return true;
+            }
             myList = new StringBuilder(profile.getMyMovieList());
         }
         myList.append(myListCreationRequest.getSlugMovie()).append(",");

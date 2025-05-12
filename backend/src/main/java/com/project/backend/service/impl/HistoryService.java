@@ -79,10 +79,17 @@ public class HistoryService implements IHistoryService {
                                 .link_m3u8(serverData.getLink_m3u8())
                                 .build();
                         dto.setEpisode(episode);
+                        String time = movieResponse.getMovie().getTime();
+                        if (time != null) {
+                            String[] timeParts = time.split(" ");
+                            int totalTime = Integer.parseInt(timeParts[0]) * 60;
+                            dto.setProgress((float) history.getWatchDuration() / totalTime);
+                        }
                     } catch (Exception e) {
                         // Ghi log nếu cần, không throw để không ảnh hưởng các phần tử khác
                         System.err.println("Error fetching movie for slug: " + history.getMovieSlug());
                     }
+
                     return dto;
                 }, executor))
                 .collect(Collectors.toList());
