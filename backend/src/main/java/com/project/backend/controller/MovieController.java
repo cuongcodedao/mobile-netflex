@@ -1,6 +1,7 @@
 package com.project.backend.controller;
 
 import com.project.backend.dto.response.*;
+import com.project.backend.service.IMovieService;
 import com.project.backend.service.impl.MovieService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MovieController {
 
-    private final MovieService movieService;
+    private final IMovieService movieService;
 
     @GetMapping(value = "/{slug}")
     public TemplateResponse<APIMovieResponse> getMovieBySlug(@PathVariable("slug") String slug) throws IOException {

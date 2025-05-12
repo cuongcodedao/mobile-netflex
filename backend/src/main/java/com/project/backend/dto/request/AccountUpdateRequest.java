@@ -13,7 +13,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AccountUpdateRequest {
-    @NotNull(message = "Account ID is required!")
     Long id;
 
     String password;

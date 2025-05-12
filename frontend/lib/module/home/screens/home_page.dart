@@ -5,6 +5,7 @@ import 'package:frontend/module/home/widgets/feature_banner.dart';
 import 'package:frontend/module/home/widgets/horizontal_film_list.dart';
 import 'package:frontend/module/watching/screens/watching_screen.dart';
 import 'package:frontend/repositories/film_repository.dart';
+import 'package:frontend/repositories/my_list_repository.dart';
 import 'package:frontend/services/api_services.dart';
 import 'package:frontend/models/profile/profile_model.dart';
 
@@ -47,8 +48,11 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> loadForYouFilms() async {
     try {
-      final profileId = widget.profile.id; // Access profile ID using widget.profile.id
-      forYouFilms = await filmRepository.getListFilmByFavorite(profileId!); // Add null check
+      final profileId =
+          widget.profile.id; // Access profile ID using widget.profile.id
+      forYouFilms = await filmRepository.getListFilmByFavorite(
+        profileId!,
+      ); // Add null check
       setState(() {});
     } catch (e) {
       print('Error loading For You films: $e');
@@ -88,8 +92,18 @@ class _HomePageState extends State<HomePage> {
               newFilms.length,
               (index) => BannerFilm(
                 imageUrl: "https://phimimg.com/${newFilms[index].urlPoster}",
-                genres: (newFilms[index].category?.map((e) => e.name).whereType<String>().toList()) ?? [],
-                onAddToList: () => print('Add to My List Film 1'),
+                genres:
+                    (newFilms[index].category
+                        ?.map((e) => e.name)
+                        .whereType<String>()
+                        .toList()) ??
+                    [],
+                onAddToList: () {
+                  print('Add to My List Film 1');
+                  MyListRepository(
+                    ApiService(),
+                  ).addMyListFilm(filmPage!.items[index].slug);
+                },
                 onPlay: () {
                   Navigator.push(
                     context,

@@ -3,6 +3,7 @@ package com.project.backend.service.impl;
 import com.project.backend.dto.UserDetailsImpl;
 import com.project.backend.dto.request.AccountCreationRequest;
 import com.project.backend.dto.request.AccountUpdateRequest;
+import com.project.backend.dto.request.LogoutRequest;
 import com.project.backend.dto.request.SignInRequest;
 import com.project.backend.dto.response.AccountResponse;
 import com.project.backend.dto.response.AuthResponse;
@@ -10,6 +11,7 @@ import com.project.backend.entity.AccessLog;
 import com.project.backend.entity.Account;
 import com.project.backend.entity.Plan;
 import com.project.backend.entity.RefreshToken;
+import com.project.backend.enums.DeviceType;
 import com.project.backend.exception.AppException;
 import com.project.backend.exception.ErrorCode;
 import com.project.backend.exception.UserAlreadyExistsException;
@@ -23,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -55,7 +58,7 @@ public class AccountService implements IAccountService {
     }
 
     @Override
-    @PostAuthorize("returnObject.id == authentication.id")
+    @PostAuthorize("returnObject.id == authentication.principal.id")
     public AccountResponse getAccountById(Long id) {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
@@ -75,6 +78,7 @@ public class AccountService implements IAccountService {
                 .orElseThrow(() -> new RuntimeException("Plan not found"));
         account.setCreatedAt(LocalDateTime.now());
         account.setCurrentPlan(plan);
+        account.setEnabled(true);
         account = accountRepository.save(account);
         return accountMapper.toAccountResponse(account);
     }
@@ -96,12 +100,27 @@ public class AccountService implements IAccountService {
         if(cnt>=userDetails.getCurrentPlan().getMaxNumberOfDeviceActive()){
             throw new AppException(ErrorCode.EXCEEDS_MAX_DEVICE_ACTIVE);
         }
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(userDetails.getUsername());
         RefreshToken refreshToken = jwtUtils.createRefreshToken(userDetails.getUsername());
         Account account = accountRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
+        if(!account.isEnabled()) {
+            throw new AppException(ErrorCode.ACCOUNT_DISABLED);
+        }
+
+        AccessLog accessLog = AccessLog.builder()
+                .account(account)
+                .deviceId(signInRequest.getDeviceId())
+                .active(true)
+                .lastLogin(LocalDateTime.now())
+                .deviceName(signInRequest.getDeviceName())
+                .deviceType(DeviceType.MOBILE)
+                .build();
+
+        accessLogRepository.save(accessLog);
         return AuthResponse.builder()
                 .account(accountMapper.toAccountResponse(account))
                 .accessToken(jwt)
@@ -128,13 +147,30 @@ public class AccountService implements IAccountService {
         return accountRepository.existsByEmail(email);
     }
 
+    @PreAuthorize("@userDetailsServiceImpl.loadUserByUsername(authentication.name).username == #logoutRequest.email")
     @Override
-    @PostAuthorize("returnObject.id == authentication.id")
-    public AccountResponse updateAccount(AccountUpdateRequest accountUpdateRequest) {
-        Account account = accountRepository.findById(accountUpdateRequest.getId())
+    public void logout(LogoutRequest logoutRequest) {
+        Account account = accountRepository.findByEmail(logoutRequest.getEmail());
+        if (account == null) {
+            throw new RuntimeException("Account not found");
+        }
+        AccessLog accessLog = accessLogRepository.findById(logoutRequest.getAccessLogId())
+                .orElseThrow(() -> new RuntimeException("Access log not found"));
+        accessLog.setActive(false);
+        jwtUtils.deleteRefreshToken(logoutRequest.getRefreshToken());
+    }
+
+    @Override
+    @PostAuthorize("returnObject.id == authentication.principal.id")
+    public AccountResponse updateAccount(Long accountId, AccountUpdateRequest accountUpdateRequest) {
+        Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
         account.setUpdatedAt(LocalDateTime.now());
         accountMapper.updateAccount(account, accountUpdateRequest);
+        if (accountUpdateRequest.getPassword() != null) {
+            account.setPassword(passwordEncoder.encode(accountUpdateRequest.getPassword()));
+        }
+        accountRepository.save(account);
         return accountMapper.toAccountResponse(account);
     }
 
@@ -145,6 +181,8 @@ public class AccountService implements IAccountService {
         account.setEnabled(false);
         accountRepository.save(account);
     }
+
+
 
 
 

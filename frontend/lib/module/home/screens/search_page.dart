@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:frontend/models/film/film.dart';
 import 'package:frontend/module/home/widgets/item_search.dart';
@@ -16,10 +15,16 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   late final FilmRepository filmRepository;
-  TextEditingController controller = TextEditingController();
+  final TextEditingController controller = TextEditingController();
   List<Film> films = [];
   bool isLoading = false;
   Timer? _debounce;
+
+  @override
+  void initState() {
+    super.initState();
+    filmRepository = FilmRepository(ApiService());
+  }
 
   void search() {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
@@ -31,18 +36,12 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    filmRepository = FilmRepository(ApiService()); // inject service
-  }
-
   Future<void> loadFilm() async {
     try {
-      films = await filmRepository.getSearchFilm(controller.text);
+      films = await filmRepository.getSearchFilm(controller.text.trim());
     } catch (e) {
       films = [];
-      print('Error loading search film page: $e');
+      debugPrint('Error loading search film page: $e');
     } finally {
       setState(() => isLoading = false);
     }
@@ -50,45 +49,72 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 50),
-              child: SearchBar(
-                controller: controller,
-                leading: Icon(Icons.search),
-                onChanged: (value) {
-                  search();
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      child: Column(
+        children: [
+          // Custom Search Input
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white12,
+              borderRadius: BorderRadius.circular(30),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: TextField(
+              controller: controller,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                icon: Icon(Icons.search, color: Colors.white),
+                hintText: "Search for films...",
+                hintStyle: TextStyle(color: Colors.white54),
+                border: InputBorder.none,
+              ),
+              onChanged: (value) {
+                search();
+              },
+            ),
+          ),
+
+          const SizedBox(height: 30),
+
+          // Loading indicator
+          if (isLoading)
+            const Center(
+              child: CircularProgressIndicator(color: Colors.redAccent),
+            )
+          // No result text
+          else if (films.isEmpty && controller.text.isNotEmpty)
+            const Padding(
+              padding: EdgeInsets.only(top: 50),
+              child: Text(
+                "No results found.",
+                style: TextStyle(color: Colors.white60, fontSize: 18),
+              ),
+            )
+          // List of films
+          else
+            Expanded(
+              child: ListView.separated(
+                itemCount: films.length,
+                itemBuilder: (context, index) {
+                  final film = films[index];
+                  return ItemSearch(
+                    urlPoster: "https://phimimg.com/${film.urlPoster}",
+                    name: film.name,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => WatchingScreen(slug: film.slug),
+                        ),
+                      );
+                    },
+                  );
                 },
+                separatorBuilder: (_, __) => const SizedBox(height: 16),
               ),
             ),
-            (isLoading)
-                ? CircularProgressIndicator()
-                : Column(
-                  children: List.generate(
-                    films.length,
-                    (index) => ItemSearch(
-                      urlPoster:
-                          "https://phimimg.com/${films[index].urlPoster}",
-                      name: films[index].name,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    WatchingScreen(slug: films[index].slug),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-          ],
-        ),
+        ],
       ),
     );
   }

@@ -104,4 +104,11 @@ public class JWTUtils {
         }
     }
 
+    public void deleteRefreshToken(String token) {
+        RefreshToken refreshToken = refreshTokenRepository.findByRefreshToken(token)
+                .orElseThrow(() -> new RuntimeException("Refresh token not found"));
+        refreshTokenRepository.delete(refreshToken);
+    }
+
+
 }

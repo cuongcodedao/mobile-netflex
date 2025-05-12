@@ -3,18 +3,23 @@ import 'package:frontend/models/episode/episode_data.dart';
 import 'package:frontend/models/film/film.dart';
 import 'package:frontend/module/watching/widgets/episodes_and_collection_section.dart';
 import 'package:better_player_plus/better_player_plus.dart';
+import 'package:frontend/repositories/film_repository.dart';
 import 'package:frontend/repositories/history_repository.dart';
 import 'package:frontend/services/api_services.dart';
 
 class PlayingFilmPage extends StatefulWidget {
-  final Film film;
-  final EpisodeData episode;
+  final String? slug;
+  final Film? film;
+  final EpisodeData? episode;
   final int indexSelected;
+  final int? watchDuration;
   const PlayingFilmPage({
     super.key,
-    required this.film,
-    required this.episode,
+    this.film,
+    this.episode,
     required this.indexSelected,
+    this.slug,
+    this.watchDuration,
   });
 
   @override
@@ -23,6 +28,9 @@ class PlayingFilmPage extends StatefulWidget {
 
 class _PlayingFilmPageState extends State<PlayingFilmPage> {
   BetterPlayerController? _betterPlayerController;
+  bool isLoading = true;
+  Film? _film;
+  EpisodeData? _episode;
 
   final TextStyle textLarge = TextStyle(
     fontSize: 23,
@@ -39,10 +47,44 @@ class _PlayingFilmPageState extends State<PlayingFilmPage> {
   @override
   void initState() {
     super.initState();
-    print("So tap cua phim: " + widget.film.listEpisodes.length.toString());
+    if (widget.slug != null) {
+      loadFilm();
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      BetterPlayerDataSource dataSource = BetterPlayerDataSource(
+        BetterPlayerDataSourceType.network,
+        widget.episode!.link_m3u8,
+        videoFormat: BetterPlayerVideoFormat.hls,
+      );
+      _betterPlayerController = BetterPlayerController(
+        BetterPlayerConfiguration(
+          aspectRatio: 16 / 9,
+          autoPlay: true,
+          fit: BoxFit.contain,
+          controlsConfiguration: BetterPlayerControlsConfiguration(
+            enableFullscreen: true,
+            enablePlayPause: true,
+            enableMute: true,
+          ),
+        ),
+        betterPlayerDataSource: dataSource,
+      );
+    }
+  }
+
+  void loadFilm() async {
+    Film f = await FilmRepository(ApiService()).getFilm(widget.slug!);
+    setState(() {
+      _film = f;
+      _episode = _film!.listEpisodes[0].serverData[widget.indexSelected];
+      ;
+      isLoading = false;
+    });
     BetterPlayerDataSource dataSource = BetterPlayerDataSource(
       BetterPlayerDataSourceType.network,
-      widget.episode.link_m3u8,
+      _episode!.link_m3u8,
       videoFormat: BetterPlayerVideoFormat.hls,
     );
     _betterPlayerController = BetterPlayerController(
@@ -58,105 +100,111 @@ class _PlayingFilmPageState extends State<PlayingFilmPage> {
       ),
       betterPlayerDataSource: dataSource,
     );
+
+    _betterPlayerController!.addEventsListener((event) {
+      if (event.betterPlayerEventType == BetterPlayerEventType.initialized) {
+        _betterPlayerController!.seekTo(
+          Duration(seconds: widget.watchDuration ?? 0),
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
-    _betterPlayerController?.dispose();
     _saveWatchingProgress();
     super.dispose();
   }
 
   void _saveWatchingProgress() async {
-    final videoPlayerController =
-        _betterPlayerController?.videoPlayerController;
-    final position = await videoPlayerController?.position;
-    final duration = await videoPlayerController?.value.duration;
-    final watchingDuration = position?.inSeconds ?? 0;
-    bool isFinished = true;
+    final videoPlayerController = _betterPlayerController?.videoPlayerController;
 
-    if (position != null && duration != null) {
-      final hasEnded = position >= duration;
-      if (hasEnded) {
-        isFinished = true;
-      } else {
-        isFinished = false;
-      }
-    }
+    // Kiểm tra nếu controller không tồn tại
+    if (videoPlayerController == null) return;
 
-    // Gọi API hoặc lưu local ở đây
+    final duration = videoPlayerController.value.duration;
+    final position = await videoPlayerController.position;
+
+    // Nếu thiếu dữ liệu thì thoát
+    if (duration == null || position == null || duration.inSeconds == 0) return;
+
+    final watchingDuration = position.inSeconds;
+    final progressPercent = position.inSeconds / duration.inSeconds;
+
+    // Kiểm tra video đã xem xong chưa (chênh lệch <= 1 giây)
+    const tolerance = Duration(seconds: 1);
+    final isFinished = (duration - position).abs() <= tolerance;
+
+    // Gửi dữ liệu đến server
     bool set = await HistoryRepository(ApiService()).addFilmHistory(
-      widget.film.slug,
+    (widget.slug == null) ? widget.film!.slug : _film!.slug,
       widget.indexSelected,
       isFinished,
       watchingDuration,
+      // progressPercent, // <-- thêm vào đây nếu API hỗ trợ
     );
-    if (set)
-      print("save film success");
-    else
-      print("save film fail");
+
+    if (set) {
+    print("Save film success. Progress: ${progressPercent.toStringAsFixed(2)}");
+  } else {
+    print("Save film fail");
+  }
+
+    _betterPlayerController?.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    if (isLoading) {
+    return const Scaffold(
       backgroundColor: Colors.black,
-      body: SingleChildScrollView(
+      body: Center(child: CircularProgressIndicator(color: Colors.redAccent)),
+    );
+  }
+
+  return Scaffold(
+    backgroundColor: Colors.black,
+    body: SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child:
-                  _betterPlayerController == null
-                      ? SizedBox(
-                        height: 150,
-                        child: Center(child: CircularProgressIndicator()),
-                      )
-                      : AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: BetterPlayer(
-                          controller: _betterPlayerController!,
-                        ),
-                      ),
+            // Video Player
+            AspectRatio(
+              aspectRatio: 16 / 9,
+              child: _betterPlayerController == null
+                  ? const Center(child: CircularProgressIndicator())
+                  : BetterPlayer(controller: _betterPlayerController!),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-              child: SizedBox(
-                width: double.infinity,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      child: Text(widget.film.originName, style: textLarge),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      child: Text(
-                        widget.film.yearOfRelease.toString(),
-                        style: textMedium,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      child: Text(
-                        "S5:E10 Nothing Remains The Same",
-                        style: headerMedium,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            const SizedBox(height: 20),
+
+            // Film Info
+            Text(
+              (widget.slug == null)
+                  ? widget.film!.originName
+                  : _film!.originName,
+              style: textLarge,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-              child: EpisodesAndCollectionSection(
-                film: widget.film,
-                episodeSelected: widget.indexSelected,
-              ),
+            const SizedBox(height: 5),
+            Text(
+              "${(widget.slug == null) ? widget.film!.yearOfRelease : _film!.yearOfRelease}",
+              style: textMedium.copyWith(color: Colors.grey[400]),
+            ),
+            const SizedBox(height: 10),
+
+            // Episode & Collection Section
+            Divider(color: Colors.grey[700]),
+            EpisodesAndCollectionSection(
+              film: (widget.slug == null) ? widget.film! : _film!,
+              episodeSelected: widget.indexSelected,
             ),
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

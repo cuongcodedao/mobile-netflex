@@ -7,14 +7,18 @@ part of 'film_history.dart';
 // **************************************************************************
 
 FilmHistory _$FilmHistoryFromJson(Map<String, dynamic> json) => FilmHistory(
-  id: (json['id'] as num?)?.toInt(),
+  id: (json['id'] as num?)?.toInt() ?? 0,
   episode: (json['episodeIndex'] as num).toInt(),
   finished: json['finished'] as bool,
-  movieSlug: json['movie_slug'] as String,
-  watchDuration: (json['watch_duration'] as num).toInt(),
-  movie: Film.fromJson(json['movie'] as Map<String, dynamic>),
-  profileId: (json['profile_id'] as num).toInt(),
-  lastWatch: DateTime.parse(json['last_watch'] as String),
+  movieSlug: json['movie_slug'] as String? ?? '',
+  watchDuration: (json['watch_duration'] as num?)?.toInt() ?? 0,
+  episodeHistory:
+      json['episode'] == null
+          ? null
+          : EpisodeHistory.fromJson(json['episode'] as Map<String, dynamic>),
+  profileId: (json['profile_id'] as num?)?.toInt() ?? 0,
+  progress: (json['progress'] as num?)?.toDouble() ?? 0.0,
+  lastWatch: _dateTimeFromList(json['last_watch'] as List),
 );
 
 Map<String, dynamic> _$FilmHistoryToJson(FilmHistory instance) =>
@@ -24,7 +28,8 @@ Map<String, dynamic> _$FilmHistoryToJson(FilmHistory instance) =>
       'episodeIndex': instance.episode,
       'movie_slug': instance.movieSlug,
       'watch_duration': instance.watchDuration,
-      'movie': instance.movie,
+      'progress': instance.progress,
+      'episode': instance.episodeHistory,
       'profile_id': instance.profileId,
-      'last_watch': instance.lastWatch.toIso8601String(),
+      'last_watch': _dateTimeToList(instance.lastWatch),
     };

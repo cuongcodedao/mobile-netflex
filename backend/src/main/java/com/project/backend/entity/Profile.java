@@ -30,5 +30,7 @@ public class Profile {
     @ManyToOne
     @JoinColumn(nullable = false)
     Account account;
+
+    String myMovieList;
 }
 

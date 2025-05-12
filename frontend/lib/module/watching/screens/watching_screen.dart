@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/film/film.dart';
+import 'package:frontend/module/watching/screens/playing_film_page.dart';
 import 'package:frontend/module/watching/widgets/actions_button.dart';
+import 'package:frontend/module/watching/widgets/button_large.dart';
 import 'package:frontend/module/watching/widgets/episodes_and_collection_section.dart';
-import 'package:frontend/module/watching/widgets/film_info.dart';
 import 'package:frontend/repositories/film_repository.dart';
+import 'package:frontend/repositories/my_list_repository.dart';
 import 'package:frontend/services/api_services.dart';
 
 class WatchingScreen extends StatefulWidget {
@@ -22,20 +24,16 @@ class _WatchingScreenState extends State<WatchingScreen> {
   @override
   void initState() {
     super.initState();
-    filmRepository = FilmRepository(ApiService()); // inject service
+    filmRepository = FilmRepository(ApiService());
     loadFilm();
   }
 
   Future<void> loadFilm() async {
     try {
-      Film filmt = await filmRepository.getFilm(widget.slug);
-      ;
+      final fetchedFilm = await filmRepository.getFilm(widget.slug);
       setState(() {
-        film = filmt;
+        film = fetchedFilm;
       });
-      if (film != null) {
-        print("So tap cua phim: " + film!.listEpisodes.length.toString());
-      }
     } catch (e) {
       print('Error loading film: $e');
     } finally {
@@ -45,45 +43,159 @@ class _WatchingScreenState extends State<WatchingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
+    if (isLoading || film == null) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
+
     return Scaffold(
       backgroundColor: Colors.black,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              height: 260,
-              color: Colors.blue,
-              child: FittedBox(
-                fit: BoxFit.fill,
-                child: Image.network(film!.urlThumb),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // Banner with overlay and title
+              Stack(
+                children: [
+                  SizedBox(
+                    height: 260,
+                    width: double.infinity,
+                    child: Image.network(
+                      film!.urlThumb,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          'assets/images/not_found.png',
+                          fit: BoxFit.cover,
+                        );
+                      },
+                    ),
+                  ),
+                  Container(
+                    height: 260,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.black.withOpacity(0.3),
+                          Colors.black.withOpacity(0.8),
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 20,
+                    left: 16,
+                    right: 16,
+                    child: Text(
+                      film!.originName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                ],
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: FilmInfo(film: film!),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-              child: SizedBox(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+
+              const SizedBox(height: 20),
+
+              // Play and download buttons
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
                   children: [
-                    ActionsButton(text: "My List", icon: Icons.add),
-                    ActionsButton(text: "Rate", icon: Icons.handshake),
-                    ActionsButton(text: "Share", icon: Icons.share),
+                    ButtonLarge(
+                      text: "Play",
+                      icons: Icons.play_arrow,
+                      colorsBackground: Colors.redAccent,
+                      colorsText: Colors.white,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => PlayingFilmPage(
+                              film: film,
+                              episode: film!.listEpisodes[0].serverData[0],
+                              indexSelected: 0,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    ButtonLarge(
+                      text: "Download",
+                      icons: Icons.download,
+                      colorsBackground: Colors.grey[800]!,
+                      colorsText: Colors.white70,
+                      onTap: () {},
+                    ),
                   ],
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: EpisodesAndCollectionSection(film: film!),
-            ),
-          ],
+
+              const SizedBox(height: 20),
+
+              // Film info
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "${film!.yearOfRelease}",
+                      style: const TextStyle(color: Colors.white70, fontSize: 16),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      film!.content,
+                      style: const TextStyle(color: Colors.white, fontSize: 15),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ActionsButton(
+                          text: "My List",
+                          icon: Icons.add,
+                          onTap: (){
+                            MyListRepository(
+                              ApiService(),
+                            ).addMyListFilm(film!.slug);
+                          },  
+                        ),
+                        ActionsButton(
+                          text: "Rate",
+                          icon: Icons.star_outline,
+                          onTap: (){},
+                        ),
+                        ActionsButton(
+                          text: "Share",
+                          icon: Icons.share,
+                          onTap: (){},
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Episodes and collection section
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: EpisodesAndCollectionSection(film: film!),
+              ),
+
+              const SizedBox(height: 32),
+            ],
+          ),
         ),
       ),
     );
