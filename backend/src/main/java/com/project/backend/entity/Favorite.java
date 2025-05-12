@@ -21,7 +21,7 @@ public class Favorite {
     @JoinColumn(nullable = false)
     private Profile profile;
 
-    private String movieSlug;
+    private String categorySlug;
 
 }
 

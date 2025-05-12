@@ -1,6 +1,7 @@
 package com.project.backend.controller;
 
 import com.project.backend.dto.response.*;
+import com.project.backend.service.IMovieService;
 import com.project.backend.service.impl.MovieService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MovieController {
 
-    private final MovieService movieService;
+    private final IMovieService movieService;
 
     @GetMapping(value = "/{slug}")
     public TemplateResponse<APIMovieResponse> getMovieBySlug(@PathVariable("slug") String slug) throws IOException {
@@ -61,6 +62,14 @@ public class MovieController {
     @GetMapping(value = "/search")
     public TemplateResponse<List<Movie>> searchMovie(@RequestParam(value = "keyword") String keyword) throws IOException {
         List<Movie> response = movieService.searchMovie(keyword);
+        return TemplateResponse.<List<Movie>>builder()
+                .result(response)
+                .build();
+    }
+
+    @GetMapping(value = "/favorite/{profileId}")
+    public TemplateResponse<List<Movie>> getMoviesByUserFavorites(@PathVariable("profileId") Long profileId) throws IOException {
+        List<Movie> response = movieService.getMoviesByUserFavorites(profileId);
         return TemplateResponse.<List<Movie>>builder()
                 .result(response)
                 .build();

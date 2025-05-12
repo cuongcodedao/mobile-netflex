@@ -20,5 +20,5 @@ Map<String, dynamic> _$ProfileModelToJson(ProfileModel instance) =>
       'username': instance.username,
       'avatar': instance.avatar,
       'kid': instance.kid,
-      'accountId': instance.accountId,
+      'accountId': instance.accountId
     };

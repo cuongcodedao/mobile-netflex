@@ -10,4 +10,5 @@ import java.util.List;
 public interface HistoryRepository extends JpaRepository<History, Long> {
     List<History> findAllByProfileId(Long profileId);
     void deleteAllByProfileId(Long profileId);
+    History findByMovieSlugAndProfileIdAndEpisodeIndex(String movieSlug, Long profileId, int episode);
 }

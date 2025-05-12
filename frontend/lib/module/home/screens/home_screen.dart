@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/models/film/film_page.dart';
+import 'package:frontend/models/profile_model.dart';
 import 'package:frontend/module/home/screens/home_page.dart';
 import 'package:frontend/module/home/screens/search_page.dart';
 import 'package:frontend/module/home/widgets/horizontal_film_list.dart';
@@ -13,7 +13,9 @@ import 'package:frontend/repositories/film_repository.dart';
 import 'package:frontend/services/api_services.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({super.key});
+  final ProfileModel profile;
+
+  const HomeScreen({super.key, required this.profile});
 
   @override
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
@@ -27,11 +29,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.initState();
   }
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    HomePage(),
-    Text('🔍 Search', style: TextStyle(fontSize: 24, color: Colors.white)),
-    SearchPage(),
-    Text('Setting Page', style: TextStyle(fontSize: 24, color: Colors.white)),
+  List<Widget> get _widgetOptions => [
+    HomePage(profile: widget.profile),
+    const Text(
+      '🔍 Search',
+      style: TextStyle(fontSize: 24, color: Colors.white),
+    ),
+    const SearchPage(),
+    const Text(
+      'Setting Page',
+      style: TextStyle(fontSize: 24, color: Colors.white),
+    ),
   ];
 
   void _onItemTapped(int index) {
@@ -62,7 +70,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
       ),
-      body: _widgetOptions[_selectedIndex],
+      body: IndexedStack(index: _selectedIndex, children: _widgetOptions),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed, // <- QUAN TRỌNG
         backgroundColor: Colors.black,

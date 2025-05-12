@@ -1,6 +1,7 @@
 import 'package:frontend/models/profile_model.dart';
 import 'package:frontend/services/api_services.dart';
 import 'package:frontend/models/auth.dart';
+import 'package:frontend/models/film/category.dart';
 
 class ProfileRepository {
   final ApiService apiService;
@@ -29,6 +30,7 @@ class ProfileRepository {
     required String avatar,
     required bool kid,
     required int accountId,
+    List<Category>? favoriteGenres,
   }) async {
     try {
       final response = await apiService.post(
@@ -38,6 +40,7 @@ class ProfileRepository {
           "avatar": avatar,
           "kid": kid,
           "account_id": accountId,
+          "favorite_genres": favoriteGenres?.map((genre) => genre.slug).toList(),
         },
       );
       print('Add profile response: ${response.data}');

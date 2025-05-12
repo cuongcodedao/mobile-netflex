@@ -4,6 +4,7 @@ import com.project.backend.dto.request.ProfileCreationRequest;
 import com.project.backend.dto.request.ProfileUpdateRequest;
 import com.project.backend.dto.response.ProfileResponse;
 import com.project.backend.entity.Account;
+import com.project.backend.entity.Favorite;
 import com.project.backend.entity.Profile;
 import com.project.backend.exception.AppException;
 import com.project.backend.exception.ErrorCode;
@@ -14,6 +15,7 @@ import com.project.backend.service.IProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,6 +27,15 @@ public class ProfileService implements IProfileService {
 
     public ProfileResponse createProfile(ProfileCreationRequest creationRequest) {
         Profile profile = profileMapper.toProfile(creationRequest);
+        List<Favorite> favorites = new ArrayList<>();
+        for(String categorySlug: creationRequest.getFavorite_genres()){
+            Favorite favorite = Favorite.builder()
+                    .categorySlug(categorySlug)
+                    .profile(profile)
+                    .build();
+            favorites.add(favorite);
+        }
+        profile.setFavorites(favorites);
         Account account = accountRepository.findById(creationRequest.getAccountId())
                 .orElseThrow(() -> new RuntimeException("Account not found"));
         List<Profile> existingProfiles = profileRepository.findAllByAccountId(account.getId());
@@ -41,6 +52,10 @@ public class ProfileService implements IProfileService {
         return profiles.stream()
                 .map(profileMapper::toProfileResponse)
                 .toList();
+    }
+    public Profile getProfileById(Long id) {
+        return profileRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
     }
 
     public ProfileResponse updateProfile(ProfileUpdateRequest profileUpdateRequest) {

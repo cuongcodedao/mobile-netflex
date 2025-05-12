@@ -1,4 +1,4 @@
-package com.project.backend.dto;
+package com.project.backend.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,8 +8,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FavoriteDTO {
-    Long id;
-    String categorySlug;
+public class MyListCreationRequest {
+
     Long profileId;
+    String slugMovie;
 }

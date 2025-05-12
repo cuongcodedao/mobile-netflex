@@ -1,7 +1,8 @@
-package com.project.backend.dto;
+package com.project.backend.dto.request;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.project.backend.dto.response.Movie;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -13,12 +14,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class HistoryDTO {
+public class HistoryCreationRequest {
     Long id;
     @JsonProperty("movie_slug")
     String movieSlug;
     @JsonProperty("watch_duration")
     int watchDuration;
+
+    int episodeIndex;
 
     @NotNull
     @JsonProperty("profile_id")

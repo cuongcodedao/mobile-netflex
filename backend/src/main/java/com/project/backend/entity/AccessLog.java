@@ -35,6 +35,7 @@ public class AccessLog {
     private String location;
     private boolean active;
     private LocalDateTime lastLogin;
+
 }
 
 

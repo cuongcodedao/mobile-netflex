@@ -36,8 +36,9 @@ public class AccountController {
 
 
     @PutMapping("/{id}")
-    public TemplateResponse<AccountResponse> updateAccount(@RequestBody @Valid AccountUpdateRequest accountUpdateRequest) {
-        AccountResponse response = accountService.updateAccount(accountUpdateRequest);
+    public TemplateResponse<AccountResponse> updateAccount(@RequestBody @Valid AccountUpdateRequest accountUpdateRequest,
+                                                          @PathVariable Long id) {
+        AccountResponse response = accountService.updateAccount(id, accountUpdateRequest);
         return TemplateResponse.<AccountResponse>builder()
                 .result(response)
                 .build();
