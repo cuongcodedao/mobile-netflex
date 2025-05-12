@@ -1,10 +1,10 @@
 import 'dart:convert'; // Import jsonEncode
 import 'package:dio/dio.dart'; // Import Options từ thư viện dioauthrep
 import 'package:frontend/models/token/token.dart';
-import 'package:frontend/models/user_model.dart';
+import 'package:frontend/models/auth/user_model.dart';
 
 import 'dart:developer';
-import 'package:frontend/models/auth.dart'; // đổi tên file thành auth.dart
+import 'package:frontend/models/auth/auth.dart'; // đổi tên file thành auth.dart
 import 'package:frontend/services/api_services.dart';
 import 'package:frontend/services/storage_service.dart';
 
@@ -110,5 +110,55 @@ class AuthRepository {
       print('Login error: $e');
       rethrow;
     }
+  }
+  // Hàm lấy thông tin người dùng bằng accountId
+  Future<UserModel> getUserInfo(int accountId) async {
+    try {
+      final response = await apiService.get('/api/v1/account/$accountId');
+      final authResponse = Auth<UserModel>.fromJson(
+        response.data,
+        (json) => UserModel.fromJson(json as Map<String, dynamic>),
+      );
+      return authResponse.result;
+    } catch (e) {
+      print('Get user info error: $e');
+      rethrow;
+    }
+  }
+  // Hàm cập nhật thông tin như firstName, lastName và mật khẩu
+Future<Map<String, dynamic>> updateUserInfo({
+  required int id,
+  String? firstName,
+  String? lastName,
+  String? password,
+}) async {
+  try {
+    final response = await apiService.put(
+      '/api/v1/account/$id',
+      {
+        'id': id,
+        'firstName': firstName,
+        'lastName': lastName,
+        'password': password,
+      },
+    );
+
+    // Trả về nguyên bản response data từ server
+    return response.data as Map<String, dynamic>;
+  } catch (e) {
+    print('Update user info error: $e');
+    rethrow;
+  }
+}
+  // Hàm xóa tài khoản 
+  Future<Map<String, dynamic>> deleteAccount(int id) async {
+    try {
+      final response = await apiService.delete('/api/v1/account/$id');
+        // Trả về nguyên bản response data từ server
+    return response.data as Map<String, dynamic>;
+  } catch (e) {
+    print('Update user info error: $e');
+    rethrow;
+  }
   }
 }

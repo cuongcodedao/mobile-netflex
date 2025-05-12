@@ -1,6 +1,6 @@
-import 'package:frontend/models/profile_model.dart';
+import 'package:frontend/models/profile/profile_model.dart';
 import 'package:frontend/services/api_services.dart';
-import 'package:frontend/models/auth.dart';
+import 'package:frontend/models/auth/auth.dart';
 import 'package:frontend/models/film/category.dart';
 
 class ProfileRepository {
@@ -47,6 +47,20 @@ class ProfileRepository {
       return ProfileModel.fromJson(response.data['result']);
     } catch (e) {
       print('Error adding profile: $e');
+      rethrow;
+    }
+  }
+  Future<bool> deleteProfile(int profileId) async {
+    try {
+      final response = await apiService.delete('/api/v1/profile/$profileId');
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
+      } else {
+        print('Error deleting profile: ${response.data}');
+        return false;
+      }
+    } catch (e) {
+      print('Error deleting profile: $e');
       rethrow;
     }
   }

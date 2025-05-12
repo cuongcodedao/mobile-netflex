@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/models/user_model.dart';
+import 'package:frontend/models/auth/user_model.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/providers/profile_provider.dart';
 import 'package:frontend/module/notify/screens/error-notify.dart';
+import 'package:frontend/services/storage_service.dart';
 import '../widgets/custom_textfield.dart';
 import '../widgets/custom_button.dart';
 import 'sign_up_screen.dart';
@@ -45,93 +46,93 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _handleLogin() async {
-  final email = _emailController.text.trim();
-  final password = _passwordController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
 
-  // Kiểm tra thông tin đầu vào
-  if (email.isEmpty || password.isEmpty) {
-    showErrorNotify(
-      context,
-      'Thiếu thông tin',
-      'Vui lòng nhập email và mật khẩu.',
-    );
-    return;
-  }
-
-  if (password.length < 8) {
-    showErrorNotify(
-      context,
-      'Mật khẩu không hợp lệ',
-      'Mật khẩu phải có ít nhất 8 ký tự.',
-    );
-    return;
-  }
-
-  try {
-    final authRepository = ref.read(authRepositoryProvider);
-    final loginResult = await authRepository.login(
-      email: email,
-      password: password,
-    );
-
-    final accountId = loginResult['accountId'] as int;
-    print('Login successful, accountId: $accountId');
-
-    // Lấy danh sách profiles
-    print('Fetching profiles for accountId: $accountId');
-    final profiles = await ref.read(profileProvider(accountId).future);
-    print('Fetched profiles: $profiles');
-
-    // Điều hướng tới ProfileSelectionScreen
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ProfileSelectionScreen(
-          profiles: profiles,
-          accountId: accountId,
-        ),
-      ),
-    );
-  } catch (e) {
-    _handleLoginError(e);
-  }
-}
-
-// Hàm xử lý lỗi đăng nhập
-void _handleLoginError(dynamic e) {
-  //print('Login error: $e');
-  String errorMessage = 'An unknown error occurred';
-
-  if (e is DioException) {
-    print('DioException: ${e.message}');
-    if (e.response != null) {
-      print('Response data: ${e.response?.data}');
-
-      final responseData = e.response?.data;
-      if (responseData is Map<String, dynamic>) {
-        if (responseData.containsKey('code')) {
-          errorMessage = responseData['code'].toString();
-        } else {
-          errorMessage = 'An unknown error occurred';
-        }
-          
-      } else if (responseData != null) {
-        errorMessage = responseData.toString();
-      }
-    } else {
-      errorMessage = e.message ?? 'An unknown Dio error occurred';
+    // Kiểm tra thông tin đầu vào
+    if (email.isEmpty || password.isEmpty) {
+      showErrorNotify(
+        context,
+        'Thiếu thông tin',
+        'Vui lòng nhập email và mật khẩu.',
+      );
+      return;
     }
-  } 
-  if (errorMessage == '1008') {
-    errorMessage = 'Sai mật khẩu, vui lòng thử lại';
-  }
-  showErrorNotify(
-    context,
-    'Đăng nhập thất bại',
-    errorMessage,
-  );
-}
 
+    if (password.length < 8) {
+      showErrorNotify(
+        context,
+        'Mật khẩu không hợp lệ',
+        'Mật khẩu phải có ít nhất 8 ký tự.',
+      );
+      return;
+    }
+
+    try {
+      final authRepository = ref.read(authRepositoryProvider);
+      final loginResult = await authRepository.login(
+        email: email,
+        password: password,
+      );
+
+      final accountId = loginResult['accountId'] as int;
+      print('Login successful, accountId: $accountId');
+      // Lưu vao StorageService
+      StorageService().saveUserInfo(accountId); // Lưu accountId vào StorageService
+
+      // Lấy danh sách profiles
+      print('Fetching profiles for accountId: $accountId');
+      final profiles = await ref.read(profileProvider(accountId).future);
+      print('Fetched profiles: $profiles');
+
+      // Điều hướng tới ProfileSelectionScreen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (context) => ProfileSelectionScreen(
+                profiles: profiles,
+                accountId: accountId,
+              ),
+        ),
+      );
+    } catch (e) {
+      _handleLoginError(e);
+    }
+  }
+
+  // Hàm xử lý lỗi đăng nhập
+  void _handleLoginError(dynamic e) {
+    //print('Login error: $e');
+    String errorMessage = 'An unknown error occurred';
+
+    if (e is DioException) {
+      print('DioException: ${e.message}');
+      if (e.response != null) {
+        print('Response data: ${e.response?.data}');
+
+        final responseData = e.response?.data;
+        if (responseData is Map<String, dynamic>) {
+          if (responseData.containsKey('code')) {
+            errorMessage = responseData['code'].toString();
+          } else {
+            errorMessage = 'An unknown error occurred';
+          }
+        } else if (responseData != null) {
+          errorMessage = responseData.toString();
+        }
+      } else {
+        errorMessage = e.message ?? 'An unknown Dio error occurred';
+      }
+    }
+    if (errorMessage == '1008') {
+      errorMessage = 'Sai mật khẩu, vui lòng thử lại';
+    }
+    if (errorMessage == '1007') {
+      errorMessage = 'Tài khoản đã bị khóa, vui lòng liên hệ với quản trị viên';
+    }
+    showErrorNotify(context, 'Đăng nhập thất bại', errorMessage);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -218,7 +219,9 @@ void _handleLoginError(dynamic e) {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => SignUpScreen()),
+                          MaterialPageRoute(
+                            builder: (context) => SignUpScreen(),
+                          ),
                         );
                       },
                       backgroundColor: Colors.transparent,

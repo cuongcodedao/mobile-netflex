@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/models/profile_model.dart';
+import 'package:frontend/models/profile/profile_model.dart';
 import 'package:frontend/module/home/screens/home_page.dart';
 import 'package:frontend/module/home/screens/search_page.dart';
 import 'package:frontend/module/home/widgets/horizontal_film_list.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/models/profile_model.dart';
+import 'package:frontend/models/profile/profile_model.dart';
 import 'package:frontend/repositories/profile_repository.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/services/storage_service.dart'; // Import apiServiceProvider từ auth_provider

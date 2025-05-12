@@ -17,6 +17,10 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('userId', userId);
   }
+  Future<int?> getUserInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('userId');
+  }
 
   Future<void> saveProfileId(int profileId) async {
     final prefs = await SharedPreferences.getInstance();

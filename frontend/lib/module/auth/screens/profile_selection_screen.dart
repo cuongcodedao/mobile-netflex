@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/models/profile_model.dart'; // Import ProfileModel
+import 'package:frontend/models/profile/profile_model.dart'; // Import ProfileModel
 import 'package:frontend/module/auth/screens/add_profile_screen.dart';
 import 'package:frontend/module/home/screens/home_screen.dart';
 import 'package:frontend/services/storage_service.dart';

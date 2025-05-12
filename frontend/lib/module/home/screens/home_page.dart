@@ -7,7 +7,7 @@ import 'package:frontend/module/watching/screens/watching_screen.dart';
 import 'package:frontend/repositories/film_repository.dart';
 import 'package:frontend/repositories/my_list_repository.dart';
 import 'package:frontend/services/api_services.dart';
-import 'package:frontend/models/profile_model.dart';
+import 'package:frontend/models/profile/profile_model.dart';
 
 class HomePage extends StatefulWidget {
   final ProfileModel profile;

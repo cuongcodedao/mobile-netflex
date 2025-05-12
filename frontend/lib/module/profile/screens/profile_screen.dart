@@ -1,16 +1,22 @@
+import 'dart:ffi';
+import 'package:frontend/module/account/screens/manager_account_screen.dart';
+import 'package:frontend/providers/profile_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/module/account/screens/manager_profile_screen.dart';
 import 'package:frontend/module/history/screens/history_screen.dart';
 import 'package:frontend/module/home/screens/my_list_page.dart';
 import 'package:frontend/module/profile/widgets/button_icon.dart';
+import 'package:frontend/services/storage_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +56,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 30),
 
             InkWell(
-              onTap: () {},
+              onTap: () => _handleGotoManagerProfile(context),
               borderRadius: BorderRadius.circular(10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -101,7 +107,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ButtonIcon(
               text: "Account",
               icon: Icons.person_outline,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ManagerAccountScreen(),
+                  ),
+                );
+              },
             ),
             ButtonIcon(
               text: "Help Center",
@@ -129,4 +142,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+
+  Future<void> _handleGotoManagerProfile(BuildContext context) async {
+    try {
+      StorageService storageService = StorageService();
+      int? accountId = await storageService.getUserInfo();
+      if (accountId == null) {
+        print('Account ID không tồn tại');
+        return;
+      }
+
+      final profiles = await ref.read(profileProvider(accountId).future);
+      print('Fetched profiles: $profiles');
+
+      // Chuyển sang màn hình ManagerProfileScreen nếu cần
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ManagerProfileScreen(
+            accountId: accountId,
+            profiles: profiles,
+          ),
+        ),
+      );
+    } catch (e) {
+      print('Error fetching profiles: $e');
+    }
+  }
 }
+

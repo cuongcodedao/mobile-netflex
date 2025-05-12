@@ -3,10 +3,10 @@ import 'dart:convert';
 
 class ApiService {
   final Dio _dio = Dio(
-    BaseOptions(baseUrl: 'https://d4fa-14-245-240-46.ngrok-free.app'),
-
+    BaseOptions(baseUrl: 'https://e7ea-14-245-240-46.ngrok-free.app'),
   );
   String? _accessToken; // Biến lưu trữ accessToken
+
 
   ApiService() {
     // Remove hardcoded accessToken initialization
@@ -55,7 +55,7 @@ class ApiService {
     }
   }
 
-// Hàm POST
+  // Hàm POST
   Future<Response> post(
     String endpoint,
     Map<String, dynamic> data, {
@@ -63,16 +63,91 @@ class ApiService {
   }) async {
     try {
       print('Request URL: ${_dio.options.baseUrl}$endpoint');
-      print('Request headers: ${options?.headers ?? {'Authorization': 'Bearer $_accessToken', 'Content-Type': 'application/json'}}');
+      print(
+        'Request headers: ${options?.headers ?? {'Authorization': 'Bearer $_accessToken', 'Content-Type': 'application/json'}}',
+      );
       print('Request body: $data');
 
       final response = await _dio.post(
         endpoint,
         data: data, // Để Dio tự chuyển Map thành JSON
-        options: options ??
+        options:
+            options ??
             Options(
               headers: {
-                if (_accessToken != null) 'Authorization': 'Bearer $_accessToken',
+                if (_accessToken != null)
+                  'Authorization': 'Bearer $_accessToken',
+                'Content-Type': 'application/json',
+              },
+            ),
+      );
+
+      print('Response status code: ${response.statusCode}');
+      print('Response data: ${response.data}');
+      return response;
+    } on DioException catch (e) {
+      // Ném lại DioException để xử lý ở phần gọi hàm
+      throw e;
+    }
+  }
+
+  // Hàm DELETE
+  Future<Response> delete(
+    String endpoint, {
+    Map<String, dynamic>? data,
+    String? token,
+  }) async {
+    try {
+      print('Request URL: ${_dio.options.baseUrl}$endpoint');
+      print(
+        'Request headers: ${token != null ? {'Authorization': 'Bearer $token'} : {'Authorization': 'Bearer $_accessToken'}}',
+      );
+      print('Request body: $data');
+
+      final response = await _dio.delete(
+        endpoint,
+        data: data,
+        options: Options(
+          headers: {
+            if (token != null)
+              'Authorization': 'Bearer $token'
+            else if (_accessToken != null)
+              'Authorization': 'Bearer $_accessToken',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      print('Response status code: ${response.statusCode}');
+      print('Response data: ${response.data}');
+      return response;
+    } on DioException catch (e) {
+      print('DELETE request failed: ${e.message}');
+      throw Exception('DELETE request failed: ${e.message}');
+    }
+  }
+  // Hàm PUT
+  Future<Response> put(
+    String endpoint,
+    Map<String, dynamic> data, {
+    Options? options,
+  }) async {
+    try {
+      print('Request URL: ${_dio.options.baseUrl}$endpoint');
+      print(
+        'Request headers: ${options?.headers ?? {'Authorization': 'Bearer $_accessToken', 'Content-Type': 'application/json'}}',
+      );
+      print('Request body: $data');
+
+      final response = await _dio.put(
+        endpoint,
+        data: data,
+        options:
+            options ??
+            Options(
+              headers: {
+                if (_accessToken != null)
+                  'Authorization': 'Bearer $_accessToken',
                 'Content-Type': 'application/json',
               },
             ),
@@ -87,3 +162,4 @@ class ApiService {
     }
   }
 }
+
