@@ -5,6 +5,7 @@ import 'package:frontend/module/home/widgets/feature_banner.dart';
 import 'package:frontend/module/home/widgets/horizontal_film_list.dart';
 import 'package:frontend/module/watching/screens/watching_screen.dart';
 import 'package:frontend/repositories/film_repository.dart';
+import 'package:frontend/repositories/my_list_repository.dart';
 import 'package:frontend/services/api_services.dart';
 import 'package:frontend/models/profile_model.dart';
 

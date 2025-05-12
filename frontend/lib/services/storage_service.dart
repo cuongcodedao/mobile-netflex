@@ -18,6 +18,16 @@ class StorageService {
     await prefs.setInt('userId', userId);
   }
 
+  Future<void> saveProfileId(int profileId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('profileId', profileId);
+  }
+
+  Future<int?> getProfileId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('profileId');
+  }
+
   // Lấy token
   Future<String?> getAccessToken() async {
     final prefs = await SharedPreferences.getInstance();

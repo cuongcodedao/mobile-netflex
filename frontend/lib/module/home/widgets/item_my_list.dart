@@ -7,7 +7,7 @@ class ItemMyList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       child: Slidable(
         endActionPane: ActionPane(
           motion: const ScrollMotion(),
@@ -21,22 +21,71 @@ class ItemMyList extends StatelessWidget {
             ),
           ],
         ),
-        child: ListTile(
-          leading: SizedBox(
-            height: 300,
-            child: FittedBox(
-              fit: BoxFit.fitWidth,
-              child: Image.network("https://marketplace.canva.com/EAFTl0ixW_k/1/0/1131w/canva-black-white-minimal-alone-movie-poster-YZ-0GJ13Nc8.jpg"),
-            ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.grey[900],
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
-          title: Text(
-            "Filmm",
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 24, color: Colors.white),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.horizontal(
+                  left: Radius.circular(12),
+                ),
+                child: Image.network(
+                  "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/movie-poste",
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/images/not_found.png',
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        "Filmm Title",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        "Short description or episode info",
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-      )
-      ,
+      ),
     );
   }
 }
