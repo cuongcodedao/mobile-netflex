@@ -29,7 +29,7 @@ class HistoryRepository {
         "profile_id": profileId,
         "last_watch": DateTime.now().toUtc().toIso8601String(),
       },
-)}");
+    )}");
 
     try {
       final response = await apiService.post(

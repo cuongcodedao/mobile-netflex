@@ -4,6 +4,7 @@ import 'package:frontend/module/home/widgets/feature_banner.dart';
 import 'package:frontend/module/home/widgets/horizontal_film_list.dart';
 import 'package:frontend/module/watching/screens/watching_screen.dart';
 import 'package:frontend/repositories/film_repository.dart';
+import 'package:frontend/repositories/my_list_repository.dart';
 import 'package:frontend/services/api_services.dart';
 
 class HomePage extends StatefulWidget {
@@ -63,7 +64,9 @@ class _HomePageState extends State<HomePage> {
               (index) => BannerFilm(
                 imageUrl: filmPage!.items[index].urlPoster,
                 genres: ['Action', 'Adventure'],
-                onAddToList: () => print('Add to My List Film 1'),
+                onAddToList: (){
+                  MyListRepository(ApiService()).addMyListFilm(filmPage!.items[index].slug);
+                },
                 onPlay: () {
                   Navigator.push(
                     context,

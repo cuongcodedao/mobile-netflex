@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 
 class ItemFilmContinue extends StatelessWidget {
   final double linearProgress;
+  final String url;
+  final String nameEspsode;
   final VoidCallback onTap;
   const ItemFilmContinue({
     super.key,
     required this.linearProgress,
+    required this.url,
+    required this.nameEspsode,
     required this.onTap,
   });
 
@@ -24,8 +28,14 @@ class ItemFilmContinue extends StatelessWidget {
             children: [
               Expanded(
                 child: Image.network(
-                  "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/movie-poster-template-design-21a1c803fe4ff4b858de24f5c91ec57f_screen.jpg?ts=1636996180",
+                  url,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/images/not_found.png', // ảnh thay thế
+                      fit: BoxFit.cover,
+                    );
+                  },
                 ),
               ),
               LinearProgressIndicator(
@@ -34,10 +44,24 @@ class ItemFilmContinue extends StatelessWidget {
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
                 minHeight: 4,
               ),
+              Container(
+                height: 30,
+                color: Colors.black87,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Text(
+                    nameEspsode,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 19
+                    ),
+                  ),
+                )
+              )
             ],
           ),
         ),
-      )
+      ),
     );
   }
 }
