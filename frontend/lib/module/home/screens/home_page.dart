@@ -102,7 +102,7 @@ class _HomePageState extends State<HomePage> {
                   print('Add to My List Film 1');
                   MyListRepository(
                     ApiService(),
-                  ).addMyListFilm(filmPage!.items[index].slug);
+                  ).addMyListFilm(newFilms[index].slug);
                 },
                 onPlay: () {
                   Navigator.push(
@@ -110,7 +110,7 @@ class _HomePageState extends State<HomePage> {
                     MaterialPageRoute(
                       builder:
                           (context) =>
-                              WatchingScreen(slug: filmPage!.items[index].slug),
+                              WatchingScreen(slug: newFilms[index].slug),
                     ),
                   );
                 },
