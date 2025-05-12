@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/module/notify/screens/error-notify.dart';
+import 'package:frontend/module/notify/screens/success-notify.dart';
 import 'package:frontend/providers/profile_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/models/profile/profile_model.dart';
@@ -83,43 +84,12 @@ class ManagerProfileScreen extends ConsumerWidget {
     );
   }
 
-  // Future<void> _handleDeleteTap(BuildContext context, WidgetRef ref, ProfileModel profile) async {
-  //   bool? result = await showWarningNotify(
-  //     context,
-  //     'Cảnh báo',
-  //     'Bạn có muốn xóa profile ${profile.username} không?',
-  //   );
-
-  //   if (result == false) {
-  //     return;
-  //   }
-
-  //   try {
-  //     final profileRepository = ref.read(profileRepositoryProvider);
-  //     bool deleteSuccess = await profileRepository.deleteProfile(profile.id!);
-
-  //     if (deleteSuccess) {
-  //       print('Profile ${profile.username} đã được xóa.');
-  //       // Cập nhật lại danh sách profile
-  //       profiles.removeWhere((p) => p.id == profile.id);
-
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(
-  //           content: Text('Đã xóa profile.'),
-  //           backgroundColor: Colors.green,
-  //         ),
-  //       );
-  //     } else {
-  //       showErrorNotify(context, 'Lỗi', 'Không thể xóa profile. Vui lòng thử lại sau.');
-
-  //     }
-  //   } catch (e) {
-  //     print('Error deleting profile: $e');
-  //     showErrorNotify(context, 'Lỗi', 'Không thể xóa profile. Vui lòng thử lại sau.');
-  //   }
-  // }
-
 Future<void> _handleDeleteTap(BuildContext context, WidgetRef ref, ProfileModel profile) async {
+  // kiểm tra không cho xóa neetus chỉ còn lại 1 profile
+  if (profiles.length <= 1) {
+    showErrorNotify(context, 'Lỗi', 'Không thể xóa profile. Vui lòng thêm profile khác.');
+    return;
+  }
   bool? result = await showWarningNotify(
     context,
     'Cảnh báo',
@@ -135,12 +105,8 @@ Future<void> _handleDeleteTap(BuildContext context, WidgetRef ref, ProfileModel 
     bool deleteSuccess = await profileRepository.deleteProfile(profile.id!);
 
     if (deleteSuccess) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Đã xóa profile.'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      
+      
      // Cập nhật danh sách profile
      profiles.removeWhere((p) => p.id == profile.id);
       // Load lại trang
@@ -153,6 +119,7 @@ Future<void> _handleDeleteTap(BuildContext context, WidgetRef ref, ProfileModel 
           ),
         ),
       );
+      showSuccessNotify(context, 'Thành công', 'Đã xóa profile ${profile.username}.');
     } else {
       showErrorNotify(context, 'Lỗi', 'Không thể xóa profile. Vui lòng thử lại sau.');
     }

@@ -128,6 +128,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (errorMessage == '1008') {
       errorMessage = 'Sai mật khẩu, vui lòng thử lại';
     }
+    if (errorMessage == '1007') {
+      errorMessage = 'Tài khoản đã bị khóa, vui lòng liên hệ với quản trị viên';
+    }
     showErrorNotify(context, 'Đăng nhập thất bại', errorMessage);
   }
 

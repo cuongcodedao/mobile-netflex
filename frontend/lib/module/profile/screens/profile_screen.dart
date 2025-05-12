@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'package:frontend/module/account/screens/manager_account_screen.dart';
 import 'package:frontend/providers/profile_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/module/account/screens/manager_profile_screen.dart';
@@ -97,7 +98,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 icon: Icons.settings,
                 onTap: () {},
               ),
-              ButtonIcon(text: "Account", icon: Icons.person, onTap: () {}),
+              ButtonIcon(text: "Account", icon: Icons.person, onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ManagerAccountScreen()),
+                );
+              }),
               ButtonIcon(text: "Help", icon: Icons.help, onTap: () {}),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 50),
