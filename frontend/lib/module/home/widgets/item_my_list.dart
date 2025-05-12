@@ -2,7 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 class ItemMyList extends StatelessWidget {
-  const ItemMyList({super.key});
+  final String nameFilm;
+  final String content;
+  final String url;
+  const ItemMyList({
+    super.key,
+    required this.nameFilm,
+    required this.content,
+    required this.url,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +48,7 @@ class ItemMyList extends StatelessWidget {
                   left: Radius.circular(12),
                 ),
                 child: Image.network(
-                  "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/movie-poste",
+                  url,
                   width: 100,
                   height: 100,
                   fit: BoxFit.cover,
@@ -60,9 +68,9 @@ class ItemMyList extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
-                        "Filmm Title",
+                        nameFilm,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -73,7 +81,7 @@ class ItemMyList extends StatelessWidget {
                       ),
                       SizedBox(height: 6),
                       Text(
-                        "Short description or episode info",
+                        content,
                         style: TextStyle(fontSize: 14, color: Colors.grey),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,

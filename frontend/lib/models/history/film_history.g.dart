@@ -17,6 +17,7 @@ FilmHistory _$FilmHistoryFromJson(Map<String, dynamic> json) => FilmHistory(
           ? null
           : EpisodeHistory.fromJson(json['episode'] as Map<String, dynamic>),
   profileId: (json['profile_id'] as num?)?.toInt() ?? 0,
+  progress: (json['progress'] as num?)?.toDouble() ?? 0.0,
   lastWatch: _dateTimeFromList(json['last_watch'] as List),
 );
 
@@ -27,6 +28,7 @@ Map<String, dynamic> _$FilmHistoryToJson(FilmHistory instance) =>
       'episodeIndex': instance.episode,
       'movie_slug': instance.movieSlug,
       'watch_duration': instance.watchDuration,
+      'progress': instance.progress,
       'episode': instance.episodeHistory,
       'profile_id': instance.profileId,
       'last_watch': _dateTimeToList(instance.lastWatch),

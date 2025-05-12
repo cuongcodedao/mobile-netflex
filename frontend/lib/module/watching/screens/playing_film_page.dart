@@ -117,42 +117,38 @@ class _PlayingFilmPageState extends State<PlayingFilmPage> {
   }
 
   void _saveWatchingProgress() async {
-    final videoPlayerController =
-        _betterPlayerController?.videoPlayerController;
-    final position = await videoPlayerController?.position;
-    final duration = videoPlayerController?.value.duration;
-    final watchingDuration = position?.inSeconds ?? 0;
-    bool isFinished = true;
+    final videoPlayerController = _betterPlayerController?.videoPlayerController;
 
+    // Kiểm tra nếu controller không tồn tại
+    if (videoPlayerController == null) return;
 
-    // Đảm bảo controller tồn tại
-    if (videoPlayerController != null) {
-      final duration = videoPlayerController.value.duration;
-      final position = await videoPlayerController.position;
+    final duration = videoPlayerController.value.duration;
+    final position = await videoPlayerController.position;
 
-      // Kiểm tra video đã xem xong chưa (cho phép chênh lệch nhỏ vài giây)
-      const tolerance = Duration(seconds: 1); // cho phép lệch 1 giây
-      if (position != null &&
-        duration != null &&
-        (duration - position).abs() <= tolerance) {
-        print("Video đã xem xong");
-        isFinished = true;
-      } else {
-        print("Video chưa xem xong");
-        isFinished = false;
-      }
-    }
+    // Nếu thiếu dữ liệu thì thoát
+    if (duration == null || position == null || duration.inSeconds == 0) return;
 
+    final watchingDuration = position.inSeconds;
+    final progressPercent = position.inSeconds / duration.inSeconds;
+
+    // Kiểm tra video đã xem xong chưa (chênh lệch <= 1 giây)
+    const tolerance = Duration(seconds: 1);
+    final isFinished = (duration - position).abs() <= tolerance;
+
+    // Gửi dữ liệu đến server
     bool set = await HistoryRepository(ApiService()).addFilmHistory(
-      (widget.slug == null) ? widget.film!.slug : _film!.slug,
+    (widget.slug == null) ? widget.film!.slug : _film!.slug,
       widget.indexSelected,
       isFinished,
       watchingDuration,
+      // progressPercent, // <-- thêm vào đây nếu API hỗ trợ
     );
-    if (set)
-      print("save film success");
-    else
-      print("save film fail");
+
+    if (set) {
+    print("Save film success. Progress: ${progressPercent.toStringAsFixed(2)}");
+  } else {
+    print("Save film fail");
+  }
 
     _betterPlayerController?.dispose();
   }

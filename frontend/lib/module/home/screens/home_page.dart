@@ -48,8 +48,11 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> loadForYouFilms() async {
     try {
-      final profileId = widget.profile.id; // Access profile ID using widget.profile.id
-      forYouFilms = await filmRepository.getListFilmByFavorite(profileId!); // Add null check
+      final profileId =
+          widget.profile.id; // Access profile ID using widget.profile.id
+      forYouFilms = await filmRepository.getListFilmByFavorite(
+        profileId!,
+      ); // Add null check
       setState(() {});
     } catch (e) {
       print('Error loading For You films: $e');
@@ -89,8 +92,18 @@ class _HomePageState extends State<HomePage> {
               newFilms.length,
               (index) => BannerFilm(
                 imageUrl: "https://phimimg.com/${newFilms[index].urlPoster}",
-                genres: (newFilms[index].category?.map((e) => e.name).whereType<String>().toList()) ?? [],
-                onAddToList: () => print('Add to My List Film 1'),
+                genres:
+                    (newFilms[index].category
+                        ?.map((e) => e.name)
+                        .whereType<String>()
+                        .toList()) ??
+                    [],
+                onAddToList: () {
+                  print('Add to My List Film 1');
+                  MyListRepository(
+                    ApiService(),
+                  ).addMyListFilm(filmPage!.items[index].slug);
+                },
                 onPlay: () {
                   Navigator.push(
                     context,
