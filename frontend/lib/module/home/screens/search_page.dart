@@ -5,6 +5,7 @@ import 'package:frontend/module/home/widgets/item_search.dart';
 import 'package:frontend/module/watching/screens/watching_screen.dart';
 import 'package:frontend/repositories/film_repository.dart';
 import 'package:frontend/services/api_services.dart';
+import 'package:shimmer/shimmer.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -77,43 +78,92 @@ class _SearchPageState extends State<SearchPage> {
 
           const SizedBox(height: 30),
 
-          // Loading indicator
-          if (isLoading)
-            const Center(
-              child: CircularProgressIndicator(color: Colors.redAccent),
-            )
-          // No result text
-          else if (films.isEmpty && controller.text.isNotEmpty)
-            const Padding(
-              padding: EdgeInsets.only(top: 50),
-              child: Text(
-                "No results found.",
-                style: TextStyle(color: Colors.white60, fontSize: 18),
-              ),
-            )
-          // List of films
-          else
-            Expanded(
-              child: ListView.separated(
-                itemCount: films.length,
-                itemBuilder: (context, index) {
-                  final film = films[index];
-                  return ItemSearch(
-                    urlPoster: "https://phimimg.com/${film.urlPoster}",
-                    name: film.name,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => WatchingScreen(slug: film.slug),
+          Expanded(
+            child:
+                // Loading indicator
+                (isLoading)
+                    ? ListView.builder(
+                      itemCount: 6,
+                      itemBuilder:
+                          (_, index) => Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Shimmer.fromColors(
+                              baseColor: Colors.grey.shade800,
+                              highlightColor: Colors.grey.shade600,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          height: 100,
+                          width: 100,
                         ),
-                      );
-                    },
-                  );
-                },
-                separatorBuilder: (_, __) => const SizedBox(height: 16),
-              ),
-            ),
+                        const SizedBox(width: 10),
+                        Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              height: 30,
+                              width: 200,
+                            ),
+                            SizedBox(height: 10,),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              height: 30,
+                              width: 200,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                            ),
+                          ),
+                    )
+                    :
+                    // No result text
+                    (films.isEmpty && controller.text.isNotEmpty)
+                    ? const Padding(
+                      padding: EdgeInsets.only(top: 50),
+                      child: Text(
+                        "No results found.",
+                        style: TextStyle(color: Colors.white60, fontSize: 18),
+                      ),
+                    )
+                    // List of films
+                    : Expanded(
+                      child: ListView.separated(
+                        itemCount: films.length,
+                        itemBuilder: (context, index) {
+                          final film = films[index];
+                          return ItemSearch(
+                            urlPoster: "https://phimimg.com/${film.urlPoster}",
+                            name: film.name,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) => WatchingScreen(slug: film.slug),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                        separatorBuilder: (_, __) => const SizedBox(height: 16),
+                      ),
+                    ),
+          ),
         ],
       ),
     );
