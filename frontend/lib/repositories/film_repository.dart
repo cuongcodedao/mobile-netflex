@@ -106,7 +106,6 @@ class FilmRepository {
         token: accessToken
       );
 
-
       final List<dynamic> results = response.data['result'] ?? [];
       List<Film> films = [];
       for (int i = 0; i < results.length; ++i) {

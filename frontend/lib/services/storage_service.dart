@@ -53,4 +53,20 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
   }
+
+
+  Future<void> setHandledSubscriptionSuccess(String subscriptionId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(subscriptionId, true);
+  }
+
+  Future<bool> hasHandledSubscriptionSuccess(String subscriptionId) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(subscriptionId) ?? false;
+  }
+
+  Future<void> resetHandledSubscriptionSuccess(String subscriptionId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(subscriptionId);
+  }
 }
