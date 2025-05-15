@@ -9,6 +9,7 @@ import 'package:frontend/module/profile/widgets/button_icon.dart';
 import 'package:frontend/services/storage_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/module/subscription/manage_subscription_screen.dart';
+import 'package:get/get.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -24,10 +25,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        foregroundColor: Colors.redAccent,
         elevation: 0,
         title: const Text(
           "Profile & More",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.redAccent,
+            fontFamily: "Montserrat",
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
       ),
@@ -66,7 +72,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   SizedBox(width: 10),
                   Text(
                     "Manage Profile",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontFamily: "Montserrat",
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
@@ -91,19 +101,24 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               text: "My List",
               icon: Icons.favorite_border,
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MyListPage()),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => MyListPage()),
+                // );
+                Get.to(() => MyListPage(), transition: Transition.rightToLeft);
               },
             ),
             ButtonIcon(
               text: "History",
               icon: Icons.history,
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HistoryScreen()),
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => HistoryScreen()),
+                // );
+                Get.to(
+                  () => HistoryScreen(),
+                  transition: Transition.rightToLeft,
                 );
               },
             ),
@@ -116,12 +131,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               text: "Account",
               icon: Icons.person_outline,
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ManagerAccountScreen(),
-                  ),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => const ManagerAccountScreen(),
+                //   ),
+                // );
+                Get.to(()=> ManagerAccountScreen(), transition: Transition.rightToLeft);
               },
             ),
             ButtonIcon(
@@ -140,6 +156,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 "Sign Out",
                 style: TextStyle(
                   fontSize: 22,
+                  fontFamily: "Montserrat",
                   color: Colors.redAccent,
                   fontWeight: FontWeight.w500,
                 ),
@@ -167,10 +184,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ManagerProfileScreen(
-            accountId: accountId,
-            profiles: profiles,
-          ),
+          builder:
+              (context) => ManagerProfileScreen(
+                accountId: accountId,
+                profiles: profiles,
+              ),
         ),
       );
     } catch (e) {
@@ -178,4 +196,3 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 }
-

@@ -34,6 +34,7 @@ class ButtonLarge extends StatelessWidget {
                 text,
                 style: TextStyle(
                   fontSize: 23,
+                  fontFamily: "Montserrat",
                   fontWeight: FontWeight.bold,
                   color: colorsText,
                 ),

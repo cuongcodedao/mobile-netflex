@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/models/episode/episode_data.dart';
 import 'package:frontend/models/film/film.dart';
 import 'package:frontend/module/watching/screens/playing_film_page.dart';
 import 'package:frontend/module/watching/widgets/button_pick.dart';
@@ -22,6 +23,7 @@ class EpisodesAndCollectionSection extends StatefulWidget {
 class _EpisodesAndCollectionSectionState
     extends State<EpisodesAndCollectionSection> {
   int tabIndexSelected = 0;
+  List<EpisodeData> episodes = [];
 
   List<String> get tabTitles => [
     "Episodes",
@@ -29,6 +31,16 @@ class _EpisodesAndCollectionSectionState
     "More Like This",
     "Trailer & More",
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      if (widget.film.listEpisodes.isNotEmpty) {
+        episodes = widget.film.listEpisodes[0].serverData;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +80,7 @@ class _EpisodesAndCollectionSectionState
                       style: TextStyle(
                         color: isSelected ? Colors.white : Colors.white70,
                         fontWeight: FontWeight.bold,
+                        fontFamily: "Montserrat",
                       ),
                     ),
                   ),
@@ -104,8 +117,22 @@ class _EpisodesAndCollectionSectionState
   }
 
   Widget _buildEpisodesList() {
-    final episodes = widget.film.listEpisodes[0].serverData;
-
+    if (episodes.isEmpty) {
+      return Center(
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Image.asset(
+            'assets/images/404 DinoStyle.gif',
+            fit: BoxFit.cover,
+            width: 300,
+            height: 300,
+          ),
+        ),
+      );
+    }
     return Column(
       children: List.generate(
         episodes.length,
@@ -148,7 +175,11 @@ class _EpisodesAndCollectionSectionState
       child: Center(
         child: Text(
           message,
-          style: const TextStyle(color: Colors.white60, fontSize: 16),
+          style: const TextStyle(
+            color: Colors.white60,
+            fontSize: 16,
+            fontFamily: "Montserrat",
+          ),
         ),
       ),
     );

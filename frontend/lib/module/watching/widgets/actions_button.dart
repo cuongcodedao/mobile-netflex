@@ -23,7 +23,14 @@ class ActionsButton extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 5),
               child: Icon(icon, color: Colors.white),
             ),
-            Text(text, style: TextStyle(fontSize: 18, color: Colors.grey)),
+            Text(
+              text,
+              style: TextStyle(
+                fontSize: 18,
+                fontFamily: "Montserrat",
+                color: Colors.grey,
+              ),
+            ),
           ],
         ),
       ),

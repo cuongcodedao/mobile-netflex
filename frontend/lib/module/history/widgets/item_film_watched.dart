@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ItemFilmWatched extends StatelessWidget {
   final String url;
@@ -21,6 +22,24 @@ class ItemFilmWatched extends StatelessWidget {
             return Image.asset(
               'assets/images/not_found.png', // ảnh thay thế
               fit: BoxFit.cover,
+              frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                if (wasSynchronouslyLoaded || frame != null) return child;
+                return Shimmer.fromColors(
+                  baseColor: Colors.grey.shade800,
+                  highlightColor: Colors.grey.shade600,
+                  child: Container(
+                    color: Colors.white,
+                    width: 160,
+                    height: 180,
+                  ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return Image.asset(
+                  'assets/images/not_found.png', // ảnh thay thế
+                  fit: BoxFit.cover,
+                );
+              },
             );
           },
         ),
