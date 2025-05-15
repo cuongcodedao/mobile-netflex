@@ -39,6 +39,7 @@ class FeatureBanner extends StatelessWidget {
                       clipBehavior: Clip.antiAlias,
                       child: Image.network(
                         films[index].imageUrl,
+                        width: double.infinity,
                         fit: BoxFit.cover,
                         frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
                           if (wasSynchronouslyLoaded || frame != null) return child;
