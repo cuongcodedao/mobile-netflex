@@ -19,14 +19,19 @@ class ButtonIcon extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.grey,
+            color: Colors.redAccent,
             borderRadius: BorderRadius.circular(10),
           ),
           child: ListTile(
             leading: Icon(icon, color: Colors.white),
             title: Text(
               text,
-              style: TextStyle(fontSize: 23, color: Colors.white),
+              style: TextStyle(
+                fontFamily: "Montserrat",
+                fontWeight: FontWeight.bold,
+                fontSize: 23,
+                color: Colors.white,
+              ),
             ),
             trailing: Icon(Icons.arrow_right, color: Colors.white),
           ),

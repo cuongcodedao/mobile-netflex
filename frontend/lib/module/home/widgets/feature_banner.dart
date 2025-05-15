@@ -86,6 +86,7 @@ class FeatureBanner extends StatelessWidget {
                                     genre,
                                     style: const TextStyle(
                                       fontSize: 14,
+                                      fontFamily: "Montserrat",
                                       color: Colors.white,
                                     ),
                                   ),
@@ -110,6 +111,7 @@ class FeatureBanner extends StatelessWidget {
                                   "My List",
                                   style: TextStyle(
                                     color: Colors.white,
+                                    fontFamily: "Montserrat",
                                     fontSize: 12,
                                   ),
                                 ),
