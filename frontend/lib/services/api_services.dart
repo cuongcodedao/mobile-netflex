@@ -5,7 +5,7 @@ class ApiService {
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl:
-          'https://94a9-2001-ee0-4c5d-f900-18fc-bb18-6d4a-70f3.ngrok-free.app',
+          'https://85b9-2001-ee0-4c5d-f900-18fc-bb18-6d4a-70f3.ngrok-free.app',
     ),
   );
   String? _accessToken; // Biến lưu trữ accessToken
