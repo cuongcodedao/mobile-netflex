@@ -4,9 +4,11 @@ import 'package:frontend/module/watching/screens/playing_film_page.dart';
 import 'package:frontend/module/watching/widgets/actions_button.dart';
 import 'package:frontend/module/watching/widgets/button_large.dart';
 import 'package:frontend/module/watching/widgets/episodes_and_collection_section.dart';
+import 'package:frontend/module/watching/widgets/loading_waching.dart';
 import 'package:frontend/repositories/film_repository.dart';
 import 'package:frontend/repositories/my_list_repository.dart';
 import 'package:frontend/services/api_services.dart';
+import 'package:shimmer/shimmer.dart';
 
 class WatchingScreen extends StatefulWidget {
   final String slug;
@@ -43,17 +45,26 @@ class _WatchingScreenState extends State<WatchingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading || film == null) {
-      return const Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: SingleChildScrollView(
+        child:
+        (isLoading)
+        ? LoadingWaching()
+        : (film == null)
+        ? Center(
+          child: Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            clipBehavior: Clip.antiAlias,
+            child: Image.asset(
+              'assets/images/404 DinoStyle.gif',
+              fit: BoxFit.cover,
+              width: 300,
+              height: 300,
+            ),
+          )
+        )
+        : SingleChildScrollView(
           child: Column(
             children: [
               // Banner with overlay and title
@@ -65,9 +76,21 @@ class _WatchingScreenState extends State<WatchingScreen> {
                     child: Image.network(
                       film!.urlThumb,
                       fit: BoxFit.cover,
+                      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                        if (wasSynchronouslyLoaded || frame != null) return child;
+                        return Shimmer.fromColors(
+                          baseColor: Colors.grey.shade800,
+                          highlightColor: Colors.grey.shade600,
+                          child: Container(
+                            color: Colors.white,
+                            width: 300,
+                            height: 300,
+                          ),
+                        );
+                      },
                       errorBuilder: (context, error, stackTrace) {
                         return Image.asset(
-                          'assets/images/not_found.png',
+                          'assets/images/not_found.png', // ảnh thay thế
                           fit: BoxFit.cover,
                         );
                       },
@@ -94,11 +117,12 @@ class _WatchingScreenState extends State<WatchingScreen> {
                       film!.originName,
                       style: const TextStyle(
                         color: Colors.white,
+                        fontFamily: "Montserrat",
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
 
@@ -118,9 +142,13 @@ class _WatchingScreenState extends State<WatchingScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => PlayingFilmPage(
+                            builder:
+                          (_) => PlayingFilmPage(
                               film: film,
-                              episode: film!.listEpisodes[0].serverData[0],
+                              episode:
+                              film!
+                              .listEpisodes[0]
+                              .serverData[0],
                               indexSelected: 0,
                             ),
                           ),
@@ -149,12 +177,20 @@ class _WatchingScreenState extends State<WatchingScreen> {
                   children: [
                     Text(
                       "${film!.yearOfRelease}",
-                      style: const TextStyle(color: Colors.white70, fontSize: 16),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontFamily: "Montserrat",
+                        fontSize: 16,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     Text(
                       film!.content,
-                      style: const TextStyle(color: Colors.white, fontSize: 15),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontFamily: "Montserrat",
+                        fontSize: 15,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Row(
@@ -163,21 +199,21 @@ class _WatchingScreenState extends State<WatchingScreen> {
                         ActionsButton(
                           text: "My List",
                           icon: Icons.add,
-                          onTap: (){
+                          onTap: () {
                             MyListRepository(
                               ApiService(),
                             ).addMyListFilm(film!.slug);
-                          },  
+                          },
                         ),
                         ActionsButton(
                           text: "Rate",
                           icon: Icons.star_outline,
-                          onTap: (){},
+                          onTap: () {},
                         ),
                         ActionsButton(
                           text: "Share",
                           icon: Icons.share,
-                          onTap: (){},
+                          onTap: () {},
                         ),
                       ],
                     ),

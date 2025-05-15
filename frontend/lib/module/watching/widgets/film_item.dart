@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/episode/episode_data.dart';
+import 'package:shimmer/shimmer.dart';
 
 class FilmItem extends StatelessWidget {
   final EpisodeData episode;
@@ -23,7 +24,8 @@ class FilmItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.redAccent.withOpacity(0.2) : Colors.grey[900],
+          color:
+              isSelected ? Colors.redAccent.withOpacity(0.2) : Colors.grey[900],
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? Colors.redAccent : Colors.transparent,
@@ -43,12 +45,24 @@ class FilmItem extends StatelessWidget {
                     height: 90,
                     width: 150,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Image.asset(
-                      'assets/images/not_found.png',
-                      height: 90,
-                      width: 150,
-                      fit: BoxFit.cover,
-                    ),
+                    frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                      if (wasSynchronouslyLoaded || frame != null) return child;
+                      return Shimmer.fromColors(
+                        baseColor: Colors.grey.shade800,
+                        highlightColor: Colors.grey.shade600,
+                        child: Container(
+                          color: Colors.white,
+                          width: 300,
+                          height: 300,
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        'assets/images/not_found.png', // ảnh thay thế
+                        fit: BoxFit.cover,
+                      );
+                    },
                   ),
                 ),
                 Container(
@@ -56,7 +70,11 @@ class FilmItem extends StatelessWidget {
                     shape: BoxShape.circle,
                     color: Colors.black.withOpacity(0.5),
                   ),
-                  child: const Icon(Icons.play_arrow, color: Colors.white, size: 36),
+                  child: const Icon(
+                    Icons.play_arrow,
+                    color: Colors.white,
+                    size: 36,
+                  ),
                 ),
               ],
             ),
@@ -72,19 +90,12 @@ class FilmItem extends StatelessWidget {
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    "27m",
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
+                      fontFamily: "Montserrat",
                     ),
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),

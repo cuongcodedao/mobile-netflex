@@ -11,6 +11,8 @@ import 'package:frontend/module/watching/screens/watching_screen.dart';
 import 'package:frontend/providers/film_provider.dart';
 import 'package:frontend/repositories/film_repository.dart';
 import 'package:frontend/services/api_services.dart';
+import 'package:get/get.dart';
+import 'package:get/utils.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   final ProfileModel profile;
@@ -33,12 +35,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     HomePage(profile: widget.profile),
     const Text(
       '🔍 Search',
-      style: TextStyle(fontSize: 24, color: Colors.white),
+      style: TextStyle(
+        fontSize: 24,
+        fontFamily: "Montserrat",
+        color: Colors.white
+      ),
     ),
     const SearchPage(),
     const Text(
       'Setting Page',
-      style: TextStyle(fontSize: 24, color: Colors.white),
+      style: TextStyle(
+        fontSize: 24,
+        fontFamily: "Montserrat",
+        color: Colors.white
+      ),
     ),
   ];
 
@@ -54,14 +64,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Text("Home Screen", style: TextStyle(color: Colors.white)),
+        leading: Image.asset("assets/images/Netflix.jpg"),
         actions: [
           GestureDetector(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ProfileScreen()),
-              );
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => ProfileScreen()),
+              // );
+              Get.to(()=> ProfileScreen(), transition: Transition.rightToLeft);
             },
             child: CircleAvatar(
               radius: 24,

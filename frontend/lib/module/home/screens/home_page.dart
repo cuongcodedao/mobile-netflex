@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:frontend/models/film/film_page.dart';
 import 'package:frontend/models/film/film.dart';
 import 'package:frontend/module/home/widgets/feature_banner.dart';
@@ -71,13 +72,26 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(
+        child: SpinKitCubeGrid(
+          color: Colors.redAccent,
+          size: 50.0,
+        ),
+      );
     }
     if (isLoadingFail) {
       return Center(
-        child: Text(
-          "Fail connect",
-          style: TextStyle(fontSize: 24, color: Colors.white),
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Image.asset(
+            'assets/images/404 DinoStyle.gif',
+            fit: BoxFit.cover,
+            width: 300,
+            height: 300,
+          ),
         ),
       );
     }
