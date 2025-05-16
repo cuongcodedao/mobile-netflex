@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/module/notify/screens/error-notify.dart';
+import 'package:frontend/module/notify/screens/success-notify.dart';
 import 'package:frontend/repositories/auth_repository.dart';
 import 'package:frontend/services/api_services.dart';
 import '../widgets/custom_textfield.dart'; // Điều chỉnh đường dẫn nếu cần
@@ -21,7 +22,8 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   late final TextEditingController _emailController;
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
 
@@ -34,7 +36,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   void initState() {
     super.initState();
-    _emailController = TextEditingController(text: widget.email ?? ''); // Pre-fill email if provided
+    _emailController = TextEditingController(
+      text: widget.email ?? '',
+    ); // Pre-fill email if provided
   }
 
   @override
@@ -59,16 +63,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final firstName = _firstNameController.text.trim();
     final lastName = _lastNameController.text.trim();
 
-    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty || firstName.isEmpty || lastName.isEmpty) {
-      showErrorNotify(context, 'Thiếu thông tin', 'Vui lòng nhập đầy đủ thông tin.');
+    if (email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty ||
+        firstName.isEmpty ||
+        lastName.isEmpty) {
+      showErrorNotify(
+        context,
+        'Missing Information',
+        'Please fill in all fields.',
+      );
       return;
     }
 
     if (password != confirmPassword) {
-      showErrorNotify(context, 'Mật khẩu không khớp', 'Vui lòng nhập lại mật khẩu.');
+      showErrorNotify(context, 'Password Mismatch', 'Passwords do not match.');
       return;
     }
-    
+
     try {
       final authRepository = AuthRepository(ApiService());
       final user = await authRepository.registerAccount(
@@ -78,57 +90,56 @@ class _SignUpScreenState extends State<SignUpScreen> {
         password: password,
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sign Up Successful! Welcome, ${user.firstName}')),
-      );
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => LoginScreen(email: email)),
+      );
+      showSuccessNotify(
+        context,
+        'Registration Successful',
+        'Welcome, ${user.firstName} ${user.lastName}!',
       );
     } catch (e) {
       _handleSignupError(e);
     }
   }
-// Hàm xử lý lỗi đăng nhập
-void _handleSignupError(dynamic e) {
-  //print('Login error: $e');
-  String errorMessage = 'An unknown error occurred';
 
-  if (e is DioException) {
-    print('DioException: ${e.message}');
-    if (e.response != null) {
-      print('Response data: ${e.response?.data}');
+  // Hàm xử lý lỗi đăng nhập
+  void _handleSignupError(dynamic e) {
+    //print('Login error: $e');
+    String errorMessage = 'An unknown error occurred';
 
-      final responseData = e.response?.data;
-      if (responseData is Map<String, dynamic>) {
-        if (responseData.containsKey('code')) {
-          errorMessage = responseData['code'].toString();
-        } else {
-          errorMessage = 'An unknown error occurred';
+    if (e is DioException) {
+      print('DioException: ${e.message}');
+      if (e.response != null) {
+        print('Response data: ${e.response?.data}');
+
+        final responseData = e.response?.data;
+        if (responseData is Map<String, dynamic>) {
+          if (responseData.containsKey('code')) {
+            errorMessage = responseData['code'].toString();
+          } else {
+            errorMessage = 'An unknown error occurred';
+          }
+        } else if (responseData != null) {
+          errorMessage = responseData.toString();
         }
-          
-      } else if (responseData != null) {
-        errorMessage = responseData.toString();
+      } else {
+        errorMessage = e.message ?? 'An unknown Dio error occurred';
       }
-    } else {
-      errorMessage = e.message ?? 'An unknown Dio error occurred';
     }
-  } 
-  if (errorMessage == '1008') {
-    errorMessage = 'Sai mật khẩu, vui lòng thử lại';
+    if (errorMessage == '1008') {
+      errorMessage = 'Password is incorrect';
+    }
+    if (errorMessage == '1001') {
+      errorMessage = 'Email already exists';
+    }
+    if (errorMessage == '9999') {
+      errorMessage = 'Password must be at least 8 characters';
+    }
+    showErrorNotify(context, 'Sign Up Error', errorMessage);
   }
-  if (errorMessage == '1001') {
-    errorMessage = 'Email đã tồn tại';
-  }
-  if (errorMessage == '9999') {
-    errorMessage = 'Mật khẩu phải có ít nhất 8 ký tự';
-  }
-  showErrorNotify(
-    context,
-    'Đăng ký thất bại',
-    errorMessage,
-  );
-}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -166,7 +177,10 @@ void _handleSignupError(dynamic e) {
                 focusNode: _emailFocusNode,
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.emailAddress, // Kiểu bàn phím email
-                onSubmitted: (_) => FocusScope.of(context).requestFocus(_firstNameFocusNode),
+                onSubmitted:
+                    (_) => FocusScope.of(
+                      context,
+                    ).requestFocus(_firstNameFocusNode),
                 backgroundColor: Colors.white, // Nền ô input trắng
                 textColor: Colors.black, // Chữ nhập màu đen
                 hintColor: Colors.grey, // Màu hint xám
@@ -182,7 +196,9 @@ void _handleSignupError(dynamic e) {
                 focusNode: _firstNameFocusNode,
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.name,
-                onSubmitted: (_) => FocusScope.of(context).requestFocus(_lastNameFocusNode),
+                onSubmitted:
+                    (_) =>
+                        FocusScope.of(context).requestFocus(_lastNameFocusNode),
                 backgroundColor: Colors.white,
                 textColor: Colors.black,
                 hintColor: Colors.grey,
@@ -197,7 +213,9 @@ void _handleSignupError(dynamic e) {
                 hintText: "Last Name",
                 focusNode: _lastNameFocusNode,
                 keyboardType: TextInputType.name,
-                onSubmitted: (_) => FocusScope.of(context).requestFocus(_passwordFocusNode),
+                onSubmitted:
+                    (_) =>
+                        FocusScope.of(context).requestFocus(_passwordFocusNode),
                 backgroundColor: Colors.white,
                 textColor: Colors.black,
                 hintColor: Colors.grey,
@@ -281,13 +299,14 @@ void _handleSignupError(dynamic e) {
                     onTap: () {
                       // Quay lại màn hình Login
                       // Navigator.pop(context) hoạt động tốt nếu SignUp được push từ Login
-                      
-                        // Trường hợp dự phòng: nếu không thể pop, thì pushReplacement
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const LoginScreen(email: "")),
-                        );
-                      
+
+                      // Trường hợp dự phòng: nếu không thể pop, thì pushReplacement
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(email: ""),
+                        ),
+                      );
                     },
                     child: const Text(
                       "Sign In",
@@ -309,4 +328,3 @@ void _handleSignupError(dynamic e) {
     );
   }
 }
-

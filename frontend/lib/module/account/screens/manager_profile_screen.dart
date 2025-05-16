@@ -26,7 +26,7 @@ class ManagerProfileScreen extends ConsumerWidget {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text(
-          'Quản lý Profile',
+          'Profile Manager',
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -89,7 +89,7 @@ class ManagerProfileScreen extends ConsumerWidget {
                               builder: (context, snapshot) {
                                 if (snapshot.data == profile.id) {
                                   return Text(
-                                    'Đang sử dụng',
+                                    'Using',
                                     style: TextStyle(
                                       color: Colors.green[400],
                                       fontSize: 14,
@@ -138,7 +138,7 @@ class ManagerProfileScreen extends ConsumerWidget {
                       const SizedBox(width: 16),
                       const Expanded(
                         child: Text(
-                          'Thêm profile',
+                          'Add profile',
                           style: TextStyle(
                             color: Colors.white, 
                             fontSize: 18,
@@ -174,21 +174,21 @@ class ManagerProfileScreen extends ConsumerWidget {
 
   Future<void> _handleDeleteTap(BuildContext context, WidgetRef ref, ProfileModel profile) async {
     if (profiles.length <= 1) {
-      showErrorNotify(context, 'Lỗi', 'Không thể xóa profile. Vui lòng thêm profile khác.');
+      showErrorNotify(context, 'Error', 'Cannot delete the last profile.');
       return;
     }
     
     // Check if trying to delete current profile
     final currentProfileId = await StorageService().getProfileId();
     if (currentProfileId == profile.id) {
-      showErrorNotify(context, 'Lỗi', 'Không thể xóa profile đang sử dụng. Vui lòng chuyển sang profile khác trước.');
+      showErrorNotify(context, 'Error', 'Cannot delete the current profile.');
       return;
     }
 
     bool? result = await showWarningNotify(
       context,
-      'Cảnh báo',
-      'Bạn có muốn xóa profile ${profile.username} không?',
+      'Warning',
+      'Are you sure you want to delete profile ${profile.username}?',
     );
 
     if (result == false) {
@@ -210,30 +210,30 @@ class ManagerProfileScreen extends ConsumerWidget {
             ),
           ),
         );
-        showSuccessNotify(context, 'Thành công', 'Đã xóa profile ${profile.username}.');
+        showSuccessNotify(context, 'Success', 'Profile ${profile.username} deleted successfully.');
       } else {
-        showErrorNotify(context, 'Lỗi', 'Không thể xóa profile. Vui lòng thử lại sau.');
+        showErrorNotify(context, 'Error', 'Failed to delete profile. Please try again.');
       }
     } catch (e) {
-      showErrorNotify(context, 'Lỗi', 'Không thể xóa profile. Vui lòng thử lại sau.');
+      showErrorNotify(context, 'Error', 'An error occurred while deleting the profile.');
     }
   }
 
   Future<void> _handleProfileTap(BuildContext context, ProfileModel profile) async {
     int? currentID = await StorageService().getProfileId();
     if (currentID == profile.id) {
-      showErrorNotify(context, 'Thông báo', 'Bạn đang sử dụng profile này.');
+      showErrorNotify(context, 'Error', 'This is your current profile.');
       return;
     }
 
     bool? result = await showWarningNotify(
       context,
-      'Thông báo',
-      'Bạn có muốn chuyển sang profile ${profile.username} không?',
+      'Warning',
+      'Are you sure you want to switch to profile ${profile.username}?',
     );
     if (result == true){
       await StorageService().saveProfileId(profile.id!);
-      showSuccessNotify(context, 'Thành công', 'Đã chuyển sang profile ${profile.username}.');
+      showSuccessNotify(context, 'Success', 'Switched to profile ${profile.username} successfully.');
        _goToHomeScreen(context, profile);
     } else {
       return;
