@@ -12,6 +12,7 @@ import 'package:frontend/providers/film_provider.dart';
 import 'package:frontend/providers/profile_provider.dart';
 import 'package:frontend/repositories/film_repository.dart';
 import 'package:frontend/services/api_services.dart';
+import 'package:frontend/services/storage_service.dart';
 import 'package:get/get.dart';
 import 'package:get/utils.dart';
 
@@ -39,7 +40,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       style: TextStyle(
         fontSize: 24,
         fontFamily: "Montserrat",
-        color: Colors.white
+        color: Colors.white,
       ),
     ),
     const SearchPage(),
@@ -48,7 +49,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       style: TextStyle(
         fontSize: 24,
         fontFamily: "Montserrat",
-        color: Colors.white
+        color: Colors.white,
       ),
     ),
   ];
@@ -69,11 +70,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         actions: [
           GestureDetector(
             onTap: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => ProfileScreen()),
-              // );
-              Get.to(()=> ProfileScreen(), transition: Transition.rightToLeft);
+              Get.to(() => ProfileScreen(), transition: Transition.rightToLeft);
             },
             child: CircleAvatar(
               backgroundColor: Colors.transparent,
@@ -84,20 +81,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator();
                   } else if (snapshot.hasError) {
-                    return const Icon(Icons.error);
+                    return const Icon(Icons.manage_accounts);
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return const Icon(Icons.person);
                   }
 
                   final avatarUrl = snapshot.data!;
-                  return CircleAvatar(
-                    backgroundImage: AssetImage('assets/images/$avatarUrl'),
-                    radius: 20,
-                    backgroundColor: Colors.transparent,
+                  return Container(
+                    width: 40, // chiều rộng của hình vuông
+                    height: 40, // chiều cao của hình vuông
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('assets/images/$avatarUrl'),
+                        fit: BoxFit.cover,
+                      ),
+                      shape: BoxShape.rectangle, // Hình vuông
+                      borderRadius: BorderRadius.circular(
+                        10,
+                      ), // Bo góc (có thể tùy chỉnh)
+                    ),
                   );
                 },
+              ),
             ),
-          ),
           ),
         ],
       ),
@@ -120,19 +126,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<String> _getProfileAvatar() async {
-    final profileID = await StorageService().getProfileId();
-    if (profileID == null) {
-      print ('nan');
+    StorageService storageService = StorageService();
+    int? accountId = await storageService.getUserInfo();
+    if (accountId == null) {
+      print('Account ID không tồn tại');
       return '';
     }
 
-    // Sử dụng read để lấy giá trị Future của provider
-    final profileAsyncValue = await ref.read(
-      profileDetailProvider(profileID).future,
+    final profiles = await ref.read(profileProvider(accountId).future);
+    final profile = profiles.firstWhere(
+      (profile) => profile.id == widget.profile.id,
     );
-    print ('Fetched profile: $profileAsyncValue');
-    print ('Fetched profile avatar: ${profileAsyncValue.avatar}');
-
-    return profileAsyncValue.avatar;
+    return profile.avatar ??
+        ''; // Trả về avatar hoặc chuỗi rỗng nếu không có avatar
   }
 }

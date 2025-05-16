@@ -17,7 +17,11 @@ class ProfileSelectionScreen extends StatelessWidget {
   final List<ProfileModel> profiles; // Accept profiles as a parameter
   final int accountId; // Thêm accountId làm tham số
 
-  const ProfileSelectionScreen({super.key, required this.profiles, required this.accountId});
+  const ProfileSelectionScreen({
+    super.key,
+    required this.profiles,
+    required this.accountId,
+  });
 
   static const String avatarPngPath = 'assets/images/avatar.png';
 
@@ -27,7 +31,7 @@ class ProfileSelectionScreen extends StatelessWidget {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text(
-          'Ai đang xem?',
+          'Who\'s watching?',
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -44,7 +48,9 @@ class ProfileSelectionScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: GridView.builder(
-                  itemCount: profiles.length + 1, // Thêm 1 để hiển thị nút "Thêm profile"
+                  itemCount:
+                      profiles.length +
+                      1, // Thêm 1 để hiển thị nút "Thêm profile"
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     childAspectRatio: 0.85,
@@ -67,7 +73,9 @@ class ProfileSelectionScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(30.0),
                               ),
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(30.0), // Bo góc cho avatar
+                                borderRadius: BorderRadius.circular(
+                                  30.0,
+                                ), // Bo góc cho avatar
                                 child: Padding(
                                   padding: const EdgeInsets.all(1.0),
                                   child: Image.asset(
@@ -91,13 +99,21 @@ class ProfileSelectionScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          Text(
-                            profile.username,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
+                          SizedBox(
+                            width:
+                                120, // Đảm bảo text không vượt quá chiều rộng của avatar
+                            child: Text(
+                              profile.username,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 1, // Giới hạn tối đa 2 dòng
+                              overflow:
+                                  TextOverflow
+                                      .ellipsis, // Thêm "..." nếu quá dài
                             ),
-                            textAlign: TextAlign.center,
                           ),
                         ],
                       );
@@ -108,11 +124,16 @@ class ProfileSelectionScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => AddProfileScreen(accountId: accountId), // Truyền accountId
+                              builder:
+                                  (context) => AddProfileScreen(
+                                    accountId: accountId,
+                                  ), // Truyền accountId
                             ),
                           ).then((newProfile) {
                             if (newProfile != null) {
-                              print('New profile added: ${newProfile.username}');
+                              print(
+                                'New profile added: ${newProfile.username}',
+                              );
                             }
                           });
                         },
@@ -133,7 +154,7 @@ class ProfileSelectionScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 12),
                             const Text(
-                              'Thêm profile',
+                              'Add profile',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
@@ -160,9 +181,7 @@ class ProfileSelectionScreen extends StatelessWidget {
     print("Id Profile :" + profile.id!.toString());
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => HomeScreen(profile: profile),
-      ),
+      MaterialPageRoute(builder: (context) => HomeScreen(profile: profile)),
     );
   }
 }

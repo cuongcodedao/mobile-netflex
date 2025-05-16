@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/module/notify/screens/error-notify.dart';
+import 'package:frontend/module/notify/screens/success-notify.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_textfield.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -56,8 +57,10 @@ class _AddProfileScreenState extends ConsumerState<AddProfileScreen> {
       });
     } catch (e) {
       print('Error fetching categories: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Không thể tải danh mục thể loại: ${e.toString()}')),
+      showErrorNotify(
+        context,
+        'Error',
+        'Failed to fetch categories. Please try again later.',
       );
     }
   }
@@ -71,8 +74,8 @@ class _AddProfileScreenState extends ConsumerState<AddProfileScreen> {
     if (name.isEmpty || _selectedAvatar == null) {
             showErrorNotify(
         context,
-        'Thiếu thông tin',
-        'Vui lòng nhập tên và chọn avatar.',
+        'Missing Information',
+        'Please fill in all the fields.',
       );
       return;
     }
@@ -80,8 +83,8 @@ class _AddProfileScreenState extends ConsumerState<AddProfileScreen> {
     if (_selectedGenres.isEmpty) {
       showErrorNotify(
         context,
-        'Thiếu thể loại',
-        'Vui lòng chọn ít nhất một thể loại phim yêu thích.',
+        'Missing Genres',
+        'Please select at least one favorite genre.',
       );
       return;
     }
@@ -107,6 +110,9 @@ class _AddProfileScreenState extends ConsumerState<AddProfileScreen> {
           ),
         ),
       );
+            showSuccessNotify(context, 
+      'Success', 
+      'Profile added successfully.');
     } catch (e) {
       _handleAddError(e);
     }
@@ -137,11 +143,11 @@ void _handleAddError(dynamic e) {
     }
   } 
   if (errorMessage == '1013') {
-    errorMessage = 'Chỉ có tối đa 3 profile cho mỗi tài khoản thường';
+    errorMessage = 'Maximum number of profiles reached';
   }
   showErrorNotify(
     context,
-    'Thêm profile thất bại',
+    'Add Profile Error',
     errorMessage,
   );
 }
@@ -162,7 +168,7 @@ void _handleAddError(dynamic e) {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Thêm Actor Mới'),
+        title: const Text('Add Profile'),
         titleTextStyle: const TextStyle(
           color: Colors.white,
           fontSize: 20,
@@ -180,7 +186,7 @@ void _handleAddError(dynamic e) {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CustomTextField(
-                hintText: 'Tên',
+                hintText: 'Name',
                 controller: _nameController,
                 backgroundColor: Colors.black,
                 textColor: Colors.white,
@@ -191,7 +197,7 @@ void _handleAddError(dynamic e) {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Chọn Avatar',
+                'Choose Avatar',
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.white,
@@ -281,7 +287,7 @@ void _handleAddError(dynamic e) {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Thể Loại Phim Yêu Thích',
+                'Favorite Genres',
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.white,

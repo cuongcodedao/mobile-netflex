@@ -139,7 +139,7 @@ class _WarningNotifyScreenState extends State<WarningNotifyScreen>
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 24.0, vertical: 8.0),
                           ),
-                          child: const Text("Có "),
+                          child: const Text("Yes"),
                         ),
                         TextButton(
                           onPressed: () => _hidePopup(false),
@@ -149,7 +149,7 @@ class _WarningNotifyScreenState extends State<WarningNotifyScreen>
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 24.0, vertical: 8.0),
                           ),
-                          child: const Text("Không"),
+                          child: const Text("No"),
                         ),
                       ],
                     ),

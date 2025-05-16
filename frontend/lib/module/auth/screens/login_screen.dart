@@ -53,8 +53,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (email.isEmpty || password.isEmpty) {
       showErrorNotify(
         context,
-        'Thiếu thông tin',
-        'Vui lòng nhập email và mật khẩu.',
+        "Missing information",
+        "Please enter both email and password.",
       );
       return;
     }
@@ -62,8 +62,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (password.length < 8) {
       showErrorNotify(
         context,
-        'Mật khẩu không hợp lệ',
-        'Mật khẩu phải có ít nhất 8 ký tự.',
+        "Password too short",
+        "Password must be at least 8 characters long.",
       );
       return;
     }
@@ -126,12 +126,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     }
     if (errorMessage == '1008') {
-      errorMessage = 'Sai mật khẩu, vui lòng thử lại';
+      errorMessage = "Password is incorrect";
     }
     if (errorMessage == '1007') {
-      errorMessage = 'Tài khoản đã bị khóa, vui lòng liên hệ với quản trị viên';
+      errorMessage = 'This account is not activated. Please contact support.';
     }
-    showErrorNotify(context, 'Đăng nhập thất bại', errorMessage);
+    showErrorNotify(context,"Login failed", errorMessage);
   }
 
   @override
