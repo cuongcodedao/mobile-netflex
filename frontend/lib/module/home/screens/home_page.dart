@@ -3,6 +3,7 @@ import 'package:frontend/models/film/film_page.dart';
 import 'package:frontend/models/film/film.dart';
 import 'package:frontend/module/home/widgets/feature_banner.dart';
 import 'package:frontend/module/home/widgets/horizontal_film_list.dart';
+import 'package:frontend/module/notify/screens/success-notify.dart';
 import 'package:frontend/module/watching/screens/watching_screen.dart';
 import 'package:frontend/repositories/film_repository.dart';
 import 'package:frontend/repositories/my_list_repository.dart';
@@ -98,11 +99,15 @@ class _HomePageState extends State<HomePage> {
                         .whereType<String>()
                         .toList()) ??
                     [],
-                onAddToList: () {
-                  print('Add to My List Film 1');
-                  MyListRepository(
+                onAddToList: () async {
+                  
+                  bool set = await MyListRepository(
                     ApiService(),
                   ).addMyListFilm(newFilms[index].slug);
+                  if (set) {
+                  showSuccessNotify(context, 
+                  "Success", "Add to My list");
+                  }
                 },
                 onPlay: () {
                   Navigator.push(
@@ -140,7 +145,7 @@ class _HomePageState extends State<HomePage> {
               filmPage!.items.length,
               (index) => FilmItem(
                 imageUrl: filmPage!.items[index].urlPoster,
-                labelType: FilmLabelType.top,
+                labelType: FilmLabelType.newFilm,
               ),
             ),
           ),
@@ -152,7 +157,7 @@ class _HomePageState extends State<HomePage> {
               forYouFilms.length,
               (index) => FilmItem(
                 imageUrl: "https://phimimg.com/${forYouFilms[index].urlPoster}",
-                labelType: FilmLabelType.top,
+                labelType: FilmLabelType.none,
               ),
             ),
           ),
@@ -164,7 +169,7 @@ class _HomePageState extends State<HomePage> {
               filmPage!.items.length,
               (index) => FilmItem(
                 imageUrl: filmPage!.items[index].urlPoster,
-                labelType: FilmLabelType.top,
+                labelType: FilmLabelType.hot,
               ),
             ),
           ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/film/film.dart';
+import 'package:frontend/module/notify/screens/success-notify.dart';
 import 'package:frontend/module/watching/screens/playing_film_page.dart';
 import 'package:frontend/module/watching/widgets/actions_button.dart';
 import 'package:frontend/module/watching/widgets/button_large.dart';
@@ -98,7 +99,7 @@ class _WatchingScreenState extends State<WatchingScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
 
@@ -118,11 +119,12 @@ class _WatchingScreenState extends State<WatchingScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => PlayingFilmPage(
-                              film: film,
-                              episode: film!.listEpisodes[0].serverData[0],
-                              indexSelected: 0,
-                            ),
+                            builder:
+                                (_) => PlayingFilmPage(
+                                  film: film,
+                                  episode: film!.listEpisodes[0].serverData[0],
+                                  indexSelected: 0,
+                                ),
                           ),
                         );
                       },
@@ -149,7 +151,10 @@ class _WatchingScreenState extends State<WatchingScreen> {
                   children: [
                     Text(
                       "${film!.yearOfRelease}",
-                      style: const TextStyle(color: Colors.white70, fontSize: 16),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     Text(
@@ -163,21 +168,28 @@ class _WatchingScreenState extends State<WatchingScreen> {
                         ActionsButton(
                           text: "My List",
                           icon: Icons.add,
-                          onTap: (){
-                            MyListRepository(
+                          onTap: () async {
+                            bool set = await MyListRepository(
                               ApiService(),
                             ).addMyListFilm(film!.slug);
-                          },  
+                            if (set) {
+                              showSuccessNotify(
+                                context,
+                                "Success",
+                                "Add to My list",
+                              );
+                            }
+                          },
                         ),
                         ActionsButton(
                           text: "Rate",
                           icon: Icons.star_outline,
-                          onTap: (){},
+                          onTap: () {},
                         ),
                         ActionsButton(
                           text: "Share",
                           icon: Icons.share,
-                          onTap: (){},
+                          onTap: () {},
                         ),
                       ],
                     ),

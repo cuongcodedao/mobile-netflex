@@ -127,14 +127,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
                           if (episode == null) return const SizedBox.shrink();
 
-                          return ItemFilmWatched(
+                         return ItemFilmContinue(
+                            linearProgress: film.progress,
                             url: episode.posterUrl,
+                            nameEspsode: episode.name,
                             onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) =>
-                                      WatchingScreen(slug: episode.slug),
+                                  builder: (_) => PlayingFilmPage(
+                                    slug: episode.slug,
+                                    watchDuration: film.watchDuration,
+                                    indexSelected: index,
+                                  ),
                                 ),
                               );
                             },

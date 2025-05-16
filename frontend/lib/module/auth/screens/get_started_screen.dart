@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/module/auth/screens/login_screen.dart';
 import 'package:frontend/module/auth/screens/sign_up_screen.dart';
+import 'package:frontend/module/notify/screens/error-notify.dart';
 import 'package:frontend/providers/auth_provider.dart';
 
 class GetStarted extends ConsumerStatefulWidget {
@@ -23,8 +24,19 @@ class _GetStartedState extends ConsumerState<GetStarted> {
   Future<void> _handleGetStarted() async {
     final email = _emailController.text.trim();
     if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid email.')),
+      showErrorNotify(
+        context,
+        'Missing Information',
+        'Please enter your email address.',
+      );
+      return;
+    } else if (!RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    ).hasMatch(email)) {
+      showErrorNotify(
+        context,
+        'Invalid Email',
+        'Please enter a valid email address.',
       );
       return;
     }
@@ -37,22 +49,28 @@ class _GetStartedState extends ConsumerState<GetStarted> {
       if (emailExists) {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => LoginScreen(email: email),
-          ),
+          MaterialPageRoute(builder: (context) => LoginScreen(email: email)),
         );
       } else {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => SignUpScreen(email: email),
-          ),
+          MaterialPageRoute(builder: (context) => SignUpScreen(email: email)),
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred: $e')),
-      );
+      if (e.toString().contains('404')) {
+        showErrorNotify(
+          context,
+          'Error',
+          'The server is not responding. Please try again later.',
+        );
+      } else {
+        showErrorNotify(
+          context,
+          'Error',
+          'An error occurred while checking the email. Please try again.',
+        );
+      }
     }
   }
 

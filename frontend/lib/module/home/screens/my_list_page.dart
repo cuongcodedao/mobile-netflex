@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:frontend/models/film/film.dart';
 import 'package:frontend/module/home/widgets/item_my_list.dart';
+import 'package:frontend/module/watching/screens/watching_screen.dart';
 import 'package:frontend/repositories/film_repository.dart';
 import 'package:frontend/repositories/my_list_repository.dart';
 import 'package:frontend/services/api_services.dart';
@@ -53,7 +54,15 @@ class _MyListPageState extends State<MyListPage> {
                 nameFilm: myList[index].name,
                 content: myList[index].content,
                 url: myList[index].urlPoster,
-              )
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => WatchingScreen(slug: myList[index].slug),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ),
