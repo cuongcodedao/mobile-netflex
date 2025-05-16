@@ -6,11 +6,13 @@ class ItemMyList extends StatelessWidget {
   final String nameFilm;
   final String content;
   final String url;
+  final VoidCallback onTap;
   const ItemMyList({
     super.key,
     required this.nameFilm,
     required this.content,
     required this.url,
+    required this.onTap
   });
 
   @override

@@ -24,6 +24,19 @@ class ProfileRepository {
       rethrow;
     }
   }
+  Future<ProfileModel> fetchProfile(int profileId) async {
+    try {
+      final response = await apiService.get('/api/v1/profile/$profileId');
+      final authResponse = Auth<ProfileModel>.fromJson(
+        response.data,
+        (json) => ProfileModel.fromJson(json as Map<String, dynamic>),
+      );
+      return authResponse.result;
+    } catch (e) {
+      print('Error fetching profile: $e');
+      rethrow;
+    }
+  }
 
   Future<ProfileModel> addProfile({
     required String username,

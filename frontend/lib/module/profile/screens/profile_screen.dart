@@ -1,5 +1,7 @@
 import 'dart:ffi';
+import 'package:frontend/models/profile/profile_model.dart';
 import 'package:frontend/module/account/screens/manager_account_screen.dart';
+import 'package:frontend/module/auth/screens/profile_selection_screen.dart';
 import 'package:frontend/providers/profile_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/module/account/screens/manager_profile_screen.dart';
@@ -44,18 +46,43 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           children: [
             // Avatar Selector
             SizedBox(
-              height: 70,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: 5,
-                separatorBuilder: (_, __) => const SizedBox(width: 20),
-                itemBuilder: (context, index) {
-                  return CircleAvatar(
-                    radius: 35,
-                    backgroundImage: AssetImage(
-                      "assets/images/avatar-${index + 1}.png",
-                    ),
-                    backgroundColor: Colors.grey[800],
+              height: 100,
+              child: FutureBuilder<List<ProfileModel?>>(
+                future: _getProfileList(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text("Error loading profiles"));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text("No profiles available"));
+                  }
+
+                  final profiles = snapshot.data!;
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: profiles.length,
+                    itemBuilder: (context, index) {
+                      final profile = profiles[index];
+                      return InkWell(
+                        onTap: () {
+                          // Handle profile selection
+                        },
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 10),
+                          width: 100,
+                          height: 70,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            image: DecorationImage(
+                              image: AssetImage('assets/images/${profile?.avatar}' ?? ''),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   );
                 },
               ),
@@ -169,6 +196,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  // hàm lấy danh sách profile
   Future<void> _handleGotoManagerProfile(BuildContext context) async {
     try {
       StorageService storageService = StorageService();
@@ -194,6 +222,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       );
     } catch (e) {
       print('Error fetching profiles: $e');
+    }
+  }
+
+  // hàm lấy danh sách profile
+  Future<List<ProfileModel?>> _getProfileList() async {
+    try {
+      StorageService storageService = StorageService();
+      int? accountId = await storageService.getUserInfo();
+      if (accountId == null) {
+        print('Account ID không tồn tại');
+        return [];
+      }
+      final profiles = await ref.read(profileProvider(accountId).future);
+      return profiles;
+    } catch (e) {
+      print('Error fetching profiles: $e');
+      return [];
     }
   }
 }

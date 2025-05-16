@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/film/film.dart';
+import 'package:frontend/module/notify/screens/success-notify.dart';
 import 'package:frontend/module/watching/screens/playing_film_page.dart';
 import 'package:frontend/module/watching/widgets/actions_button.dart';
 import 'package:frontend/module/watching/widgets/button_large.dart';

@@ -9,6 +9,7 @@ import 'package:frontend/module/profile/screens/profile_screen.dart';
 import 'package:frontend/module/profile/widgets/button_avata.dart';
 import 'package:frontend/module/watching/screens/watching_screen.dart';
 import 'package:frontend/providers/film_provider.dart';
+import 'package:frontend/providers/profile_provider.dart';
 import 'package:frontend/repositories/film_repository.dart';
 import 'package:frontend/services/api_services.dart';
 import 'package:get/get.dart';
@@ -75,9 +76,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Get.to(()=> ProfileScreen(), transition: Transition.rightToLeft);
             },
             child: CircleAvatar(
-              radius: 24,
-              backgroundImage: AssetImage("assets/images/avatar-1.png"),
+              backgroundColor: Colors.transparent,
+              radius: 20,
+              child: FutureBuilder<String>(
+                future: _getProfileAvatar(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return const Icon(Icons.error);
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Icon(Icons.person);
+                  }
+
+                  final avatarUrl = snapshot.data!;
+                  return CircleAvatar(
+                    backgroundImage: AssetImage('assets/images/$avatarUrl'),
+                    radius: 20,
+                    backgroundColor: Colors.transparent,
+                  );
+                },
             ),
+          ),
           ),
         ],
       ),
@@ -97,5 +117,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onTap: _onItemTapped,
       ),
     );
+  }
+
+  Future<String> _getProfileAvatar() async {
+    final profileID = await StorageService().getProfileId();
+    if (profileID == null) {
+      print ('nan');
+      return '';
+    }
+
+    // Sử dụng read để lấy giá trị Future của provider
+    final profileAsyncValue = await ref.read(
+      profileDetailProvider(profileID).future,
+    );
+    print ('Fetched profile: $profileAsyncValue');
+    print ('Fetched profile avatar: ${profileAsyncValue.avatar}');
+
+    return profileAsyncValue.avatar;
   }
 }
