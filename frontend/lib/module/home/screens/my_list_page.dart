@@ -46,110 +46,78 @@ class _MyListPageState extends State<MyListPage> {
           style: TextStyle(color: Colors.redAccent, fontFamily: "Montserrat"),
         ),
       ),
-      body:
-          (isLoading)
-              ? Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Shimmer.fromColors(
-                    baseColor: Colors.grey.shade800,
-                    highlightColor: Colors.grey.shade600,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          10,
-                          (index) => Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Row(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  height: 100,
-                                  width: 100,
-                                ),
-                                SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                        ),
-                                        height: 20,
-                                        width: 100,
-                                      ),
-                                      SizedBox(height: 5),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                        ),
-                                        height: 10,
-                                      ),
-                                      SizedBox(height: 5),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                        ),
-                                        height: 10,
-                                      ),
-                                      SizedBox(height: 5),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                        ),
-                                        height: 10,
-                                        width: 250,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+      body: isLoading
+          ? _buildShimmerLoading()
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  children: List.generate(
+                    myList.length,
+                    (index) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: InkWell(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => WatchingScreen(
+                              slug: myList[index].slug,
                             ),
                           ),
+                        ),
+                        child: ItemMyList(
+                          nameFilm: myList[index].name,
+                          content: myList[index].content,
+                          url: myList[index].urlPoster,
+                          onTap: () {},
                         ),
                       ),
                     ),
                   ),
                 ),
-              )
-              : SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-            children: List.generate(
-              myList.length,
-            (index) => Padding(padding: EdgeInsets.only(bottom: 10),
-                child: 
-                ItemMyList(
-                  nameFilm: myList[index].name,
-                  content: myList[index].content,
-                  url: myList[index].urlPoster,
+              ),
+            ),
+    );
+  }
+
+  Widget _buildShimmerLoading() => Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey.shade800,
+            highlightColor: Colors.grey.shade600,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  10,
+                  (index) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Row(
+                      children: [
+                        Container(
+                          color: Colors.white,
+                          height: 100,
+                          width: 100,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            children: List.generate(3, (index) => Container(
+                                  height: 10,
+                                  margin: const EdgeInsets.only(bottom: 5),
+                                  color: Colors.white,
+                                )),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
-                ),
-              ),
-              ),
-    );
-  }
+          ),
+        ),
+      );
 }

@@ -12,6 +12,7 @@ import 'package:frontend/providers/film_provider.dart';
 import 'package:frontend/providers/profile_provider.dart';
 import 'package:frontend/repositories/film_repository.dart';
 import 'package:frontend/services/api_services.dart';
+import 'package:frontend/services/storage_service.dart';
 import 'package:get/get.dart';
 import 'package:get/utils.dart';
 
