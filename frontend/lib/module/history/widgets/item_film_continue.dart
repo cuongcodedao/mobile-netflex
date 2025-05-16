@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ItemFilmContinue extends StatelessWidget {
   final double linearProgress;
@@ -30,6 +31,17 @@ class ItemFilmContinue extends StatelessWidget {
                 child: Image.network(
                   url,
                   fit: BoxFit.cover,
+                  frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                    if (wasSynchronouslyLoaded || frame != null) return child;
+                    return Shimmer.fromColors(
+                      baseColor: Colors.grey.shade800,
+                      highlightColor: Colors.grey.shade600,
+                      child: Expanded(child: Container(
+                        color: Colors.white,
+                        width: double.infinity,
+                      )),
+                    );
+                  },
                   errorBuilder: (context, error, stackTrace) {
                     return Image.asset(
                       'assets/images/not_found.png', // ảnh thay thế
@@ -53,11 +65,12 @@ class ItemFilmContinue extends StatelessWidget {
                     nameEspsode,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 19
+                      fontFamily: "Montserrat",
+                      fontSize: 19,
                     ),
                   ),
-                )
-              )
+                ),
+              ),
             ],
           ),
         ),

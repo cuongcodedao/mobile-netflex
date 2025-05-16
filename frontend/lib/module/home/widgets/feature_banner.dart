@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:shimmer/shimmer.dart";
 
 class FeatureBanner extends StatelessWidget {
   final List<BannerFilm> films;
@@ -33,13 +34,30 @@ class FeatureBanner extends StatelessWidget {
                   // Ảnh nền của phim
                   Padding(
                     padding: const EdgeInsets.all(0.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        image: DecorationImage(
-                          image: NetworkImage(films[index].imageUrl),
-                          fit: BoxFit.cover,
-                        ),
+                    child: Card(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                      clipBehavior: Clip.antiAlias,
+                      child: Image.network(
+                        films[index].imageUrl,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                          if (wasSynchronouslyLoaded || frame != null) return child;
+                          return Shimmer.fromColors(
+                            baseColor: Colors.grey.shade800,
+                            highlightColor: Colors.grey.shade600,
+                            child: Expanded(child: Container(
+                              color: Colors.white,
+                              width: double.infinity,
+                            )),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'assets/images/not_found.png', // ảnh thay thế
+                            fit: BoxFit.cover,
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -86,6 +104,7 @@ class FeatureBanner extends StatelessWidget {
                                     genre,
                                     style: const TextStyle(
                                       fontSize: 14,
+                                      fontFamily: "Montserrat",
                                       color: Colors.white,
                                     ),
                                   ),
@@ -110,6 +129,7 @@ class FeatureBanner extends StatelessWidget {
                                   "My List",
                                   style: TextStyle(
                                     color: Colors.white,
+                                    fontFamily: "Montserrat",
                                     fontSize: 12,
                                   ),
                                 ),

@@ -11,12 +11,18 @@ class FilmInfo extends StatelessWidget {
     fontSize: 23,
     fontWeight: FontWeight.bold,
     color: Colors.white,
+    fontFamily: "Montserrat",
   );
-  final TextStyle textMedium = TextStyle(fontSize: 16, color: Colors.white);
+  final TextStyle textMedium = TextStyle(
+    fontSize: 16,
+    color: Colors.white,
+    fontFamily: "Montserrat",
+  );
   final TextStyle headerMedium = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.bold,
     color: Colors.white,
+    fontFamily: "Montserrat",
   );
 
   @override

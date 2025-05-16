@@ -7,7 +7,6 @@ class ApiService {
   );
   String? _accessToken; // Biến lưu trữ accessToken
 
-
   ApiService() {
     // Remove hardcoded accessToken initialization
   }
@@ -126,6 +125,7 @@ class ApiService {
       throw Exception('DELETE request failed: ${e.message}');
     }
   }
+
   // Hàm PUT
   Future<Response> put(
     String endpoint,
@@ -162,4 +162,3 @@ class ApiService {
     }
   }
 }
-

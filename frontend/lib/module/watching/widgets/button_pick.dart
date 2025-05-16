@@ -27,7 +27,8 @@ class _ButtonPickState extends State<ButtonPick> {
     super.initState();
     // Delay để đợi render xong rồi đo kích thước
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final renderBox = _textKey.currentContext?.findRenderObject() as RenderBox?;
+      final renderBox =
+          _textKey.currentContext?.findRenderObject() as RenderBox?;
       if (renderBox != null) {
         setState(() {
           _textWidth = renderBox.size.width;
@@ -50,10 +51,12 @@ class _ButtonPickState extends State<ButtonPick> {
                 widget.text,
                 key: _textKey,
                 style: TextStyle(
-                  color: (widget.index == widget.indexSelected)
-                      ? Colors.white
-                      : Colors.grey,
+                  color:
+                      (widget.index == widget.indexSelected)
+                          ? Colors.white
+                          : Colors.grey,
                   fontWeight: FontWeight.bold,
+                  fontFamily: "Montserrat",
                 ),
               ),
             ),
@@ -61,11 +64,7 @@ class _ButtonPickState extends State<ButtonPick> {
           if (widget.index == widget.indexSelected)
             Positioned(
               top: 0,
-              child: Container(
-                width: _textWidth,
-                height: 5,
-                color: Colors.red,
-              ),
+              child: Container(width: _textWidth, height: 5, color: Colors.red),
             ),
         ],
       ),

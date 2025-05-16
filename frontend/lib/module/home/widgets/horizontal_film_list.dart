@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 
 enum FilmLabelType { top, newFilm, hot, none } // Các loại nhãn
 
@@ -69,11 +70,20 @@ class HorizontalFilmList extends StatelessWidget {
               fit: BoxFit.cover,
               frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
                 if (wasSynchronouslyLoaded || frame != null) return child;
-                return Container(
-                  color: Colors.black,
-                  child: const Center(
-                    child: CircularProgressIndicator(color: Colors.white),
+                return Shimmer.fromColors(
+                  baseColor: Colors.grey.shade800,
+                  highlightColor: Colors.grey.shade600,
+                  child: Container(
+                    color: Colors.white,
+                    width: itemWidth,
+                    height: itemHeight,
                   ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return Image.asset(
+                  'assets/images/not_found.png', // ảnh thay thế
+                  fit: BoxFit.cover,
                 );
               },
             ),
