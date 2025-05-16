@@ -8,6 +8,8 @@ import 'package:frontend/module/home/screens/my_list_page.dart';
 import 'package:frontend/module/profile/widgets/button_icon.dart';
 import 'package:frontend/services/storage_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/module/subscription/manage_subscription_screen.dart';
+
 import 'package:get/get.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -85,9 +87,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
             // Settings buttons
             ButtonIcon(
-              text: "Notifications",
+              text: "Subscription",
               icon: Icons.notifications_none,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ManageSubscriptionScreen(),
+                  ),
+                );
+              },
             ),
             ButtonIcon(
               text: "My List",
