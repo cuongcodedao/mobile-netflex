@@ -11,7 +11,15 @@ import java.util.List;
 @Repository
 public interface AccessLogRepository extends JpaRepository<AccessLog, Long> {
     @Query("SELECT a FROM AccessLog a WHERE a.account.id = :accountId and a.deviceId = :deviceId")
-    List<AccessLog> findByAccountIdAndDeviceId(@Param("accountId") Long accountId, @Param("deviceId") String deviceId);
+    AccessLog findByAccountIdAndDeviceId(@Param("accountId") Long accountId, @Param("deviceId") String deviceId);
+    List<AccessLog> findByAccountId(Long accountId);
+
+    @Query("SELECT COUNT(a) FROM AccessLog a WHERE a.account.id = :accountId")
+    int countDevices(@Param("accountId") Long accountId);
+
+    @Query("SELECT COUNT(a) FROM AccessLog a WHERE a.account.id = :accountId AND a.active = true")
+    int countActiveDevices(@Param("accountId") Long accountId);
+
 
 
 }

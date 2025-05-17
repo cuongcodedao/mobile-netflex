@@ -7,11 +7,13 @@ import com.project.backend.dto.response.PaypalSubscriptionResponse;
 import com.project.backend.dto.response.SubscriptionResponse;
 import com.project.backend.entity.Account;
 import com.project.backend.entity.Plan;
+import com.project.backend.entity.Profile;
 import com.project.backend.entity.Subscription;
 import com.project.backend.enums.PaymentStatus;
 import com.project.backend.mapper.SubscriptionMapper;
 import com.project.backend.repository.AccountRepository;
 import com.project.backend.repository.PlanRepository;
+import com.project.backend.repository.ProfileRepository;
 import com.project.backend.repository.SubscriptionRepository;
 import com.project.backend.service.IPaypalService;
 import com.project.backend.service.ISubscriptionService;
@@ -35,6 +37,7 @@ public class SubscriptionService implements ISubscriptionService {
     private final SubscriptionMapper subscriptionMapper;
     private final AccountRepository accountRepository;
     private final PlanRepository planRepository;
+    private final ProfileRepository profileRepository;
 
     @Override
     @Transactional
@@ -61,6 +64,10 @@ public class SubscriptionService implements ISubscriptionService {
         Account account = subscription.getAccount();
         subscription.setStatus(PaymentStatus.valueOf(subscriptionResponse.getStatus()));
         if(subscriptionResponse.getStatus().equals("ACTIVE")) {
+            Subscription subs = subscriptionRepository.findByAccountIdAndActive(account.getId(), true);
+            if(subs!=null){
+                cancelSubscription(subs.getId());
+            }
             account.setCurrentPlan(subscription.getPlan());
             subscription.setActive(true);
             accountRepository.save(account);
@@ -73,10 +80,16 @@ public class SubscriptionService implements ISubscriptionService {
     public void cancelSubscription(String subscriptionId) throws IOException {
         Subscription subscription = subscriptionRepository.findById(subscriptionId)
                 .orElseThrow(() -> new RuntimeException("Subscription not found"));
+        Account account = subscription.getAccount();
+        Plan plan = planRepository.findById("basic-plan").orElseThrow(()->new RuntimeException("Plan not found"));
+        account.setCurrentPlan(plan);
+        List<Profile> profiles = profileRepository.findAllByAccountId(account.getId());
+        profileRepository.deleteAll(profiles);
+        paypalService.cancelSubscription(subscriptionId);
         subscription.setActive(false);
         subscription.setStatus(PaymentStatus.CANCELED);
+        accountRepository.save(account);
         subscriptionRepository.save(subscription);
-        paypalService.cancelSubscription(subscriptionId);
     }
 
     public List<SubscriptionResponse> getAllSubscriptions() {
