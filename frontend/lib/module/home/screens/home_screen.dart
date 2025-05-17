@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:frontend/models/profile/profile_model.dart';
 import 'package:frontend/module/home/screens/home_page.dart';
 import 'package:frontend/module/home/screens/search_page.dart';
@@ -11,6 +12,7 @@ import 'package:frontend/module/watching/screens/watching_screen.dart';
 import 'package:frontend/providers/film_provider.dart';
 import 'package:frontend/providers/profile_provider.dart';
 import 'package:frontend/repositories/film_repository.dart';
+import 'package:frontend/repositories/profile_repository.dart';
 import 'package:frontend/services/api_services.dart';
 import 'package:frontend/services/storage_service.dart';
 import 'package:get/get.dart';
@@ -79,7 +81,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 future: _getProfileAvatar(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
+                    return SpinKitSpinningLines(
+                      color: Colors.redAccent,
+                      size: 20.0,
+                    );
                   } else if (snapshot.hasError) {
                     return const Icon(Icons.manage_accounts);
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -128,16 +133,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<String> _getProfileAvatar() async {
     StorageService storageService = StorageService();
     int? accountId = await storageService.getUserInfo();
-    if (accountId == null) {
+    int? profileId = await storageService.getProfileId();
+    String? accessToken = await storageService.getAccessToken();
+    if (accountId == null || profileId == null || accessToken == null) {
       print('Account ID không tồn tại');
       return '';
     }
-
-    final profiles = await ref.read(profileProvider(accountId).future);
-    final profile = profiles.firstWhere(
-      (profile) => profile.id == widget.profile.id,
-    );
-    return profile.avatar ??
-        ''; // Trả về avatar hoặc chuỗi rỗng nếu không có avatar
+    ProfileModel profile = await ProfileRepository(
+      ApiService(),
+    ).fetchProfile2(accountId, accessToken, profileId);
+    return profile.avatar;
   }
 }
+

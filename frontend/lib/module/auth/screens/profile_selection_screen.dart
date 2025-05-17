@@ -179,9 +179,10 @@ class ProfileSelectionScreen extends StatelessWidget {
   void _goToHomeScreen(BuildContext context, ProfileModel profile) {
     StorageService().saveProfileId(profile.id!);
     print("Id Profile :" + profile.id!.toString());
-    Navigator.push(
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => HomeScreen(profile: profile)),
+      (Route<dynamic> route) => false,
     );
   }
 }

@@ -78,13 +78,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final accountId = loginResult['accountId'] as int;
       print('Login successful, accountId: $accountId');
       // Lưu vao StorageService
-      StorageService().saveUserInfo(accountId); // Lưu accountId vào StorageService
+      StorageService().saveUserInfo(
+        accountId,
+      ); // Lưu accountId vào StorageService
 
       // Lấy danh sách profiles
       print('Fetching profiles for accountId: $accountId');
       final profiles = await ref.read(profileProvider(accountId).future);
       print('Fetched profiles: $profiles');
-
+      StorageService().saveFirstInstall(false);
       // Điều hướng tới ProfileSelectionScreen
       Navigator.push(
         context,
@@ -131,7 +133,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (errorMessage == '1007') {
       errorMessage = 'This account is not activated. Please contact support.';
     }
-    showErrorNotify(context,"Login failed", errorMessage);
+    showErrorNotify(context, "Login failed", errorMessage);
   }
 
   @override
