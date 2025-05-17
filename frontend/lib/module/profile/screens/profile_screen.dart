@@ -1,6 +1,8 @@
 import 'dart:ffi';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:frontend/models/profile/profile_model.dart';
 import 'package:frontend/module/account/screens/manager_account_screen.dart';
+import 'package:frontend/module/auth/screens/login_screen.dart';
 import 'package:frontend/module/auth/screens/profile_selection_screen.dart';
 import 'package:frontend/providers/profile_provider.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,8 @@ import 'package:frontend/module/account/screens/manager_profile_screen.dart';
 import 'package:frontend/module/history/screens/history_screen.dart';
 import 'package:frontend/module/home/screens/my_list_page.dart';
 import 'package:frontend/module/profile/widgets/button_icon.dart';
+import 'package:frontend/repositories/profile_repository.dart';
+import 'package:frontend/services/api_services.dart';
 import 'package:frontend/services/storage_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/module/subscription/manage_subscription_screen.dart';
@@ -50,8 +54,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               child: FutureBuilder<List<ProfileModel?>>(
                 future: _getProfileList(),
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: SpinKitSpinningLines(
+                      color: Colors.redAccent,
+                      size: 50.0,
+                    ),
+                  );
                   } else if (snapshot.hasError) {
                     return const Center(child: Text("Error loading profiles"));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -76,7 +85,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                             image: DecorationImage(
-                              image: AssetImage('assets/images/${profile?.avatar}' ?? ''),
+                              image: AssetImage(
+                                'assets/images/${profile?.avatar}' ?? '',
+                              ),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -165,7 +176,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 //     builder: (context) => const ManagerAccountScreen(),
                 //   ),
                 // );
-                Get.to(()=> ManagerAccountScreen(), transition: Transition.rightToLeft);
+                Get.to(
+                  () => ManagerAccountScreen(),
+                  transition: Transition.rightToLeft,
+                );
               },
             ),
             ButtonIcon(
@@ -177,8 +191,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             const SizedBox(height: 50),
 
             InkWell(
-              onTap: () {
-                // TODO: Add sign out logic
+              onTap: () async{
+                StorageService storageService = StorageService();
+                bool? isFirstInstall = await storageService.getFirstInstall();
+                storageService.clearStorage();
+                if(isFirstInstall != null){
+                  storageService.saveFirstInstall(isFirstInstall);
+                }
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                (Route<dynamic> route) => false,
+                );
               },
               child: const Text(
                 "Sign Out",
@@ -227,18 +251,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   // hàm lấy danh sách profile
   Future<List<ProfileModel?>> _getProfileList() async {
-    try {
-      StorageService storageService = StorageService();
-      int? accountId = await storageService.getUserInfo();
-      if (accountId == null) {
-        print('Account ID không tồn tại');
-        return [];
-      }
-      final profiles = await ref.read(profileProvider(accountId).future);
-      return profiles;
-    } catch (e) {
-      print('Error fetching profiles: $e');
+    StorageService storageService = StorageService();
+    int? accountId = await storageService.getUserInfo();
+    int? profileId = await storageService.getProfileId();
+    String? accessToken = await storageService.getAccessToken();
+    if (accountId == null || profileId == null || accessToken == null) {
+      print('Account ID không tồn tại');
       return [];
     }
+    final profiles = await ProfileRepository(
+      ApiService(),
+    ).fetchProfiles2(accountId, accessToken);
+    return profiles;
   }
 }

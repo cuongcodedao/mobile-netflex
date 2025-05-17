@@ -20,7 +20,9 @@ class AuthRepository {
         {"refreshToken": refreshToken},
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
+      print("refresh data " + response.data.toString());
       final token = Token.fromJson(response.data['result']);
+      print("co lay duoc token " + token.toString());
       return token;
     } catch (e) {
       print('Refresh token error: $e');
@@ -95,7 +97,7 @@ class AuthRepository {
       final accessToken = data['accessToken'];
       final refreshToken = data['refreshToken'];
       print("Access token: ${token.accessToken}");
-      StorageService().saveTokens(token); 
+      StorageService().saveTokens(token);
       // Luu accessToken va refreshToken
 
       // Set the accessToken in ApiService after successful login
@@ -112,6 +114,7 @@ class AuthRepository {
       rethrow;
     }
   }
+
   // Hàm lấy thông tin người dùng bằng accountId
   Future<UserModel> getUserInfo(int accountId) async {
     try {
@@ -126,40 +129,39 @@ class AuthRepository {
       rethrow;
     }
   }
+
   // Hàm cập nhật thông tin như firstName, lastName và mật khẩu
-Future<Map<String, dynamic>> updateUserInfo({
-  required int id,
-  String? firstName,
-  String? lastName,
-  String? password,
-}) async {
-  try {
-    final response = await apiService.put(
-      '/api/v1/account/$id',
-      {
+  Future<Map<String, dynamic>> updateUserInfo({
+    required int id,
+    String? firstName,
+    String? lastName,
+    String? password,
+  }) async {
+    try {
+      final response = await apiService.put('/api/v1/account/$id', {
         'id': id,
         'firstName': firstName,
         'lastName': lastName,
         'password': password,
-      },
-    );
+      });
 
-    // Trả về nguyên bản response data từ server
-    return response.data as Map<String, dynamic>;
-  } catch (e) {
-    print('Update user info error: $e');
-    rethrow;
+      // Trả về nguyên bản response data từ server
+      return response.data as Map<String, dynamic>;
+    } catch (e) {
+      print('Update user info error: $e');
+      rethrow;
+    }
   }
-}
-  // Hàm xóa tài khoản 
+
+  // Hàm xóa tài khoản
   Future<Map<String, dynamic>> deleteAccount(int id) async {
     try {
       final response = await apiService.delete('/api/v1/account/$id');
-        // Trả về nguyên bản response data từ server
-    return response.data as Map<String, dynamic>;
-  } catch (e) {
-    print('Update user info error: $e');
-    rethrow;
-  }
+      // Trả về nguyên bản response data từ server
+      return response.data as Map<String, dynamic>;
+    } catch (e) {
+      print('Update user info error: $e');
+      rethrow;
+    }
   }
 }

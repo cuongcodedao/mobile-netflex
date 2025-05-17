@@ -6,6 +6,7 @@ class StorageService {
   Future<void> saveTokens(Token token) async {
     final prefs = await SharedPreferences.getInstance();
     print("Save Access token ${token.accessToken}");
+    print("Save Refresh token ${token.refreshToken}");
     await prefs.setString('accessToken', token.accessToken);
     await prefs.setString('refreshToken', token.refreshToken);
     await prefs.setString('tokenToken', token.tokenType);
@@ -17,6 +18,7 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('userId', userId);
   }
+
   Future<int?> getUserInfo() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt('userId');
@@ -30,6 +32,16 @@ class StorageService {
   Future<int?> getProfileId() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt('profileId');
+  }
+
+  Future<void> saveFirstInstall(bool isFirstInstall) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isFirstInstall', isFirstInstall);
+  }
+
+  Future<bool?> getFirstInstall() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isFirstInstall');
   }
 
   // Lấy token
@@ -53,7 +65,6 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
   }
-
 
   Future<void> setHandledSubscriptionSuccess(String subscriptionId) async {
     final prefs = await SharedPreferences.getInstance();
