@@ -57,6 +57,8 @@ public class SubscriptionService implements ISubscriptionService {
         return paypalSubscriptionResponse;
     }
 
+    @Override
+    @Transactional
     public PaypalSubscriptionResponse activeSubscription(String subscriptionId) throws IOException {
         PaypalSubscriptionResponse subscriptionResponse = paypalService.getSubscription(subscriptionId);
         Subscription subscription = subscriptionRepository.findById(subscriptionId)
@@ -77,6 +79,7 @@ public class SubscriptionService implements ISubscriptionService {
     }
 
     @Override
+    @Transactional
     public void cancelSubscription(String subscriptionId) throws IOException {
         Subscription subscription = subscriptionRepository.findById(subscriptionId)
                 .orElseThrow(() -> new RuntimeException("Subscription not found"));
@@ -90,6 +93,14 @@ public class SubscriptionService implements ISubscriptionService {
         subscription.setStatus(PaymentStatus.CANCELED);
         accountRepository.save(account);
         subscriptionRepository.save(subscription);
+    }
+
+    @Override
+    public void cancelSubscriptionByAccountId(Long accountId) throws IOException {
+        Subscription subscription = subscriptionRepository.findByAccountIdAndActive(accountId, true);
+        if (subscription != null) {
+            cancelSubscription(subscription.getId());
+        }
     }
 
     public List<SubscriptionResponse> getAllSubscriptions() {

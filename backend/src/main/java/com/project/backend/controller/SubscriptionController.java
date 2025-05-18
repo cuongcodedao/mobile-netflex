@@ -26,7 +26,7 @@ public class SubscriptionController {
     }
 
     @GetMapping("/{subscription_id}")
-    public TemplateResponse<?> getSubscription(@PathVariable String subscription_id) throws IOException {
+    public TemplateResponse<?> activeSubscription(@PathVariable String subscription_id) throws IOException {
         return TemplateResponse.builder()
                 .result(subscriptionService.activeSubscription(subscription_id).getStatus())
                 .build();
@@ -34,6 +34,14 @@ public class SubscriptionController {
     @DeleteMapping("/cancel/{subscription_id}")
     public TemplateResponse<?> cancelSubscription(@PathVariable String subscription_id) throws IOException {
         subscriptionService.cancelSubscription(subscription_id);
+        return TemplateResponse.builder()
+                .result("Subscription cancelled successfully")
+                .build();
+    }
+
+    @DeleteMapping("/cancel/account/{account_id}")
+    public TemplateResponse<?> cancelSubscription(@PathVariable Long account_id) throws IOException {
+        subscriptionService.cancelSubscriptionByAccountId(account_id);
         return TemplateResponse.builder()
                 .result("Subscription cancelled successfully")
                 .build();
