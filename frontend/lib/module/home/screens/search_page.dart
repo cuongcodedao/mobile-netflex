@@ -39,7 +39,13 @@ class _SearchPageState extends State<SearchPage> {
 
   Future<void> loadFilm() async {
     try {
-      films = await filmRepository.getSearchFilm(controller.text.trim());
+      List<Film> filmstmp = await filmRepository.getSearchFilm(
+        controller.text.trim(),
+      );
+      if (!mounted) return;
+      setState(() {
+        films = filmstmp;
+      });
     } catch (e) {
       films = [];
       debugPrint('Error loading search film page: $e');
@@ -90,43 +96,47 @@ class _SearchPageState extends State<SearchPage> {
                             child: Shimmer.fromColors(
                               baseColor: Colors.grey.shade800,
                               highlightColor: Colors.grey.shade600,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Row(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          height: 100,
-                          width: 100,
-                        ),
-                        const SizedBox(width: 10),
-                        Column(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      height: 100,
+                                      width: 100,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Column(
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          height: 30,
+                                          width: 200,
+                                        ),
+                                        SizedBox(height: 10),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          height: 30,
+                                          width: 200,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                              height: 30,
-                              width: 200,
-                            ),
-                            SizedBox(height: 10,),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              height: 30,
-                              width: 200,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
                             ),
                           ),
                     )
