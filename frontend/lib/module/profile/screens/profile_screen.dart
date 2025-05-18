@@ -54,13 +54,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               child: FutureBuilder<List<ProfileModel?>>(
                 future: _getProfileList(),
                 builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: SpinKitSpinningLines(
-                      color: Colors.redAccent,
-                      size: 50.0,
-                    ),
-                  );
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: SpinKitSpinningLines(
+                        color: Colors.redAccent,
+                        size: 50.0,
+                      ),
+                    );
                   } else if (snapshot.hasError) {
                     return const Center(child: Text("Error loading profiles"));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -191,17 +191,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             const SizedBox(height: 50),
 
             InkWell(
-              onTap: () async{
+              onTap: () async {
                 StorageService storageService = StorageService();
                 bool? isFirstInstall = await storageService.getFirstInstall();
                 storageService.clearStorage();
-                if(isFirstInstall != null){
+                if (isFirstInstall != null) {
                   storageService.saveFirstInstall(isFirstInstall);
                 }
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => LoginScreen()),
-                (Route<dynamic> route) => false,
+                  (Route<dynamic> route) => false,
                 );
               },
               child: const Text(
@@ -225,12 +225,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     try {
       StorageService storageService = StorageService();
       int? accountId = await storageService.getUserInfo();
-      if (accountId == null) {
+      int? profileId = await storageService.getProfileId();
+      String? accessToken = await storageService.getAccessToken();
+      if (accountId == null || profileId == null || accessToken == null) {
         print('Account ID không tồn tại');
         return;
       }
-
-      final profiles = await ref.read(profileProvider(accountId).future);
+      final profiles = await ProfileRepository(
+        ApiService(),
+      ).fetchProfiles2(accountId, accessToken);
       print('Fetched profiles: $profiles');
 
       // Chuyển sang màn hình ManagerProfileScreen nếu cần

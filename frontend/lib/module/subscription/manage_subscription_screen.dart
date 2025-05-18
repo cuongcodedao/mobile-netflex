@@ -69,7 +69,8 @@ class _ManageSubscriptionScreenState extends ConsumerState<ManageSubscriptionScr
           (p) => p['id'] == userPlanId,
           orElse: () => plans[0],
         );
-
+        // print("User plan ID: $userPlanId");
+        // print("User plan: $plan");
         setState(() {
           currentPlan = plan;
         });
