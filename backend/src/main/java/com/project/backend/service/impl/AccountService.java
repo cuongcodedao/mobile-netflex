@@ -103,10 +103,10 @@ public class AccountService implements IAccountService {
 
         int plus = accessLog == null ? 1 : 0;
 
-        if (totalDevices+plus >= userDetails.getCurrentPlan().getMaxNumberOfDevice()) {
+        if (totalDevices+plus > userDetails.getCurrentPlan().getMaxNumberOfDevice()) {
             throw new AppException(ErrorCode.EXCEEDS_MAX_DEVICE);
         }
-        if (activeDevices+plus >= userDetails.getCurrentPlan().getMaxNumberOfDeviceActive()) {
+        if (activeDevices+plus > userDetails.getCurrentPlan().getMaxNumberOfDeviceActive()) {
             throw new AppException(ErrorCode.EXCEEDS_MAX_DEVICE_ACTIVE);
         }
         if(accessLog!=null){
