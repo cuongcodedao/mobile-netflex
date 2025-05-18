@@ -74,12 +74,21 @@ class AuthRepository {
   Future<Map<String, dynamic>> login({
     required String email,
     required String password,
+    required String deviceId,
+    required String deviceName,
+    required String deviceType,
   }) async {
     try {
       print('Sending login request with email: $email and password: $password');
       final response = await apiService.post(
         '/api/v1/auth/signin',
-        {"email": email, "password": password},
+        {
+          "email": email,
+          "password": password,
+          "deviceId": deviceId,
+          "deviceName": deviceName,
+          "deviceType": deviceType,
+        },
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
       //print('Request headers: ${response.requestOptions.headers}');
