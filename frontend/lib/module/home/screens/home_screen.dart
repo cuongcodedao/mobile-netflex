@@ -37,21 +37,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   List<Widget> get _widgetOptions => [
     HomePage(profile: widget.profile),
-    const Text(
-      '🔍 Search',
-      style: TextStyle(
-        fontSize: 24,
-        fontFamily: "Montserrat",
-        color: Colors.white,
+    const Padding(
+      padding: const EdgeInsets.all(30),
+      child: Center(
+        child: Text(
+          "Hot \$ New is coming soon",
+          style: const TextStyle(
+            color: Colors.white60,
+            fontSize: 16,
+            fontFamily: "Montserrat",
+          ),
+        ),
       ),
     ),
     const SearchPage(),
-    const Text(
-      'Setting Page',
-      style: TextStyle(
-        fontSize: 24,
-        fontFamily: "Montserrat",
-        color: Colors.white,
+    const Padding(
+      padding: const EdgeInsets.all(30),
+      child: Center(
+        child: Text(
+          "Setting is coming soon",
+          style: const TextStyle(
+            color: Colors.white60,
+            fontSize: 16,
+            fontFamily: "Montserrat",
+          ),
+        ),
       ),
     ),
   ];

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/models/film/film.dart';
+import 'package:frontend/module/home/bloc/my_list_cubit.dart';
 import 'package:frontend/module/notify/screens/success-notify.dart';
 import 'package:frontend/module/watching/screens/playing_film_page.dart';
 import 'package:frontend/module/watching/widgets/actions_button.dart';
@@ -9,6 +11,7 @@ import 'package:frontend/module/watching/widgets/loading_waching.dart';
 import 'package:frontend/repositories/film_repository.dart';
 import 'package:frontend/repositories/my_list_repository.dart';
 import 'package:frontend/services/api_services.dart';
+import 'package:get_it/get_it.dart';
 import 'package:shimmer/shimmer.dart';
 
 class WatchingScreen extends StatefulWidget {
@@ -47,6 +50,17 @@ class _WatchingScreenState extends State<WatchingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: Image.asset(
+          "assets/images/Netflix.jpg",
+          fit: BoxFit.fill,
+          height: 50,
+        ),
+      ),
       backgroundColor: Colors.black,
       body: SafeArea(
         child:
@@ -219,6 +233,7 @@ class _WatchingScreenState extends State<WatchingScreen> {
                                         "Add to My list",
                                       );
                                     }
+                                    GetIt.instance<MyListCubit>().loadMyList();
                                   },
                                 ),
                                 ActionsButton(
