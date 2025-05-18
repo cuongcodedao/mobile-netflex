@@ -197,7 +197,12 @@ class ManagerProfileScreen extends ConsumerWidget {
 
     try {
       final profileRepository = ref.read(profileRepositoryProvider);
-      bool deleteSuccess = await profileRepository.deleteProfile(profile.id!);
+      final String? accessToken = await StorageService().getAccessToken();
+      if (accessToken == null) {
+        showErrorNotify(context, 'Error', 'Access token not found.');
+        return;
+      }
+      bool deleteSuccess = await profileRepository.deleteProfile2(profile.id!, accessToken);
 
       if (deleteSuccess) {
         profiles.removeWhere((p) => p.id == profile.id);

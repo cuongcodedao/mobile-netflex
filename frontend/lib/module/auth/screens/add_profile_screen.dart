@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/module/notify/screens/error-notify.dart';
 import 'package:frontend/module/notify/screens/success-notify.dart';
+import 'package:frontend/repositories/profile_repository.dart';
+import 'package:frontend/services/api_services.dart';
+import 'package:frontend/services/storage_service.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_textfield.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,15 +30,22 @@ class _AddProfileScreenState extends ConsumerState<AddProfileScreen> {
   String? _selectedAvatar;
 
   final List<String> avatarOptions = [
-    'avatar-1.png', 'avatar-2.png', 'avatar-3.png', 'avatar-4.png',
-    'avatar-5.png', 'avatar-6.png', 'avatar-7.png', 'avatar-8.png',
-    'avatar-9.png', 'avatar-10.png',
+    'avatar-1.png',
+    'avatar-2.png',
+    'avatar-3.png',
+    'avatar-4.png',
+    'avatar-5.png',
+    'avatar-6.png',
+    'avatar-7.png',
+    'avatar-8.png',
+    'avatar-9.png',
+    'avatar-10.png',
   ];
 
   // Define the set of genre names NOT suitable for kids
   // Using a Set for efficient `contains` lookups
   final Set<String> _nonKidFriendlyGenreNames = {
-    'Hành Động', 'Miền Tây', 'Cổ Trang', 'Chiến Tranh', 
+    'Hành Động', 'Miền Tây', 'Cổ Trang', 'Chiến Tranh',
     'Kinh Dị', 'Phim 18+', 'Tình Cảm', 'Hình Sự',
     // Add any other genres that are not kid-friendly by their exact name from the API
   };
@@ -61,7 +71,9 @@ class _AddProfileScreenState extends ConsumerState<AddProfileScreen> {
       print('Error fetching categories: $e');
       if (mounted) {
         showErrorNotify(
-          context, 'Error', 'Failed to fetch categories. Please try again later.',
+          context,
+          'Error',
+          'Failed to fetch categories. Please try again later.',
         );
       }
     }
@@ -74,28 +86,50 @@ class _AddProfileScreenState extends ConsumerState<AddProfileScreen> {
     final isKid = _isKid;
 
     if (name.isEmpty) {
-      showErrorNotify(context, 'Missing Information', 'Please enter a name for the profile.');
+      showErrorNotify(
+        context,
+        'Missing Information',
+        'Please enter a name for the profile.',
+      );
       return;
     }
     if (_selectedAvatar == null) {
-      showErrorNotify(context, 'Missing Information', 'Please choose an avatar.');
+      showErrorNotify(
+        context,
+        'Missing Information',
+        'Please choose an avatar.',
+      );
       return;
     }
     if (_isKid == null) {
-      showErrorNotify(context, 'Missing Information', 'Please specify if this profile is for a kid.');
+      showErrorNotify(
+        context,
+        'Missing Information',
+        'Please specify if this profile is for a kid.',
+      );
       return;
     }
     if (_selectedGenres.isEmpty) {
-      showErrorNotify(context, 'Missing Genres', 'Please select at least one favorite genre.');
+      showErrorNotify(
+        context,
+        'Missing Genres',
+        'Please select at least one favorite genre.',
+      );
       return;
     }
 
     // Additional check: if it's a kid profile, ensure no non-kid-friendly genres are accidentally selected
     // This is a safeguard, as the UI should prevent this, but good to have.
     if (_isKid == true) {
-      final hasNonKidGenre = _selectedGenres.any((g) => _nonKidFriendlyGenreNames.contains(g.name));
+      final hasNonKidGenre = _selectedGenres.any(
+        (g) => _nonKidFriendlyGenreNames.contains(g.name),
+      );
       if (hasNonKidGenre) {
-        showErrorNotify(context, 'Invalid Selection', 'Kid profiles cannot have certain genres selected. Please adjust selection.');
+        showErrorNotify(
+          context,
+          'Invalid Selection',
+          'Kid profiles cannot have certain genres selected. Please adjust selection.',
+        );
         // Optionally, auto-remove them here before proceeding, or just rely on the UI logic.
         // _selectedGenres.removeWhere((g) => _nonKidFriendlyGenreNames.contains(g.name));
         // setState(() {}); // if you modify _selectedGenres
@@ -103,35 +137,40 @@ class _AddProfileScreenState extends ConsumerState<AddProfileScreen> {
       }
     }
 
-
     try {
       final profileRepository = ref.read(profileRepositoryProvider);
-      final newProfile = await profileRepository.addProfile(
-        username: name, avatar: _selectedAvatar!, kid: isKid!,
-        accountId: widget.accountId, favoriteGenres: _selectedGenres,
+      final String? accessToken = await StorageService().getAccessToken();
+      if (accessToken == null) {
+        showErrorNotify(context, 'Error', 'Access token not found.');
+        return;
+      }
+      final newProfile = await profileRepository.addProfile2(
+        username: name,
+        avatar: _selectedAvatar!,
+        kid: isKid!,
+        accountId: widget.accountId,
+        favoriteGenres: _selectedGenres,
+        acccesToken: accessToken,
       );
       print('Profile added: $newProfile');
-      
-      await Future.delayed(const Duration(milliseconds: 300));
-      final profiles = await ref.refresh(profileProvider(widget.accountId).future);
-      print('Fetched profiles after add: $profiles');
 
-      if (mounted) {
-        showSuccessNotify(context, 'Success', 'Profile added successfully.');
-        Future.delayed(const Duration(milliseconds: 1200), () {
-          if (mounted) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProfileSelectionScreen(
-                  profiles: profiles, accountId: widget.accountId,
-                ),
+      await Future.delayed(const Duration(milliseconds: 300));
+      final profiles = await ProfileRepository(
+        ApiService(),
+      ).fetchProfiles2(widget.accountId, accessToken);
+      print('Fetched profiles after add: $profiles');
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder:
+              (context) => ProfileSelectionScreen(
+                profiles: profiles,
+                accountId: widget.accountId,
               ),
-              (Route<dynamic> route) => false, 
-            );
-          }
-        });
-      }
+        ),
+        (Route<dynamic> route) => false,
+      );
+      showSuccessNotify(context, 'Success', 'Profile added successfully.');
     } catch (e) {
       if (mounted) {
         _handleAddError(e);
@@ -150,9 +189,10 @@ class _AddProfileScreenState extends ConsumerState<AddProfileScreen> {
           if (responseData.containsKey('message')) {
             errorMessage = responseData['message'].toString();
           } else if (responseData.containsKey('code')) {
-             errorMessage = responseData['code'].toString();
+            errorMessage = responseData['code'].toString();
           } else {
-            errorMessage = 'An unknown error occurred with the server response.';
+            errorMessage =
+                'An unknown error occurred with the server response.';
           }
         } else if (responseData != null) {
           errorMessage = responseData.toString();
@@ -163,7 +203,8 @@ class _AddProfileScreenState extends ConsumerState<AddProfileScreen> {
     } else {
       print('Non-Dio Error: $e');
     }
-    if (errorMessage == '1013' || errorMessage.toLowerCase().contains("profile limit exceeded")) {
+    if (errorMessage == '1013' ||
+        errorMessage.toLowerCase().contains("profile limit exceeded")) {
       errorMessage = 'Maximum number of profiles reached for this account.';
     }
     showErrorNotify(context, 'Add Profile Error', errorMessage);
@@ -193,27 +234,35 @@ class _AddProfileScreenState extends ConsumerState<AddProfileScreen> {
       _isKid = value;
       // If setting to 'kid = true', remove any selected non-kid-friendly genres
       if (_isKid == true) {
-        _selectedGenres.removeWhere((genre) => _nonKidFriendlyGenreNames.contains(genre.name));
+        _selectedGenres.removeWhere(
+          (genre) => _nonKidFriendlyGenreNames.contains(genre.name),
+        );
       }
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     // Filter genres to display based on _isKid status
-    List<Category> displayableGenres = List.from(genres); // Create a mutable copy
+    List<Category> displayableGenres = List.from(
+      genres,
+    ); // Create a mutable copy
     if (_isKid == true) {
-      displayableGenres.retainWhere((genre) => !_nonKidFriendlyGenreNames.contains(genre.name));
+      displayableGenres.retainWhere(
+        (genre) => !_nonKidFriendlyGenreNames.contains(genre.name),
+      );
     }
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Profile'),
         titleTextStyle: const TextStyle(
-          color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold,
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
         ),
-        backgroundColor: Colors.black, centerTitle: true,
+        backgroundColor: Colors.black,
+        centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       backgroundColor: Colors.black,
@@ -224,15 +273,23 @@ class _AddProfileScreenState extends ConsumerState<AddProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CustomTextField(
-                hintText: 'Name', controller: _nameController,
-                backgroundColor: Colors.black, textColor: Colors.white,
-                hintColor: Colors.grey, borderRadius: 8.0,
-                borderColor: Colors.white70, borderWidth: 1.0,
+                hintText: 'Name',
+                controller: _nameController,
+                backgroundColor: Colors.black,
+                textColor: Colors.white,
+                hintColor: Colors.grey,
+                borderRadius: 8.0,
+                borderColor: Colors.white70,
+                borderWidth: 1.0,
               ),
               const SizedBox(height: 24),
               const Text(
                 'Choose Avatar',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(height: 12),
               SizedBox(
@@ -245,31 +302,46 @@ class _AddProfileScreenState extends ConsumerState<AddProfileScreen> {
                     final isAvatarSelected = _selectedAvatar == avatar;
                     return GestureDetector(
                       onTap: () {
-                        setState(() { _selectedAvatar = avatar; });
+                        setState(() {
+                          _selectedAvatar = avatar;
+                        });
                       },
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
-                        width: 100, height: 90,
+                        width: 100,
+                        height: 90,
                         margin: const EdgeInsets.symmetric(horizontal: 6.0),
                         decoration: BoxDecoration(
-                          color: isAvatarSelected ? Colors.red.withOpacity(0.3) : Colors.grey[800],
+                          color:
+                              isAvatarSelected
+                                  ? Colors.red.withOpacity(0.3)
+                                  : Colors.grey[800],
                           borderRadius: BorderRadius.circular(12.0),
                           border: Border.all(
-                            color: isAvatarSelected ? Colors.redAccent : Colors.white38,
+                            color:
+                                isAvatarSelected
+                                    ? Colors.redAccent
+                                    : Colors.white38,
                             width: isAvatarSelected ? 5.0 : 0,
                           ),
-                          boxShadow: isAvatarSelected ? [
-                            BoxShadow(
-                              color: Colors.redAccent.withOpacity(0.5),
-                              blurRadius: 8, spreadRadius: 1,
-                            )
-                          ] : [],
+                          boxShadow:
+                              isAvatarSelected
+                                  ? [
+                                    BoxShadow(
+                                      color: Colors.redAccent.withOpacity(0.5),
+                                      blurRadius: 8,
+                                      spreadRadius: 1,
+                                    ),
+                                  ]
+                                  : [],
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10.0),
                           child: Image.asset(
-                            'assets/images/$avatar', fit: BoxFit.cover,
-                            width: double.infinity, height: double.infinity,
+                            'assets/images/$avatar',
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
                           ),
                         ),
                       ),
@@ -280,24 +352,38 @@ class _AddProfileScreenState extends ConsumerState<AddProfileScreen> {
               const SizedBox(height: 24),
               const Text(
                 'Is this profile for a kid?',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
               ),
               Row(
                 children: [
                   Expanded(
                     child: RadioListTile<bool>(
-                      title: const Text('Yes', style: TextStyle(color: Colors.white)),
-                      value: true, groupValue: _isKid,
+                      title: const Text(
+                        'Yes',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      value: true,
+                      groupValue: _isKid,
                       onChanged: _setIsKid, // Use the new method
-                      activeColor: Colors.red, contentPadding: EdgeInsets.zero,
+                      activeColor: Colors.red,
+                      contentPadding: EdgeInsets.zero,
                     ),
                   ),
                   Expanded(
                     child: RadioListTile<bool>(
-                      title: const Text('No', style: TextStyle(color: Colors.white)),
-                      value: false, groupValue: _isKid,
+                      title: const Text(
+                        'No',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      value: false,
+                      groupValue: _isKid,
                       onChanged: _setIsKid, // Use the new method
-                      activeColor: Colors.red, contentPadding: EdgeInsets.zero,
+                      activeColor: Colors.red,
+                      contentPadding: EdgeInsets.zero,
                     ),
                   ),
                 ],
@@ -305,72 +391,104 @@ class _AddProfileScreenState extends ConsumerState<AddProfileScreen> {
               const SizedBox(height: 24),
               const Text(
                 'Favorite Genres',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(height: 12),
               if (genres.isEmpty)
-                const Center(child: CircularProgressIndicator(color: Colors.red,))
+                const Center(
+                  child: CircularProgressIndicator(color: Colors.red),
+                )
               else if (_isKid == true && displayableGenres.isEmpty)
-                 Padding( // Show a message if kid profile and no kid-friendly genres
-                   padding: const EdgeInsets.symmetric(vertical: 16.0),
-                   child: Center(
-                     child: Text(
-                       "No suitable genres available for a kid's profile.",
-                       style: TextStyle(color: Colors.grey[400], fontSize: 16),
-                       textAlign: TextAlign.center,
-                     ),
-                   ),
-                 )
+                Padding(
+                  // Show a message if kid profile and no kid-friendly genres
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Center(
+                    child: Text(
+                      "No suitable genres available for a kid's profile.",
+                      style: TextStyle(color: Colors.grey[400], fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )
               else
                 Wrap(
-                  spacing: 10.0, runSpacing: 10.0,
-                  children: displayableGenres.map((genre) { // Use displayableGenres
-                    final isSelected = _selectedGenres.contains(genre);
-                    return GestureDetector(
-                      onTap: () => _toggleGenre(genre),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
-                        decoration: BoxDecoration(
-                          color: isSelected ? Colors.red : Colors.grey[800],
-                          borderRadius: BorderRadius.circular(20.0),
-                          border: Border.all(
-                            color: isSelected ? Colors.redAccent : Colors.white38,
-                            width: 1.5,
-                          ),
-                          boxShadow: isSelected ? [
-                            BoxShadow(
-                              color: Colors.red.withOpacity(0.4),
-                              blurRadius: 6, offset: const Offset(0,2),
-                            )
-                          ] : [],
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              genre.name ?? 'Unknown',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                              ),
+                  spacing: 10.0,
+                  runSpacing: 10.0,
+                  children:
+                      displayableGenres.map((genre) {
+                        // Use displayableGenres
+                        final isSelected = _selectedGenres.contains(genre);
+                        return GestureDetector(
+                          onTap: () => _toggleGenre(genre),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14.0,
+                              vertical: 8.0,
                             ),
-                            if (isSelected) ...[
-                              const SizedBox(width: 8.0),
-                              const Icon(Icons.check_circle, color: Colors.white, size: 16.0),
-                            ],
-                          ],
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                            decoration: BoxDecoration(
+                              color: isSelected ? Colors.red : Colors.grey[800],
+                              borderRadius: BorderRadius.circular(20.0),
+                              border: Border.all(
+                                color:
+                                    isSelected
+                                        ? Colors.redAccent
+                                        : Colors.white38,
+                                width: 1.5,
+                              ),
+                              boxShadow:
+                                  isSelected
+                                      ? [
+                                        BoxShadow(
+                                          color: Colors.red.withOpacity(0.4),
+                                          blurRadius: 6,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ]
+                                      : [],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  genre.name ?? 'Unknown',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight:
+                                        isSelected
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                  ),
+                                ),
+                                if (isSelected) ...[
+                                  const SizedBox(width: 8.0),
+                                  const Icon(
+                                    Icons.check_circle,
+                                    color: Colors.white,
+                                    size: 16.0,
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
                 ),
               const SizedBox(height: 32),
               Center(
                 child: CustomButton(
-                  text: 'Save Profile', onPressed: _saveProfile,
-                  backgroundColor: Colors.red, textColor: Colors.white,
+                  text: 'Save Profile',
+                  onPressed: _saveProfile,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
                   borderRadius: 8.0,
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 50),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 14,
+                    horizontal: 50,
+                  ),
                 ),
               ),
               const SizedBox(height: 24),

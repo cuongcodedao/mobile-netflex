@@ -61,7 +61,7 @@ class _ManagerAccountScreenState extends ConsumerState<ManagerAccountScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text(
-          'Quản lý tài khoản',
+          'Manager account',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
@@ -87,11 +87,11 @@ class _ManagerAccountScreenState extends ConsumerState<ManagerAccountScreen> {
                   _buildInfoRow('Email', _email ?? "Loading..."),
                   const SizedBox(height: 12),
                   _buildInfoRow(
-                    'Họ và tên',
+                    'Full Name',
                     '${_firstNameController.text} ${_lastNameController.text}',
                   ),
                   const SizedBox(height: 12),
-                  _buildInfoRow('Gói hiện tại', _currentPlan ?? "Loading..."),
+                  _buildInfoRow('Current Plan', _currentPlan ?? "Loading..."),
                   const SizedBox(height: 16),
                   Center(
                     child: ElevatedButton(
@@ -107,7 +107,7 @@ class _ManagerAccountScreenState extends ConsumerState<ManagerAccountScreen> {
                         ),
                       ),
                       child: Text(
-                        _isEditing ? 'HỦY CẬP NHẬT' : 'CẬP NHẬT THÔNG TIN',
+                        _isEditing ? 'CANCEL UPDATE' : 'UPDATE INFO',
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -122,7 +122,7 @@ class _ManagerAccountScreenState extends ConsumerState<ManagerAccountScreen> {
             if (_isEditing) ...[
               const SizedBox(height: 24),
               Text(
-                'Thông tin cập nhật',
+                'Information for update',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -130,12 +130,12 @@ class _ManagerAccountScreenState extends ConsumerState<ManagerAccountScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              _buildEditField('Họ', _firstNameController),
+              _buildEditField('FirstName', _firstNameController),
               const SizedBox(height: 16),
-              _buildEditField('Tên', _lastNameController),
+              _buildEditField('LastName', _lastNameController),
               const SizedBox(height: 16),
               _buildEditField(
-                'Mật khẩu',
+                'Password',
                 _passwordController,
                 isPassword: true,
               ),
@@ -176,7 +176,7 @@ class _ManagerAccountScreenState extends ConsumerState<ManagerAccountScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                     child: const Text(
-                      'XÓA TÀI KHOẢN',
+                      'DELETE ACCOUNT',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -243,8 +243,8 @@ class _ManagerAccountScreenState extends ConsumerState<ManagerAccountScreen> {
   Future<void> _updateUserInfo() async {
     bool? check = await showWarningNotify(
     context,
-    'Cảnh báo',
-    'Bạn có muốn luu thay đổi không?',
+    'Warning',
+    'Are you sure for change it?',
     );
     if (check == false) {
       return;
@@ -252,82 +252,88 @@ class _ManagerAccountScreenState extends ConsumerState<ManagerAccountScreen> {
       final authRepository = ref.read(authRepositoryProvider);
       final userId = await StorageService().getUserInfo();
       if (userId == null) {
-        showErrorNotify(context, "Lỗi", "Không tìm thấy thông tin người dùng");
+        showErrorNotify(context, "Error", "Cannot find User info");
+        return;
+      }
+      final String? accessToken = await StorageService().getAccessToken();
+      if (accessToken == null) {
+        showErrorNotify(context, 'Error', 'Access token not found.');
         return;
       }
 
       try {
-        final response = await authRepository.updateUserInfo(
+        final response = await authRepository.updateUserInfo2(
           id: userId,
           firstName: _firstNameController.text,
           lastName: _lastNameController.text,
           password: _passwordController.text,
+          accessToken: accessToken
         );
         //print('Update response: $response');
           if (response['code'] == 1000) {
             // Assuming 1000 is your success code
             showSuccessNotify(
               context,
-              "Thành công",
-              "Cập nhật thông tin thành công",
+              "Success",
+              "Update infomation complete"
             );
             await _fetchUserInfo(); // Refresh user info
             setState(() => _isEditing = false);
           } else {
             showErrorNotify(
               context,
-              "Lỗi",
-              response['message'] ?? "Cập nhật thông tin thất bại",
+              "Error",
+              response['message'] ?? "Update infomation fail",
             );
           }
         
       } catch (e) {
         print('Error updating user info: $e');
-        showErrorNotify(context, "Lỗi", "Cập nhật thông tin thất bại");
+        showErrorNotify(context, "Error",  "Update infomation fail",);
       }
     }
   }
     Future<void> _deleteAccount() async {
-      showErrorNotify(context, "Lỗi", "Chức năng này chỉ dành cho admin");
+      showErrorNotify(context, "Error", "Only ADMIN can delete account");
         return;
-      final authRepository = ref.read(authRepositoryProvider);
-      final userId = await StorageService().getUserInfo();
-      if (userId == null) {
-        showErrorNotify(context, "Lỗi", "Không tìm thấy thông tin người dùng");
-        return;
-      }
+      // final authRepository = ref.read(authRepositoryProvider);
+      // final userId = await StorageService().getUserInfo();
+      // if (userId == null) {
+      //   showErrorNotify(context, "Lỗi", "Không tìm thấy thông tin người dùng");
+      //   return;
+      // }
 
-        bool? check = await showWarningNotify(
-            context,
-            'Cảnh báo',
-            'Bạn có muốn xóa tài khoản không?',
-        );
-        if (check == false) {
-          return;
-        } else {
-          try {
-            final response = await authRepository.deleteAccount(userId);
-            if (response['code'] == 1000) {
-              // Assuming 1000 is your success code
-              showSuccessNotify(
-                context,
-                "Thành công",
-                "Xóa tài khoản thành công",
-              );
-              StorageService().clearStorage(); // Xóa thông tin người dùng
-              // Chuyển hướng về trang đăng nhập hoặc trang chính
-                Navigator.popUntil(context, (route) => route.isFirst);
-            } else {
-                showErrorNotify(
-                    context,
-                    "Lỗi",
-                    response['message'] ?? "Xóa tài khoản thất bại",
-                );
-                }
-            } catch (e) {
-            print('Error deleting account: $e');
-            showErrorNotify(context, "Lỗi", "Xóa tài khoản thất bại");
-            }
-        }
+      //   bool? check = await showWarningNotify(
+      //       context,
+      //       'Cảnh báo',
+      //       'Bạn có muốn xóa tài khoản không?',
+      //   );
+      //   if (check == false) {
+      //     return;
+      //   } else {
+      //     try {
+      //       final response = await authRepository.deleteAccount(userId);
+      //       if (response['code'] == 1000) {
+      //         // Assuming 1000 is your success code
+      //         showSuccessNotify(
+      //           context,
+      //           "Thành công",
+      //           "Xóa tài khoản thành công",
+      //         );
+      //         StorageService().clearStorage(); // Xóa thông tin người dùng
+      //         // Chuyển hướng về trang đăng nhập hoặc trang chính
+      //           Navigator.popUntil(context, (route) => route.isFirst);
+      //       } else {
+      //           showErrorNotify(
+      //               context,
+      //               "Lỗi",
+      //               response['message'] ?? "Xóa tài khoản thất bại",
+      //           );
+      //           }
+      //       } catch (e) {
+      //       print('Error deleting account: $e');
+      //       showErrorNotify(context, "Lỗi", "Xóa tài khoản thất bại");
+      //       }
+      //   }
     }
 }

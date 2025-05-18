@@ -39,70 +39,94 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     filmRepository = FilmRepository(ApiService()); // inject service
-    loadFilmPage();
-    loadForYouFilms();
-    loadNewFilms();
-    loadHistory();
-    loadMyList();
+    loadAllData();
+  }
+
+  Future<void> loadAllData() async {
+    setState(() {
+      isLoading = true;
+      isLoadingFail = false;
+    });
+
+    try {
+      await Future.wait([
+        loadFilmPage(),
+        loadNewFilms(),
+        loadForYouFilms(),
+        loadHistory(),
+        loadMyList(),
+      ]);
+    } catch (e) {
+      print('Error loading data: $e');
+      isLoadingFail = true;
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Future<void> loadFilmPage() async {
     try {
-      filmPage = await filmRepository.getFilmPage(1); // truyen lug
+      filmPage = await filmRepository.getFilmPage(1);
+      print("Số new film được: ${filmPage?.items.length ?? 0}");
     } catch (e) {
-      isLoadingFail = true;
       print('Error loading film page: $e');
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
-
-  Future<void> loadForYouFilms() async {
-    try {
-      final profileId =
-          widget.profile.id; // Access profile ID using widget.profile.id
-      forYouFilms = await filmRepository.getListFilmByFavorite(
-        profileId!,
-      ); // Add null check
-      setState(() {});
-    } catch (e) {
-      print('Error loading For You films: $e');
     }
   }
 
   Future<void> loadNewFilms() async {
     try {
-      newFilms = await filmRepository.getNewFilms(); // Add null check
-      setState(() {});
+      newFilms = await filmRepository.getNewFilms();
+      print("Số phim mới: ${newFilms.length}");
+    } catch (e) {
+      print('Error loading new films: $e');
+    }
+  }
+
+  Future<void> loadForYouFilms() async {
+    try {
+      final profileId = widget.profile.id;
+      if (profileId == null) throw Exception("Profile ID is null");
+
+      forYouFilms = await filmRepository.getListFilmByFavorite(profileId);
+      print("Số phim tìm được: ${forYouFilms.length}");
     } catch (e) {
       print('Error loading For You films: $e');
     }
   }
 
   Future<void> loadHistory() async {
-    List<FilmHistory> list =
-        await HistoryRepository(ApiService()).getFilmHistory();
-    for (var history in list) {
-      if (history.finished) {
-        listHistoryWatched.add(history);
-      } else {
-        listHistoryContinue.add(history);
+    try {
+      List<FilmHistory>? list =
+          await HistoryRepository(ApiService()).getFilmHistory();
+      listHistoryWatched.clear();
+      listHistoryContinue.clear();
+
+      if (list != null) {
+        for (var history in list) {
+          if (history.finished) {
+            listHistoryWatched.add(history);
+          } else {
+            listHistoryContinue.add(history);
+          }
+        }
       }
+      print("Số phim đã xem: ${listHistoryWatched.length}");
+      print("Số phim đang xem: ${listHistoryContinue.length}");
+    } catch (e) {
+      print('Error loading history: $e');
     }
-    setState(() {});
-    // hiển thị số lượng phim đã xem và đang xem
-    //print("Số phim đã xem: ${listHistoryWatched.length}");
-    //print("Số phim đang xem: ${listHistoryContinue.length}");
   }
-    Future<void> loadMyList() async {
-    List<Film> list = await MyListRepository(ApiService()).getMyListFilm();
-    // đảo ngược danh sách
-    //list = list.reversed.toList();
-    setState(() {
-      myList = list;
-      isLoading = false;
-    });
-    print("Số phim trong danh sách của tôi: ${myList.length}");
+
+  Future<void> loadMyList() async {
+    try {
+      List<Film>? list = await MyListRepository(ApiService()).getMyListFilm();
+      myList = list ?? [];
+      print("Số phim trong danh sách của tôi: ${myList.length}");
+    } catch (e) {
+      print('Error loading my list: $e');
+    }
   }
 
   @override
@@ -177,14 +201,16 @@ class _HomePageState extends State<HomePage> {
               (index) => FilmItem(
                 imageUrl: filmPage!.items[index].urlPoster,
                 labelType: FilmLabelType.newFilm,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => WatchingScreen(
-                      slug: filmPage!.items[index].slug,
+                onTap:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => WatchingScreen(
+                              slug: filmPage!.items[index].slug,
+                            ),
+                      ),
                     ),
-                  ),
-                )
               ),
             ),
             itemHeight: 180,
@@ -199,76 +225,96 @@ class _HomePageState extends State<HomePage> {
               (index) => FilmItem(
                 imageUrl: "https://phimimg.com/${forYouFilms[index].urlPoster}",
                 labelType: FilmLabelType.none,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => WatchingScreen(
-                      slug: forYouFilms[index].slug,
+                onTap:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) =>
+                                WatchingScreen(slug: forYouFilms[index].slug),
+                      ),
                     ),
-                  ),
-                )
               ),
             ),
           ),
 
-          // Danh sách NEW EPISODES
-          HorizontalFilmList(
-            listTitle: 'Your List',
-            films: List.generate(
-              myList.length,
-              (index) => FilmItem(
-                imageUrl: myList[index].urlPoster,
-                labelType: FilmLabelType.top,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => WatchingScreen(
-                      slug: myList[index].slug,
-                    ),
-                  ),
-                )
+          // Danh sách
+          if (myList.isNotEmpty)
+            HorizontalFilmList(
+              listTitle: 'Your List',
+              films: List.generate(
+                myList.length,
+                (index) => FilmItem(
+                  imageUrl: myList[index].urlPoster,
+                  labelType: FilmLabelType.top,
+                  onTap:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  WatchingScreen(slug: myList[index].slug),
+                        ),
+                      ),
+                ),
               ),
             ),
-          ),
 
           // Danh sách Xem lại
-          HorizontalFilmList(
-            listTitle: 'Continue Watching',
-            films: List.generate(
-              listHistoryContinue.length,
-              (index) => FilmItem(
-                imageUrl: listHistoryContinue[index].episodeHistory?.posterUrl ?? '',
-                labelType: FilmLabelType.none,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => WatchingScreen(
-                      slug: listHistoryContinue[index].episodeHistory?.slug ?? '',
-                    ),
-                  ),
+          if (listHistoryContinue.isNotEmpty)
+            HorizontalFilmList(
+              listTitle: 'Continue Watching',
+              films: List.generate(
+                listHistoryContinue.length,
+                (index) => FilmItem(
+                  imageUrl:
+                      listHistoryContinue[index].episodeHistory?.posterUrl ??
+                      '',
+                  labelType: FilmLabelType.none,
+                  onTap:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => WatchingScreen(
+                                slug:
+                                    listHistoryContinue[index]
+                                        .episodeHistory
+                                        ?.slug ??
+                                    '',
+                              ),
+                        ),
+                      ),
                 ),
-              )
+              ),
             ),
-          ),
           // Danh sách xem lại
-          HorizontalFilmList(
-            listTitle: 'Watch it Again',
-            films: List.generate(
-              listHistoryWatched.length,
-              (index) => FilmItem(
-                imageUrl: listHistoryWatched[index].episodeHistory?.posterUrl ?? '',
-                labelType: FilmLabelType.none,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => WatchingScreen(
-                      slug: listHistoryWatched[index].episodeHistory?.slug ?? '',
-                    ),
-                  ),
+          if (listHistoryWatched.isNotEmpty)
+            HorizontalFilmList(
+              listTitle: 'Watch it Again',
+              films: List.generate(
+                listHistoryWatched.length,
+                (index) => FilmItem(
+                  imageUrl:
+                      listHistoryWatched[index].episodeHistory?.posterUrl ?? '',
+                  labelType: FilmLabelType.none,
+                  onTap:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => WatchingScreen(
+                                slug:
+                                    listHistoryWatched[index]
+                                        .episodeHistory
+                                        ?.slug ??
+                                    '',
+                              ),
+                        ),
+                      ),
                 ),
-              )
+              ),
             ),
-          ),
         ],
       ),
     );
