@@ -1,5 +1,6 @@
 package com.project.backend.dto.request;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

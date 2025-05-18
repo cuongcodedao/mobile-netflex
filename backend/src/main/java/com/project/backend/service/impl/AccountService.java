@@ -175,8 +175,11 @@ public class AccountService implements IAccountService {
                 .orElseThrow(() -> new RuntimeException("Account not found"));
         account.setUpdatedAt(LocalDateTime.now());
         accountMapper.updateAccount(account, accountUpdateRequest);
-        if (accountUpdateRequest.getPassword() != null) {
+        if (accountUpdateRequest.getPassword() != null && !accountUpdateRequest.getPassword().isEmpty()) {
             account.setPassword(passwordEncoder.encode(accountUpdateRequest.getPassword()));
+        }
+        else{
+            account.setPassword(account.getPassword());
         }
         accountRepository.save(account);
         return accountMapper.toAccountResponse(account);
