@@ -3,7 +3,7 @@ import 'dart:convert';
 
 class ApiService {
   final Dio _dio = Dio(
-    BaseOptions(baseUrl: 'https://a85a-117-2-255-218.ngrok-free.app'),
+    BaseOptions(baseUrl: 'http://54.255.180.117:8080'),
   );
   String? _accessToken; // Biến lưu trữ accessToken
 
