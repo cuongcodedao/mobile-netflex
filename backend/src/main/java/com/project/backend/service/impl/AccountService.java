@@ -97,16 +97,18 @@ public class AccountService implements IAccountService {
         if(!account.isEnabled()) {
             throw new AppException(ErrorCode.ACCOUNT_DISABLED);
         }
-        int totalDevices = accessLogRepository.countDevices(userDetails.getId());
-        int activeDevices = accessLogRepository.countActiveDevices(userDetails.getId());
+        AccessLog accessLog = accessLogRepository.findByAccountIdAndDeviceId(userDetails.getId(), signInRequest.getDeviceId());
+        int totalDevices = accessLogRepository.countDevices(userDetails.getId(), signInRequest.getDeviceId());
+        int activeDevices = accessLogRepository.countActiveDevices(userDetails.getId(),  signInRequest.getDeviceId());
 
-        if (totalDevices >= userDetails.getCurrentPlan().getMaxNumberOfDevice()) {
+        int plus = accessLog == null ? 1 : 0;
+
+        if (totalDevices+plus > userDetails.getCurrentPlan().getMaxNumberOfDevice()) {
             throw new AppException(ErrorCode.EXCEEDS_MAX_DEVICE);
         }
-        if (activeDevices >= userDetails.getCurrentPlan().getMaxNumberOfDeviceActive()) {
+        if (activeDevices+plus > userDetails.getCurrentPlan().getMaxNumberOfDeviceActive()) {
             throw new AppException(ErrorCode.EXCEEDS_MAX_DEVICE_ACTIVE);
         }
-        AccessLog accessLog = accessLogRepository.findByAccountIdAndDeviceId(userDetails.getId(), signInRequest.getDeviceId());
         if(accessLog!=null){
             accessLog.setLastLogin(LocalDateTime.now());
         }
@@ -173,8 +175,11 @@ public class AccountService implements IAccountService {
                 .orElseThrow(() -> new RuntimeException("Account not found"));
         account.setUpdatedAt(LocalDateTime.now());
         accountMapper.updateAccount(account, accountUpdateRequest);
-        if (accountUpdateRequest.getPassword() != null) {
+        if (accountUpdateRequest.getPassword() != null && !accountUpdateRequest.getPassword().isEmpty()) {
             account.setPassword(passwordEncoder.encode(accountUpdateRequest.getPassword()));
+        }
+        else{
+            account.setPassword(account.getPassword());
         }
         accountRepository.save(account);
         return accountMapper.toAccountResponse(account);

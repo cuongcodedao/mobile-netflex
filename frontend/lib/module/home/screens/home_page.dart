@@ -46,20 +46,29 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     filmRepository = FilmRepository(ApiService()); // inject service
     loadFilmPage();
-    // loadForYouFilms();
-    // loadNewFilms();
-    // loadHistory();
-    // loadMyList();
   }
 
-  Future<void> loadFilmPage() async {
+  Future<void> loadAllData() async {
+    setState(() {
+      isLoading = true;
+      isLoadingFail = false;
+    });
+
     try {
-      filmPage = await filmRepository.getFilmPage(1); // truyen lug
+      await Future.wait([
+        loadFilmPage(),
+        loadNewFilms(),
+        loadForYouFilms(),
+        loadHistory(),
+        loadMyList(),
+      ]);
     } catch (e) {
+      print('Error loading data: $e');
       isLoadingFail = true;
-      print('Error loading film page: $e');
     } finally {
-      setState(() => isLoading = false);
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -82,7 +91,7 @@ class _HomePageState extends State<HomePage> {
       ); // Add null check
       setState(() {});
     } catch (e) {
-      print('Error loading For You films: $e');
+      print('Error loading film page: $e');
     }
   }
 
@@ -100,8 +109,20 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> loadNewFilms() async {
     try {
-      newFilms = await filmRepository.getNewFilms(); // Add null check
-      setState(() {});
+      newFilms = await filmRepository.getNewFilms();
+      print("Số phim mới: ${newFilms.length}");
+    } catch (e) {
+      print('Error loading new films: $e');
+    }
+  }
+
+  Future<void> loadForYouFilms() async {
+    try {
+      final profileId = widget.profile.id;
+      if (profileId == null) throw Exception("Profile ID is null");
+
+      forYouFilms = await filmRepository.getListFilmByFavorite(profileId);
+      print("Số phim tìm được: ${forYouFilms.length}");
     } catch (e) {
       print('Error loading For You films: $e');
     }

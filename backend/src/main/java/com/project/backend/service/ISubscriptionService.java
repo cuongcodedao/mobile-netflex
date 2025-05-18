@@ -12,5 +12,6 @@ public interface ISubscriptionService {
     PaypalSubscriptionResponse create(SubscriptionCreationRequest subscriptionDTO) throws IOException;
     PaypalSubscriptionResponse activeSubscription(String subscriptionId) throws IOException;
     void cancelSubscription(String subscriptionId) throws IOException;
+    void cancelSubscriptionByAccountId(Long accountId) throws IOException;
     List<SubscriptionResponse> getAllSubscriptions() throws IOException;
 }
