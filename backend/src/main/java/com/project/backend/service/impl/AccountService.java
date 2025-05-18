@@ -21,6 +21,7 @@ import com.project.backend.repository.AccountRepository;
 import com.project.backend.repository.PlanRepository;
 import com.project.backend.service.IAccountService;
 import com.project.backend.utils.JWTUtils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,41 +85,44 @@ public class AccountService implements IAccountService {
     }
 
     @Override
+    @Transactional
     public AuthResponse login(SignInRequest signInRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(signInRequest.getEmail(), signInRequest.getPassword())
         );
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<AccessLog> accessLogs = accessLogRepository.findByAccountIdAndDeviceId(userDetails.getId(), signInRequest.getDeviceId());
-        if(accessLogs.size()>=userDetails.getCurrentPlan().getMaxNumberOfDevice()){
-            throw new AppException(ErrorCode.EXCEEDS_MAX_DEVICE);
-        }
-        int cnt = 0;
-        for(AccessLog accessLog: accessLogs){
-            if(accessLog.isActive()) cnt++;
-        }
-        if(cnt>=userDetails.getCurrentPlan().getMaxNumberOfDeviceActive()){
-            throw new AppException(ErrorCode.EXCEEDS_MAX_DEVICE_ACTIVE);
-        }
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(userDetails.getUsername());
-        RefreshToken refreshToken = jwtUtils.createRefreshToken(userDetails.getUsername());
         Account account = accountRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
         if(!account.isEnabled()) {
             throw new AppException(ErrorCode.ACCOUNT_DISABLED);
         }
+        int totalDevices = accessLogRepository.countDevices(userDetails.getId());
+        int activeDevices = accessLogRepository.countActiveDevices(userDetails.getId());
 
-        AccessLog accessLog = AccessLog.builder()
-                .account(account)
-                .deviceId(signInRequest.getDeviceId())
-                .active(true)
-                .lastLogin(LocalDateTime.now())
-                .deviceName(signInRequest.getDeviceName())
-                .deviceType(DeviceType.MOBILE)
-                .build();
+        if (totalDevices >= userDetails.getCurrentPlan().getMaxNumberOfDevice()) {
+            throw new AppException(ErrorCode.EXCEEDS_MAX_DEVICE);
+        }
+        if (activeDevices >= userDetails.getCurrentPlan().getMaxNumberOfDeviceActive()) {
+            throw new AppException(ErrorCode.EXCEEDS_MAX_DEVICE_ACTIVE);
+        }
+        AccessLog accessLog = accessLogRepository.findByAccountIdAndDeviceId(userDetails.getId(), signInRequest.getDeviceId());
+        if(accessLog!=null){
+            accessLog.setLastLogin(LocalDateTime.now());
+        }
+        else{
+             accessLog = AccessLog.builder()
+                    .account(account)
+                    .deviceId(signInRequest.getDeviceId())
+                    .active(true)
+                    .lastLogin(LocalDateTime.now())
+                    .deviceName(signInRequest.getDeviceName())
+                    .deviceType(DeviceType.MOBILE)
+                    .build();
+        }
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtUtils.generateJwtToken(userDetails.getUsername());
+        RefreshToken refreshToken = jwtUtils.createRefreshToken(userDetails.getUsername());
 
         accessLogRepository.save(accessLog);
         return AuthResponse.builder()
@@ -158,6 +162,8 @@ public class AccountService implements IAccountService {
                 .orElseThrow(() -> new RuntimeException("Access log not found"));
         accessLog.setActive(false);
         jwtUtils.deleteRefreshToken(logoutRequest.getRefreshToken());
+        SecurityContextHolder.clearContext();
+        accessLogRepository.save(accessLog);
     }
 
     @Override
@@ -181,9 +187,4 @@ public class AccountService implements IAccountService {
         account.setEnabled(false);
         accountRepository.save(account);
     }
-
-
-
-
-
 }
