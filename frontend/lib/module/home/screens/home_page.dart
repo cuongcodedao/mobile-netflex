@@ -97,7 +97,7 @@ class _HomePageState extends State<HomePage> {
     Future<void> loadMyList() async {
     List<Film> list = await MyListRepository(ApiService()).getMyListFilm();
     // đảo ngược danh sách
-    list = list.reversed.toList();
+    //list = list.reversed.toList();
     setState(() {
       myList = list;
       isLoading = false;
@@ -190,26 +190,6 @@ class _HomePageState extends State<HomePage> {
             itemWidth: 120,
           ),
 
-          // Danh sách NEW EPISODES
-          HorizontalFilmList(
-            listTitle: 'Your List',
-            films: List.generate(
-              myList.length,
-              (index) => FilmItem(
-                imageUrl: myList[index].urlPoster,
-                labelType: FilmLabelType.top,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => WatchingScreen(
-                      slug: myList[index].slug,
-                    ),
-                  ),
-                )
-              ),
-            ),
-          ),
-
           // Danh sách For You
           HorizontalFilmList(
             listTitle: 'For You',
@@ -223,6 +203,26 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                     builder: (context) => WatchingScreen(
                       slug: forYouFilms[index].slug,
+                    ),
+                  ),
+                )
+              ),
+            ),
+          ),
+
+          // Danh sách NEW EPISODES
+          HorizontalFilmList(
+            listTitle: 'Your List',
+            films: List.generate(
+              myList.length,
+              (index) => FilmItem(
+                imageUrl: myList[index].urlPoster,
+                labelType: FilmLabelType.top,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => WatchingScreen(
+                      slug: myList[index].slug,
                     ),
                   ),
                 )

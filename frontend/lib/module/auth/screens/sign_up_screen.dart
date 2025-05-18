@@ -55,8 +55,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _lastNameFocusNode.dispose();
     super.dispose();
   }
-
+  bool isLoading = false;
   void _handleSignUp() async {
+    if (isLoading) return; // Prevent multiple submissions
+    setState(() {
+      isLoading = true; // Set loading state
+    });
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
     final confirmPassword = _confirmPasswordController.text.trim();
@@ -73,11 +77,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
         'Missing Information',
         'Please fill in all fields.',
       );
+      setState(() {
+        isLoading = false; // Reset loading state
+      });
       return;
     }
 
     if (password != confirmPassword) {
       showErrorNotify(context, 'Password Mismatch', 'Passwords do not match.');
+      setState(() {
+        isLoading = false; // Reset loading state
+      });
       return;
     }
 
@@ -101,6 +111,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
       );
     } catch (e) {
       _handleSignupError(e);
+    } finally {
+      setState(() {
+        isLoading = false; // Reset loading state
+      });
     }
   }
 
@@ -133,6 +147,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
     if (errorMessage == '1001') {
       errorMessage = 'Email already exists';
+    }
+    if (errorMessage == '1012') {
+      errorMessage = 'User already exists';
     }
     if (errorMessage == '9999') {
       errorMessage = 'Password must be at least 8 characters';
@@ -261,13 +278,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(height: 30),
               // Sign Up Button
               CustomButton(
-                text: "Sign Up",
-                onPressed: _handleSignUp,
-                backgroundColor: Colors.red, // Nút màu đỏ
-                textColor: Colors.white, // Chữ nút màu trắng
-                fontSize: 18,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                borderRadius: 4.0,
+                text: isLoading ? "Signing Up..." : "Sign Up",
+                onPressed: isLoading ?  () {} : _handleSignUp,
+                backgroundColor: isLoading ? Colors.grey : Colors.red, // Màu nền nút
+                textColor: Colors.white, // Chữ trắng
+                borderRadius: 4.0, // Bo góc nút
+                padding: const EdgeInsets.symmetric(
+                    vertical: 16.0, horizontal: 32.0), // Padding cho nút
               ),
               const SizedBox(height: 24),
               GestureDetector(

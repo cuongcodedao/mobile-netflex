@@ -101,10 +101,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         fit: BoxFit.cover,
                       ),
                       shape: BoxShape.rectangle, // Hình vuông
-                      borderRadius: BorderRadius.circular(
-                        10,
-                      ), // Bo góc (có thể tùy chỉnh)
+                      borderRadius: BorderRadius.circular(10),
                     ),
+                    margin: const EdgeInsets.only(right: 5, top: 5),
                   );
                 },
               ),
@@ -145,4 +144,3 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return profile.avatar;
   }
 }
-

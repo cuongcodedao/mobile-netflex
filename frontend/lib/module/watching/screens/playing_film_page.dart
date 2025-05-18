@@ -106,9 +106,9 @@ class _PlayingFilmPageState extends State<PlayingFilmPage> {
           iconsColor: Colors.redAccent,
           loadingColor: Colors.redAccent,
           liveTextColor: Colors.redAccent,
-          overflowModalColor: Colors.redAccent,
-          overflowMenuIconsColor: Colors.redAccent,
-          overflowModalTextColor: Colors.redAccent,
+          //overflowModalColor: Colors.redAccent,
+          //overflowMenuIconsColor: Colors.redAccent,
+          //overflowModalTextColor: Colors.redAccent,
           loadingWidget: Center(
             child: SpinKitCubeGrid(color: Colors.redAccent, size: 50.0),
           ),
