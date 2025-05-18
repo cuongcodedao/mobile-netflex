@@ -9,6 +9,8 @@ import 'package:frontend/models/auth/user_model.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/providers/profile_provider.dart';
 import 'package:frontend/module/notify/screens/error-notify.dart';
+import 'package:frontend/repositories/profile_repository.dart';
+import 'package:frontend/services/api_services.dart';
 import 'package:frontend/services/storage_service.dart';
 import '../widgets/custom_textfield.dart';
 import '../widgets/custom_button.dart';
@@ -123,14 +125,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       StorageService().saveUserInfo(
         accountId,
       ); // Lưu accountId vào StorageService
-
+      StorageService().saveFirstInstall(false);
       // Lấy danh sách profiles
       print('Fetching profiles for accountId: $accountId');
-      final profiles = await ref.read(profileProvider(accountId).future);
-      print('Fetched profiles: $profiles');
-      StorageService().saveFirstInstall(false);
       // Điều hướng tới ProfileSelectionScreen
-      Navigator.push(
+      final String? accessToken = await StorageService().getAccessToken();
+      if (accessToken == null) {
+        showErrorNotify(context, 'Error', 'Access token not found.');
+        return;
+      }
+      final profiles = await ProfileRepository(
+        ApiService(),
+      ).fetchProfiles2(accountId, accessToken);
+      print('Fetched profiles after add: $profiles');
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
           builder:
@@ -139,7 +147,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 accountId: accountId,
               ),
         ),
+        (Route<dynamic> route) => false,
       );
+      
     } catch (e) {
       _handleLoginError(e);
     } finally {

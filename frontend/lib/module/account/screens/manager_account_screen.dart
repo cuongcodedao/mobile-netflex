@@ -156,7 +156,7 @@ class _ManagerAccountScreenState extends ConsumerState<ManagerAccountScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                     child: Text(
-                      'LƯU THAY ĐỔI',
+                      'SAVE CHANGE',
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
@@ -242,13 +242,13 @@ class _ManagerAccountScreenState extends ConsumerState<ManagerAccountScreen> {
 
   Future<void> _updateUserInfo() async {
     bool? check = await showWarningNotify(
-    context,
-    'Warning',
-    'Are you sure for change it?',
+      context,
+      'Warning',
+      'Are you sure for change it?',
     );
     if (check == false) {
       return;
-      } else {
+    } else {
       final authRepository = ref.read(authRepositoryProvider);
       final userId = await StorageService().getUserInfo();
       if (userId == null) {
@@ -262,78 +262,90 @@ class _ManagerAccountScreenState extends ConsumerState<ManagerAccountScreen> {
       }
 
       try {
-        final response = await authRepository.updateUserInfo2(
-          id: userId,
-          firstName: _firstNameController.text,
-          lastName: _lastNameController.text,
-          password: _passwordController.text,
-          accessToken: accessToken
-        );
-        //print('Update response: $response');
-          if (response['code'] == 1000) {
-            // Assuming 1000 is your success code
-            showSuccessNotify(
-              context,
-              "Success",
-              "Update infomation complete"
-            );
-            await _fetchUserInfo(); // Refresh user info
-            setState(() => _isEditing = false);
+        final response;
+        if (_passwordController.text.isEmpty) {
+          response = await authRepository.updateUserInfo2(
+            id: userId,
+            firstName: _firstNameController.text,
+            lastName: _lastNameController.text,
+            accessToken: accessToken,
+          );
+        } else {
+          if (_passwordController.text.length < 8) {
+            showErrorNotify(context, "Error", "Please enter a valid password");
+            return;
           } else {
-            showErrorNotify(
-              context,
-              "Error",
-              response['message'] ?? "Update infomation fail",
-            );
+          response = await authRepository.updateUserInfo2(
+            id: userId,
+            firstName: _firstNameController.text,
+            lastName: _lastNameController.text,
+            password: _passwordController.text,
+            accessToken: accessToken,
+          );
           }
-        
+        }
+
+        //print('Update response: $response');
+        if (response['code'] == 1000) {
+          // Assuming 1000 is your success code
+          showSuccessNotify(context, "Success", "Update infomation complete");
+          await _fetchUserInfo(); // Refresh user info
+          setState(() => _isEditing = false);
+        } else {
+          showErrorNotify(
+            context,
+            "Error",
+            response['message'] ?? "Update infomation fail",
+          );
+        }
       } catch (e) {
         print('Error updating user info: $e');
-        showErrorNotify(context, "Error",  "Update infomation fail",);
+        showErrorNotify(context, "Error", "Update infomation fail");
       }
     }
   }
-    Future<void> _deleteAccount() async {
-      showErrorNotify(context, "Error", "Only ADMIN can delete account");
-        return;
-      // final authRepository = ref.read(authRepositoryProvider);
-      // final userId = await StorageService().getUserInfo();
-      // if (userId == null) {
-      //   showErrorNotify(context, "Lỗi", "Không tìm thấy thông tin người dùng");
-      //   return;
-      // }
 
-      //   bool? check = await showWarningNotify(
-      //       context,
-      //       'Cảnh báo',
-      //       'Bạn có muốn xóa tài khoản không?',
-      //   );
-      //   if (check == false) {
-      //     return;
-      //   } else {
-      //     try {
-      //       final response = await authRepository.deleteAccount(userId);
-      //       if (response['code'] == 1000) {
-      //         // Assuming 1000 is your success code
-      //         showSuccessNotify(
-      //           context,
-      //           "Thành công",
-      //           "Xóa tài khoản thành công",
-      //         );
-      //         StorageService().clearStorage(); // Xóa thông tin người dùng
-      //         // Chuyển hướng về trang đăng nhập hoặc trang chính
-      //           Navigator.popUntil(context, (route) => route.isFirst);
-      //       } else {
-      //           showErrorNotify(
-      //               context,
-      //               "Lỗi",
-      //               response['message'] ?? "Xóa tài khoản thất bại",
-      //           );
-      //           }
-      //       } catch (e) {
-      //       print('Error deleting account: $e');
-      //       showErrorNotify(context, "Lỗi", "Xóa tài khoản thất bại");
-      //       }
-      //   }
-    }
+  Future<void> _deleteAccount() async {
+    showErrorNotify(context, "Error", "Only ADMIN can delete account");
+    return;
+    // final authRepository = ref.read(authRepositoryProvider);
+    // final userId = await StorageService().getUserInfo();
+    // if (userId == null) {
+    //   showErrorNotify(context, "Lỗi", "Không tìm thấy thông tin người dùng");
+    //   return;
+    // }
+
+    //   bool? check = await showWarningNotify(
+    //       context,
+    //       'Cảnh báo',
+    //       'Bạn có muốn xóa tài khoản không?',
+    //   );
+    //   if (check == false) {
+    //     return;
+    //   } else {
+    //     try {
+    //       final response = await authRepository.deleteAccount(userId);
+    //       if (response['code'] == 1000) {
+    //         // Assuming 1000 is your success code
+    //         showSuccessNotify(
+    //           context,
+    //           "Thành công",
+    //           "Xóa tài khoản thành công",
+    //         );
+    //         StorageService().clearStorage(); // Xóa thông tin người dùng
+    //         // Chuyển hướng về trang đăng nhập hoặc trang chính
+    //           Navigator.popUntil(context, (route) => route.isFirst);
+    //       } else {
+    //           showErrorNotify(
+    //               context,
+    //               "Lỗi",
+    //               response['message'] ?? "Xóa tài khoản thất bại",
+    //           );
+    //           }
+    //       } catch (e) {
+    //       print('Error deleting account: $e');
+    //       showErrorNotify(context, "Lỗi", "Xóa tài khoản thất bại");
+    //       }
+    //   }
+  }
 }
