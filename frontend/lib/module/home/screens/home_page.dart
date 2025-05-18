@@ -151,6 +151,7 @@ class _HomePageState extends State<HomePage> {
                   ).addMyListFilm(newFilms[index].slug);
                   if (set) {
                     showSuccessNotify(context, "Success", "Add to My list");
+                    await loadMyList();
                   }
                 },
                 onPlay: () {
