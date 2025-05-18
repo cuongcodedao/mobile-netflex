@@ -190,7 +190,30 @@ class AuthRepository {
     rethrow;
   }
 }
+ Future<Map<String, dynamic>> updateUserInfo3({
+  required int id,
+  String? firstName,
+  String? lastName,
+  String? accessToken, // Thêm access token làm tham số tùy chọn
+}) async {
+  try {
+    final response = await apiService.put1(
+      '/api/v1/account/$id',
+      {
+        'id': id,
+        'firstName': firstName,
+        'lastName': lastName,
+      },
+      token: accessToken, // Sử dụng access token nếu có
+    );
 
+    // Trả về nguyên bản response data từ server
+    return response.data as Map<String, dynamic>;
+  } catch (e) {
+    print('Update user info error: $e');
+    rethrow;
+  }
+}
 
   // Hàm xóa tài khoản
   Future<Map<String, dynamic>> deleteAccount(int id) async {
