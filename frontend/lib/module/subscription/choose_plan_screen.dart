@@ -85,7 +85,7 @@ class _ChoosePlanScreenState extends State<ChoosePlanScreen> {
 
 
   Future<String?> _checkSubscriptionStatus(String subscriptionId) async {
-    final uri = Uri.parse("http://10.0.2.2:8080/api/v1/subscription/$subscriptionId");
+    final uri = Uri.parse("https://099c-14-245-240-46.ngrok-free.app/api/v1/subscription/$subscriptionId");
     final token = await _getToken();
 
     try {
@@ -137,7 +137,7 @@ class _ChoosePlanScreenState extends State<ChoosePlanScreen> {
       return;
     }
 
-    final uri = Uri.parse("http://10.0.2.2:8080/api/v1/subscription");
+    final uri = Uri.parse("https://099c-14-245-240-46.ngrok-free.app/api/v1/subscription");
 
     try {
       final response = await http.post(
