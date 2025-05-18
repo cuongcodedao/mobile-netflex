@@ -24,11 +24,18 @@ jobs:
         chmod +x mvnw
         ./mvnw clean package -DskipTests
 
+    - name: Pull postgres image
+      run: docker pull postgres:15
+
     - name: Build Docker images
       run: docker compose build backend db
 
+    - name: Show Docker images
+      run: docker images
+
     - name: Save Docker images to tar
       run: docker save backend postgres:15 -o app.tar
+
 
     - name: Copy files to EC2
       uses: appleboy/scp-action@v0.1.3
