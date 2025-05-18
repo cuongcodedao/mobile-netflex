@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/module/subscription/choose_plan_screen.dart';
 import 'package:frontend/services/storage_service.dart';
 import 'package:frontend/providers/auth_provider.dart';
+import 'package:frontend/repositories/subscription_repository.dart';
+import 'package:frontend/module/notify/screens/error-notify.dart';
+import 'package:frontend/module/notify/screens/success-notify.dart';
+import 'package:frontend/module/subscription/success_cancel_page.dart';
 
 class ManageSubscriptionScreen extends ConsumerStatefulWidget {
   const ManageSubscriptionScreen({Key? key}) : super(key: key);
@@ -54,6 +58,33 @@ class _ManageSubscriptionScreenState extends ConsumerState<ManageSubscriptionScr
   void initState() {
     super.initState();
     _fetchUserInfo();
+  }
+
+  Future<void> cancelSubscription() async {
+    final accountId = await StorageService().getUserInfo();
+    if (accountId == null) {
+      print('Account ID is null');
+      showErrorNotify(context, "Error", "Account ID not found");
+      return;
+    }
+    try {
+      print('Canceling subscription for account: $accountId');
+      final apiService = ref.read(apiServiceProvider);
+      final subscriptionRepository = SubscriptionRepository(apiService);
+      final success = await subscriptionRepository.cancelSubscription(accountId);
+      if (success) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const CancelPlanPage()),
+        );
+        await _fetchUserInfo();
+      } else {
+        showErrorNotify(context, "Error", "Failed to cancel subscription");
+      }
+    } catch (e) {
+      print('Error in cancelSubscription: $e');
+      showErrorNotify(context, "Error", "An error occurred while canceling subscription");
+    }
   }
 
   Future<void> _fetchUserInfo() async {
@@ -197,7 +228,7 @@ class _ManageSubscriptionScreenState extends ConsumerState<ManageSubscriptionScr
                               Expanded(
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    // Handle cancel subscription here
+                                    cancelSubscription();
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.red,

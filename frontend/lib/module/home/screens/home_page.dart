@@ -18,7 +18,9 @@ import 'package:frontend/repositories/history_repository.dart';
 import 'package:frontend/repositories/my_list_repository.dart';
 import 'package:frontend/services/api_services.dart';
 import 'package:frontend/models/profile/profile_model.dart';
+import 'package:frontend/repositories/subscription_repository.dart';
 import 'package:get_it/get_it.dart';
+
 
 class HomePage extends StatefulWidget {
   final ProfileModel profile;
@@ -31,6 +33,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late final FilmRepository filmRepository;
   late final HistoryRepository historyRepository;
+  late final SubscriptionRepository subscriptionRepository;
   FilmPage? filmPage;
   List<Film> newFilms = [];
   List<Film> topFilms = [];
@@ -44,7 +47,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    filmRepository = FilmRepository(ApiService()); // inject service
+    filmRepository = FilmRepository(ApiService());
+    historyRepository = HistoryRepository(ApiService());
+    subscriptionRepository = SubscriptionRepository(ApiService());
+    loadAllData();
     loadFilmPage();
   }
 
@@ -206,6 +212,7 @@ class _HomePageState extends State<HomePage> {
       return [];
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

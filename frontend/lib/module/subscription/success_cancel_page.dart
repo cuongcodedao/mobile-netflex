@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend/module/auth/screens/login_screen.dart';
 import 'package:frontend/services/storage_service.dart';
 
-class SuccessPage extends StatelessWidget {
-  const SuccessPage({Key? key}) : super(key: key);
+class CancelPlanPage extends StatelessWidget {
+  const CancelPlanPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,13 +26,13 @@ class SuccessPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(
-              Icons.check_circle_outline,
+              Icons.cancel_outlined,
               color: Colors.red,
               size: 80,
             ),
             const SizedBox(height: 24),
             const Text(
-              "Payment Susscess",
+              "Plan Cancelled",
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -42,7 +42,7 @@ class SuccessPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             const Text(
-              "Thank you for your payment. Your subscription is now active.",
+              "Your subscription has been successfully cancelled. You will have access until the end of your billing period.",
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.white70,
@@ -61,7 +61,7 @@ class SuccessPage extends StatelessWidget {
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => LoginScreen()),
-                (Route<dynamic> route) => false,
+                  (Route<dynamic> route) => false,
                 );
               },
               child: const Text(
@@ -76,7 +76,7 @@ class SuccessPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             const Text(
-              "You can now enjoy all the features of our app.",
+              "You can subscribe again at any time to restore full access.",
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.white70,
