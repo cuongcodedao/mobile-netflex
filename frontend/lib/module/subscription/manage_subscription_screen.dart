@@ -59,6 +59,7 @@ class _ManageSubscriptionScreenState extends ConsumerState<ManageSubscriptionScr
   Future<void> _fetchUserInfo() async {
     final authRepository = ref.read(authRepositoryProvider);
     final userId = await StorageService().getUserInfo();
+    print('User ID: $userId');
 
     if (userId != null) {
       try {
