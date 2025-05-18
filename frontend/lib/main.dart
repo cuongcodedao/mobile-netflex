@@ -1,19 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/profile/profile_model.dart';
 import 'package:frontend/models/token/token.dart';
 import 'package:frontend/module/auth/screens/login_screen.dart';
 import 'package:frontend/module/auth/screens/onboarding_screen.dart';
+import 'package:frontend/module/home/bloc/history_cubit.dart';
+import 'package:frontend/module/home/bloc/my_list_cubit.dart';
 import 'package:frontend/module/home/screens/home_screen.dart';
 import 'package:frontend/repositories/auth_repository.dart';
 import 'package:frontend/repositories/profile_repository.dart';
 import 'package:frontend/services/api_services.dart';
 import 'package:frontend/services/storage_service.dart';
 import 'package:get/get.dart';
+import 'package:get_it/get_it.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final getIt = GetIt.instance;
+
+void setup() {
+  getIt.registerSingleton<MyListCubit>(MyListCubit());
+  getIt.registerSingleton<HistoryCubit>(HistoryCubit());
+}
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  setup();
   StorageService storageService = StorageService();
   bool? isFirstInstall = await storageService.getFirstInstall();
   bool isLogin = false;
@@ -82,12 +93,21 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home:
-          (isFirstInstall)
-              ? OnboardingScreen()
-              : (isLogin)
-              ? HomeScreen(profile: profile!)
-              : LoginScreen(),
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<MyListCubit>(
+            create: (context) => GetIt.instance<MyListCubit>(),
+          ),
+          BlocProvider<HistoryCubit>(
+            create: (context) => GetIt.instance<HistoryCubit>(),
+          ),
+        ], 
+        child: (isFirstInstall)
+        ? OnboardingScreen()
+        : (isLogin)
+        ? HomeScreen(profile: profile!)
+        : LoginScreen(),
+      ),
     );
   }
 }

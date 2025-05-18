@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:frontend/models/episode/episode_data.dart';
 import 'package:frontend/models/film/film.dart';
+import 'package:frontend/module/home/bloc/history_cubit.dart';
 import 'package:frontend/module/watching/widgets/episodes_and_collection_section.dart';
 import 'package:better_player_plus/better_player_plus.dart';
 import 'package:frontend/module/watching/widgets/loading_waching.dart';
 import 'package:frontend/repositories/film_repository.dart';
 import 'package:frontend/repositories/history_repository.dart';
 import 'package:frontend/services/api_services.dart';
+import 'package:get_it/get_it.dart';
 
 class PlayingFilmPage extends StatefulWidget {
   final String? slug;
@@ -28,7 +30,8 @@ class PlayingFilmPage extends StatefulWidget {
   State<PlayingFilmPage> createState() => _PlayingFilmPageState();
 }
 
-class _PlayingFilmPageState extends State<PlayingFilmPage> with WidgetsBindingObserver {
+class _PlayingFilmPageState extends State<PlayingFilmPage>
+    with WidgetsBindingObserver {
   BetterPlayerController? _betterPlayerController;
   bool isLoading = true;
   Film? _film;
@@ -70,7 +73,8 @@ class _PlayingFilmPageState extends State<PlayingFilmPage> with WidgetsBindingOb
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
       // App bị ẩn hoặc chuyển trạng thái
       _saveWatchingProgress(false);
     }
@@ -85,7 +89,6 @@ class _PlayingFilmPageState extends State<PlayingFilmPage> with WidgetsBindingOb
     });
 
     loadFilmController(_episode!.link_m3u8);
-
   }
 
   void loadFilmController(String linkM3u8) {
@@ -178,6 +181,8 @@ class _PlayingFilmPageState extends State<PlayingFilmPage> with WidgetsBindingOb
     }
 
     _betterPlayerController?.dispose();
+
+    GetIt.instance<HistoryCubit>().loadHistory();
   }
 
   @override
@@ -191,6 +196,12 @@ class _PlayingFilmPageState extends State<PlayingFilmPage> with WidgetsBindingOb
 
     return Scaffold(
       backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: Image.asset("assets/images/Netflix.jpg", fit: BoxFit.fill, height: 50,),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
