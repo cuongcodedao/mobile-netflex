@@ -31,6 +31,10 @@ public class Profile {
     @JoinColumn(nullable = false)
     Account account;
 
+    @Column(columnDefinition = "TEXT")
     String myMovieList;
+
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<History> histories;
 }
 
