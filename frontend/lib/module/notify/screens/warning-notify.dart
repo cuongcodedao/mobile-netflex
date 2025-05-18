@@ -138,7 +138,15 @@ class _WarningNotifyScreenState extends State<WarningNotifyScreen>
                             foregroundColor: Colors.redAccent,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 24.0, vertical: 8.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50.0),
+                              side: const BorderSide(
+                                color: Colors.redAccent,
+                                width: 2.0,
+                              ),
+                            ),
                           ),
+                          
                           child: const Text("Yes"),
                         ),
                         TextButton(
@@ -148,6 +156,13 @@ class _WarningNotifyScreenState extends State<WarningNotifyScreen>
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 24.0, vertical: 8.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50.0),
+                              side: const BorderSide(
+                                color: Colors.redAccent,
+                                width: 2.0,
+                              ),
+                            ),
                           ),
                           child: const Text("No"),
                         ),

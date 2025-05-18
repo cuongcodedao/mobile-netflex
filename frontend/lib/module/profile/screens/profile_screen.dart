@@ -4,6 +4,7 @@ import 'package:frontend/models/profile/profile_model.dart';
 import 'package:frontend/module/account/screens/manager_account_screen.dart';
 import 'package:frontend/module/auth/screens/login_screen.dart';
 import 'package:frontend/module/auth/screens/profile_selection_screen.dart';
+import 'package:frontend/module/notify/screens/warning-notify.dart';
 import 'package:frontend/providers/profile_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/module/account/screens/manager_profile_screen.dart';
@@ -192,17 +193,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
             InkWell(
               onTap: () async {
-                StorageService storageService = StorageService();
-                bool? isFirstInstall = await storageService.getFirstInstall();
-                storageService.clearStorage();
-                if (isFirstInstall != null) {
-                  storageService.saveFirstInstall(isFirstInstall);
-                }
-                Navigator.pushAndRemoveUntil(
+                bool? confirm = await showWarningNotify(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                  (Route<dynamic> route) => false,
+                  "Sign Out",
+                  "Are you sure you want to\n sign out now?",
+                  
                 );
+                if (confirm!) {
+                  StorageService storageService = StorageService();
+                  bool? isFirstInstall = await storageService.getFirstInstall();
+                  storageService.clearStorage();
+                  if (isFirstInstall != null) {
+                    storageService.saveFirstInstall(isFirstInstall);
+                  }
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                    (Route<dynamic> route) => false,
+                  );
+                } else {
+                  return;
+                }
               },
               child: const Text(
                 "Sign Out",

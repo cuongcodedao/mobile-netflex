@@ -50,7 +50,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  bool isLoading = false;
   void _handleLogin() async {
+    if (isLoading) return; // Ngăn chặn nhiều lần nhấn nút
+    setState(() {
+      isLoading = true; // Đặt trạng thái đang tải
+    });
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
     final deviceInfo = DeviceInfoPlugin();
@@ -82,6 +87,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         "Missing information",
         "Please enter both email and password.",
       );
+      setState(() {
+        isLoading = false; // Đặt trạng thái không còn tải
+      });
       return;
     }
 
@@ -93,6 +101,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         "Password too short",
         "Password must be at least 8 characters long.",
       );
+      setState(() {
+        isLoading = false; // Đặt trạng thái không còn tải
+      });
       return;
     }
 
@@ -131,6 +142,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
     } catch (e) {
       _handleLoginError(e);
+    } finally {
+      setState(() {
+        isLoading = false; // Đặt trạng thái không còn tải
+      });
     }
   }
 
@@ -163,6 +178,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
     if (errorMessage == '1007') {
       errorMessage = 'This account is not activated. Please contact support.';
+    }
+    if (errorMessage == '1014') {
+      errorMessage = ' Exceeds max device limit. Please contact support.';
     }
     showErrorNotify(context, "Login failed", errorMessage);
   }
@@ -221,9 +239,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     const SizedBox(height: 24),
                     CustomButton(
-                      text: "Sign In",
-                      onPressed: _handleLogin,
-                      backgroundColor: Colors.red,
+                      text: isLoading ? "Signing In..." : "Sign In",
+                      onPressed: isLoading ? () {} : _handleLogin,
+                      backgroundColor: isLoading ? Colors.grey : Colors.red,
                       textColor: Colors.white,
                       fontSize: 18,
                       padding: const EdgeInsets.symmetric(vertical: 16),
