@@ -49,6 +49,7 @@ public class MyListService implements IMyListService {
         }
 
         String[] slugs = myList.split(",");
+        Collections.reverse(Arrays.asList(slugs));
 
         List<CompletableFuture<Movie>> futures = Arrays.stream(slugs)
                 .map(String::trim)

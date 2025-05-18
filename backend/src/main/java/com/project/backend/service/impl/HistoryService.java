@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -63,6 +64,7 @@ public class HistoryService implements IHistoryService {
     @Override
     public List<HistoryResponse> getAllHistoriesByProfileId(Long profileId) {
         List<History> histories = historyRepository.findAllByProfileId(profileId);
+        Collections.reverse(histories);
 
         List<CompletableFuture<HistoryResponse>> futures = histories.stream()
                 .map(history -> CompletableFuture.supplyAsync(() -> {
