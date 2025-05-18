@@ -89,6 +89,41 @@ class ApiService {
       throw e;
     }
   }
+  // Hàm POST với token
+  Future<Response> post1(
+    String endpoint,
+    Map<String, dynamic> data, {
+    String? token,
+  }) async {
+    try {
+      print('Request URL: ${_dio.options.baseUrl}$endpoint');
+      print(
+        'Request headers: ${token != null ? {'Authorization': 'Bearer $token'} : {'Authorization': 'Bearer $_accessToken'}}',
+      );
+      print('Request body: $data');
+
+      final response = await _dio.post(
+        endpoint,
+        data: data,
+        options: Options(
+          headers: {
+            if (token != null)
+              'Authorization': 'Bearer $token'
+            else if (_accessToken != null)
+              'Authorization': 'Bearer $_accessToken',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      print('Response status code: ${response.statusCode}');
+      print('Response data: ${response.data}');
+      return response;
+    } on DioException catch (e) {
+      print('POST request failed: ${e.message}');
+      throw Exception('POST request failed: ${e.message}');
+    }
+  }
 
   // Hàm DELETE
   Future<Response> delete(
@@ -161,4 +196,42 @@ class ApiService {
       throw e;
     }
   }
+  // Put2 
+  // Hàm PUT với token
+Future<Response> put1(
+  String endpoint,
+  Map<String, dynamic> data, {
+  String? token,
+}) async {
+  try {
+    print('Request URL: ${_dio.options.baseUrl}$endpoint');
+    print(
+      'Request headers: ${token != null ? {'Authorization': 'Bearer $token'} : {'Authorization': 'Bearer $_accessToken'}}',
+    );
+    print('Request body: $data');
+
+    final response = await _dio.put(
+      endpoint,
+      data: data,
+      options: Options(
+        headers: {
+          if (token != null)
+            'Authorization': 'Bearer $token'
+          else if (_accessToken != null)
+            'Authorization': 'Bearer $_accessToken',
+          'Content-Type': 'application/json',
+        },
+      ),
+    );
+
+    print('Response status code: ${response.statusCode}');
+    print('Response data: ${response.data}');
+    return response;
+  } on DioException catch (e) {
+    print('PUT request failed: ${e.message}');
+    throw Exception('PUT request failed: ${e.message}');
+  }
+}
+
+
 }

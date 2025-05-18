@@ -124,10 +124,51 @@ class ProfileRepository {
       rethrow;
     }
   }
+  Future<ProfileModel> addProfile2({
+        required String username,
+    required String avatar,
+    required bool kid,
+    required int accountId,
+    List<Category>? favoriteGenres,
+    required acccesToken
+  }) async {
+    try {
+      final response = await apiService.post1('/api/v1/profile', {
+        "username": username,
+        "avatar": avatar,
+        "kid": kid,
+        "account_id": accountId,
+        "favorite_genres": favoriteGenres?.map((genre) => genre.slug).toList(),
+      }, token: acccesToken);
+      print('Add profile response: ${response.data}');
+      return ProfileModel.fromJson(response.data['result']);
+    } catch (e) {
+      print('Error adding profile: $e');
+      rethrow;
+    }
+  }
 
   Future<bool> deleteProfile(int profileId) async {
     try {
       final response = await apiService.delete('/api/v1/profile/$profileId');
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
+      } else {
+        print('Error deleting profile: ${response.data}');
+        return false;
+      }
+    } catch (e) {
+      print('Error deleting profile: $e');
+      rethrow;
+    }
+  }
+  // Delete2
+  Future<bool> deleteProfile2(int profileId, String accessToken) async {
+    try {
+      final response = await apiService.delete(
+        '/api/v1/profile/$profileId',
+        token: accessToken,
+      );
       if (response.statusCode == 200 || response.statusCode == 204) {
         return true;
       } else {
