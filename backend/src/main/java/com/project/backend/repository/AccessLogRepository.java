@@ -14,11 +14,11 @@ public interface AccessLogRepository extends JpaRepository<AccessLog, Long> {
     AccessLog findByAccountIdAndDeviceId(@Param("accountId") Long accountId, @Param("deviceId") String deviceId);
     List<AccessLog> findByAccountId(Long accountId);
 
-    @Query("SELECT COUNT(a) FROM AccessLog a WHERE a.account.id = :accountId")
-    int countDevices(@Param("accountId") Long accountId);
+    @Query("SELECT COUNT(a) FROM AccessLog a WHERE a.account.id = :accountId and a.deviceId != :deviceId")
+    int countDevices(@Param("accountId") Long accountId, @Param(("deviceId")) String deviceId);
 
-    @Query("SELECT COUNT(a) FROM AccessLog a WHERE a.account.id = :accountId AND a.active = true")
-    int countActiveDevices(@Param("accountId") Long accountId);
+    @Query("SELECT COUNT(a) FROM AccessLog a WHERE a.account.id = :accountId AND a.active = true and a.deviceId != :deviceId")
+    int countActiveDevices(@Param("accountId") Long accountId, @Param(("deviceId")) String deviceId);
 
 
 

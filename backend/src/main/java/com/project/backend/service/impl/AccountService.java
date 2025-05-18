@@ -97,16 +97,19 @@ public class AccountService implements IAccountService {
         if(!account.isEnabled()) {
             throw new AppException(ErrorCode.ACCOUNT_DISABLED);
         }
-        int totalDevices = accessLogRepository.countDevices(userDetails.getId());
-        int activeDevices = accessLogRepository.countActiveDevices(userDetails.getId());
 
-        if (totalDevices >= userDetails.getCurrentPlan().getMaxNumberOfDevice()) {
+        AccessLog accessLog = accessLogRepository.findByAccountIdAndDeviceId(userDetails.getId(), signInRequest.getDeviceId());
+        int totalDevices = accessLogRepository.countDevices(userDetails.getId(), signInRequest.getDeviceId());
+        int activeDevices = accessLogRepository.countActiveDevices(userDetails.getId(), signInRequest.getDeviceId());
+
+        int plus =  accessLog == null ? 1 : 0;
+
+        if (totalDevices+plus > userDetails.getCurrentPlan().getMaxNumberOfDevice()) {
             throw new AppException(ErrorCode.EXCEEDS_MAX_DEVICE);
         }
-        if (activeDevices >= userDetails.getCurrentPlan().getMaxNumberOfDeviceActive()) {
+        if (activeDevices+plus > userDetails.getCurrentPlan().getMaxNumberOfDeviceActive()) {
             throw new AppException(ErrorCode.EXCEEDS_MAX_DEVICE_ACTIVE);
         }
-        AccessLog accessLog = accessLogRepository.findByAccountIdAndDeviceId(userDetails.getId(), signInRequest.getDeviceId());
         if(accessLog!=null){
             accessLog.setLastLogin(LocalDateTime.now());
         }

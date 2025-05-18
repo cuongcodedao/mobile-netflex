@@ -31,6 +31,9 @@ public class Profile {
     @JoinColumn(nullable = false)
     Account account;
 
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<History> histories;
+
     String myMovieList;
 }
 
