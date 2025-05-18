@@ -22,6 +22,7 @@ jobs:
     - name: Build backend JAR
       run: |
         cd backend
+        chmod +x mvnw
         ./mvnw clean package -DskipTests
 
     - name: Build Docker images
