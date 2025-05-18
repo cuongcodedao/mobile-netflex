@@ -18,9 +18,7 @@ import 'package:frontend/repositories/history_repository.dart';
 import 'package:frontend/repositories/my_list_repository.dart';
 import 'package:frontend/services/api_services.dart';
 import 'package:frontend/models/profile/profile_model.dart';
-import 'package:frontend/repositories/subscription_repository.dart';
 import 'package:get_it/get_it.dart';
-
 
 class HomePage extends StatefulWidget {
   final ProfileModel profile;
@@ -33,7 +31,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late final FilmRepository filmRepository;
   late final HistoryRepository historyRepository;
-  late final SubscriptionRepository subscriptionRepository;
   FilmPage? filmPage;
   List<Film> newFilms = [];
   List<Film> topFilms = [];
@@ -47,10 +44,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    filmRepository = FilmRepository(ApiService());
-    historyRepository = HistoryRepository(ApiService());
-    subscriptionRepository = SubscriptionRepository(ApiService());
-    loadAllData();
+    filmRepository = FilmRepository(ApiService()); // inject service
     loadFilmPage();
   }
 
@@ -62,7 +56,7 @@ class _HomePageState extends State<HomePage> {
 
     try {
       await Future.wait([
-        loadFilmPage(),
+        loadFilmPage1(),
         loadNewFilms(),
         loadForYouFilms(),
         loadHistory(),
@@ -71,6 +65,21 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       print('Error loading data: $e');
       isLoadingFail = true;
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> loadFilmPage() async {
+    try {
+      await filmRepository.getFilmPage(1); // truyen lug
+    } catch (e) {
+      setState(() {
+        isLoadingFail = true;
+      });
+      print('Error loading film page: $e');
     } finally {
       setState(() {
         isLoading = false;
@@ -91,7 +100,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> loadForYouFilms() async {
     try {
       final profileId =
-      widget.profile.id; // Access profile ID using widget.profile.id
+          widget.profile.id; // Access profile ID using widget.profile.id
       forYouFilms = await filmRepository.getListFilmByFavorite(
         profileId!,
       ); // Add null check
@@ -104,7 +113,7 @@ class _HomePageState extends State<HomePage> {
   Future<List<Film>> loadForYouFilms1() async {
     try {
       final profileId =
-      widget.profile.id; // Access profile ID using widget.profile.id
+          widget.profile.id; // Access profile ID using widget.profile.id
       return filmRepository.getListFilmByFavorite(profileId!); // Add null check
       setState(() {});
     } catch (e) {
@@ -122,18 +131,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> loadForYouFilms() async {
-    try {
-      final profileId = widget.profile.id;
-      if (profileId == null) throw Exception("Profile ID is null");
-
-      forYouFilms = await filmRepository.getListFilmByFavorite(profileId);
-      print("Số phim tìm được: ${forYouFilms.length}");
-    } catch (e) {
-      print('Error loading For You films: $e');
-    }
-  }
-
   Future<List<Film>> loadNewFilms1() async {
     try {
       return await filmRepository.getNewFilms(); // Add null check
@@ -145,14 +142,14 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> loadHistory() async {
     List<FilmHistory> list =
-    await HistoryRepository(ApiService()).getFilmHistory();
+        await HistoryRepository(ApiService()).getFilmHistory();
     for (var history in list) {
-    if (history.finished) {
+      if (history.finished) {
         listHistoryWatched.add(history);
       } else {
         listHistoryContinue.add(history);
       }
-  }
+    }
     setState(() {});
     // hiển thị số lượng phim đã xem và đang xem
     //print("Số phim đã xem: ${listHistoryWatched.length}");
@@ -162,13 +159,13 @@ class _HomePageState extends State<HomePage> {
   Future<List<FilmHistory>> loadHistoryWatched() async {
     try {
       List<FilmHistory> list =
-      await HistoryRepository(ApiService()).getFilmHistory();
+          await HistoryRepository(ApiService()).getFilmHistory();
       List<FilmHistory> listWatched = [];
       for (var history in list) {
-      if (history.finished) {
+        if (history.finished) {
           listWatched.add(history);
         }
-    }
+      }
       return listWatched;
     } catch (e) {
       print('Error loading For You films: $e');
@@ -179,13 +176,13 @@ class _HomePageState extends State<HomePage> {
   Future<List<FilmHistory>> loadHistoryContinue() async {
     try {
       List<FilmHistory> list =
-      await HistoryRepository(ApiService()).getFilmHistory();
+          await HistoryRepository(ApiService()).getFilmHistory();
       List<FilmHistory> listContinue = [];
       for (var history in list) {
-      if (!history.finished) {
+        if (!history.finished) {
           listContinue.add(history);
         }
-    }
+      }
       return listContinue;
     } catch (e) {
       print('Error loading For You films: $e');
@@ -213,14 +210,8 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return Center(
-        child: SpinKitCubeGrid(color: Colors.redAccent, size: 50.0),
-      );
-    }
     if (isLoadingFail) {
       return Center(
         child: Card(
@@ -255,7 +246,7 @@ class _HomePageState extends State<HomePage> {
                 );
               } else {
                 List<Film>? data = snapshot.data;
-                if (data != null) {
+                if (data != null && data.isNotEmpty) {
                   return FeatureBanner(
                     films: List.generate(
                       data.length,
@@ -298,7 +289,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   );
                 } else {
-                  return Center(child: Text("Empty"));
+                  return SizedBox();
                 }
               }
             },
@@ -316,7 +307,7 @@ class _HomePageState extends State<HomePage> {
                 );
               } else {
                 List<Film>? data = snapshot.data;
-                if (data != null) {
+                if (data != null && data.isNotEmpty) {
                   return HorizontalFilmList(
                     listTitle: 'News',
                     films: List.generate(
@@ -340,7 +331,7 @@ class _HomePageState extends State<HomePage> {
                     itemWidth: 120,
                   );
                 } else {
-                  return Center(child: Text("Empty"));
+                  return SizedBox();
                 }
               }
             },
@@ -359,7 +350,7 @@ class _HomePageState extends State<HomePage> {
                 );
               } else {
                 List<Film>? data = snapshot.data;
-                if (data != null) {
+                if (data != null && data.isNotEmpty) {
                   return HorizontalFilmList(
                     listTitle: 'For You',
                     films: List.generate(
@@ -381,7 +372,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   );
                 } else {
-                  return Center(child: Text("Empty"));
+                  return SizedBox();
                 }
               }
             },
@@ -389,140 +380,157 @@ class _HomePageState extends State<HomePage> {
 
           // Danh sách NEW EPISODES
           BlocBuilder<MyListCubit, MyListState>(
-          builder: (context, state){
-            return FutureBuilder(
-              future: loadMyList1(),
-              builder: (context, snapshot) {
-                if (snapshot.data == null) {
-                return SizedBox(
-                  height: 200,
-                  child: Center(
-                    child: SpinKitCubeGrid(color: Colors.redAccent, size: 50.0),
-                  ),
-                );
-              } else {
-                List<Film>? data = snapshot.data;
-                if (data != null) {
-                  return HorizontalFilmList(
-                    listTitle: 'Your List',
-                    films: List.generate(
-                      data.length,
-                      (index) => FilmItem(
-                        imageUrl: data[index].urlPoster,
-                        labelType: FilmLabelType.top,
-                        onTap:
-                            () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) =>
-                                        WatchingScreen(slug: data[index].slug),
-                              ),
-                            ),
+            builder: (context, state) {
+              return FutureBuilder(
+                future: loadMyList1(),
+                builder: (context, snapshot) {
+                  if (snapshot.data == null) {
+                    return SizedBox(
+                      height: 200,
+                      child: Center(
+                        child: SpinKitCubeGrid(
+                          color: Colors.redAccent,
+                          size: 50.0,
+                        ),
                       ),
-                    ),
-                  );
-                } else {
-                  return Center(child: Text("Empty"));
-                }
-              }
-              },
-            );
-          }
-        ),
+                    );
+                  } else {
+                    List<Film>? data = snapshot.data;
+                      if (data != null && data.isNotEmpty) {
+                      return HorizontalFilmList(
+                        listTitle: 'Your List',
+                        films: List.generate(
+                          data.length,
+                          (index) => FilmItem(
+                            imageUrl: data[index].urlPoster,
+                            labelType: FilmLabelType.top,
+                            onTap:
+                                () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => WatchingScreen(
+                                          slug: data[index].slug,
+                                        ),
+                                  ),
+                                ),
+                          ),
+                        ),
+                      );
+                    } else {
+                      return SizedBox();
+                    }
+                  }
+                },
+              );
+            },
+          ),
 
           // Danh sách Xem lại
-
           BlocBuilder<HistoryCubit, HistoryState>(
-          builder: (context, state){
-            return FutureBuilder(
-              future: loadHistoryContinue(),
-              builder: (context, snapshot) {
-                if (snapshot.data == null) {
-                return SizedBox(
-                  height: 200,
-                  child: Center(
-                    child: SpinKitCubeGrid(color: Colors.redAccent, size: 50.0),
-                  ),
-                );
-              } else {
-                List<FilmHistory>? data = snapshot.data;
-                if (data != null) {
-                  return HorizontalFilmList(
-                    listTitle: 'Continue Watching',
-                    films: List.generate(
-                      data.length,
-                      (index) => FilmItem(
-                        imageUrl: data[index].episodeHistory?.posterUrl ?? '',
-                        labelType: FilmLabelType.none,
-                        onTap:
-                            () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => WatchingScreen(
-                                      slug:
-                                          data[index].episodeHistory?.slug ??
-                                          '',
-                                    ),
-                              ),
-                            ),
+            builder: (context, state) {
+              return FutureBuilder(
+                future: loadHistoryContinue(),
+                builder: (context, snapshot) {
+                  if (snapshot.data == null) {
+                    return SizedBox(
+                      height: 200,
+                      child: Center(
+                        child: SpinKitCubeGrid(
+                          color: Colors.redAccent,
+                          size: 50.0,
+                        ),
                       ),
-                    ),
-                  );
-                } else {
-                  return Center(child: Text("Empty"));
-                }
-              }
-              },
-            );
-          }),
+                    );
+                  } else {
+                    List<FilmHistory>? data = snapshot.data;
+                      if (data != null && data.isNotEmpty) {
+                      return HorizontalFilmList(
+                        listTitle: 'Continue Watching',
+                        films: List.generate(
+                          data.length,
+                          (index) => FilmItem(
+                            imageUrl:
+                                data[index].episodeHistory?.posterUrl ?? '',
+                            labelType: FilmLabelType.none,
+                            onTap:
+                                () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => WatchingScreen(
+                                          slug:
+                                              data[index]
+                                                  .episodeHistory
+                                                  ?.slug ??
+                                              '',
+                                        ),
+                                  ),
+                                ),
+                          ),
+                        ),
+                      );
+                    } else {
+                      return SizedBox();
+                    }
+                  }
+                },
+              );
+            },
+          ),
+
           // Danh sách xem lại
-
           BlocBuilder<HistoryCubit, HistoryState>(
-          builder: (context, state){
-            return FutureBuilder(
-              future: loadHistoryWatched(),
-              builder: (context, snapshot) {
-                if (snapshot.data == null) {
-                return SizedBox(
-                  height: 200,
-                  child: Center(
-                    child: SpinKitCubeGrid(color: Colors.redAccent, size: 50.0),
-                  ),
-                );
-              } else {
-                List<FilmHistory>? data = snapshot.data;
-                if (data != null) {
-                  return HorizontalFilmList(
-                    listTitle: 'Watch it Again',
-                    films: List.generate(
-                      data.length,
-                      (index) => FilmItem(
-                        imageUrl: data[index].episodeHistory?.posterUrl ?? '',
-                        labelType: FilmLabelType.none,
-                        onTap:
-                            () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => WatchingScreen(
-                                      slug:
-                                          data[index].episodeHistory?.slug ??
-                                          '',
-                                    ),
-                              ),
-                            ),
+            builder: (context, state) {
+              return FutureBuilder(
+                future: loadHistoryWatched(),
+                builder: (context, snapshot) {
+                  if (snapshot.data == null) {
+                    return SizedBox(
+                      height: 200,
+                      child: Center(
+                        child: SpinKitCubeGrid(
+                          color: Colors.redAccent,
+                          size: 50.0,
+                        ),
                       ),
-                    ),
-                  );
-                } else {
-                  return Center(child: Text("Empty"));
-                }
-              }
-              },
-            );
-          }),
+                    );
+                  } else {
+                    List<FilmHistory>? data = snapshot.data;
+                    if (data != null && data.isNotEmpty) {
+                      return HorizontalFilmList(
+                        listTitle: 'Watch it Again',
+                        films: List.generate(
+                          data.length,
+                          (index) => FilmItem(
+                            imageUrl:
+                                data[index].episodeHistory?.posterUrl ?? '',
+                            labelType: FilmLabelType.none,
+                            onTap:
+                                () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => WatchingScreen(
+                                          slug:
+                                              data[index]
+                                                  .episodeHistory
+                                                  ?.slug ??
+                                              '',
+                                        ),
+                                  ),
+                                ),
+                          ),
+                        ),
+                      );
+                    } else {
+                      return SizedBox();
+                    }
+                  }
+                },
+              );
+            },
+          ),
         ],
       ),
     );

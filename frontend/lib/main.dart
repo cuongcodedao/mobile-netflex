@@ -22,6 +22,7 @@ void setup() {
   getIt.registerSingleton<MyListCubit>(MyListCubit());
   getIt.registerSingleton<HistoryCubit>(HistoryCubit());
 }
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setup();
@@ -32,7 +33,7 @@ void main() async {
   int? profileID = await storageService.getProfileId();
   int? accountID = await storageService.getUserInfo();
   ProfileModel? profile;
-  if(refreshToken != null){
+  if (refreshToken != null) {
     print("Co lay duoc refresh token");
   }
   if (refreshToken != null) {
@@ -41,28 +42,28 @@ void main() async {
         ApiService(),
       ).refreshToken(refreshToken);
 
-      if(token != null){
+      if (token != null) {
         print("co the lay lai duoc token");
-      }
-      else {
+      } else {
         print("khong co the lay lai duoc token");
       }
-      if(accountID != null){
+      if (accountID != null) {
         print("co the lay duoc accountID");
-      }
-      else {
+      } else {
         print("khong co the lay duoc accountID");
       }
 
       if (token == null || accountID == null || profileID == null) {
         isLogin = false;
       } else {
-        profile = await ProfileRepository(ApiService()).fetchProfile2(accountID, token.accessToken, profileID);
+        profile = await ProfileRepository(
+          ApiService(),
+        ).fetchProfile2(accountID, token.accessToken, profileID);
         isLogin = true;
         storageService.saveTokens(token);
       }
     } catch (e) {
-      print("Loi khi lai refresh"+ e.toString());
+      print("Loi khi lai refresh" + e.toString());
       isLogin = false;
     }
   }
@@ -91,22 +92,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: MultiBlocProvider(
-        providers: [
-          BlocProvider<MyListCubit>(
-            create: (context) => GetIt.instance<MyListCubit>(),
-          ),
-          BlocProvider<HistoryCubit>(
-            create: (context) => GetIt.instance<HistoryCubit>(),
-          ),
-        ], 
-        child: (isFirstInstall)
-        ? OnboardingScreen()
-        : (isLogin)
-        ? HomeScreen(profile: profile!)
-        : LoginScreen(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<MyListCubit>(
+          create: (context) => GetIt.instance<MyListCubit>(),
+        ),
+        BlocProvider<HistoryCubit>(
+          create: (context) => GetIt.instance<HistoryCubit>(),
+        ),
+      ],
+      child: GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        home:
+            (isFirstInstall)
+                ? OnboardingScreen()
+                : (isLogin)
+                ? HomeScreen(profile: profile!)
+                : LoginScreen(),
       ),
     );
   }
