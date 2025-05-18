@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/auth/user_model.dart';
@@ -216,20 +217,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ),
                     ),
-                    CustomButton(
-                      text: "New to Netflex? Sign up now",
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SignUpScreen(),
+                    RichText(
+                      text: TextSpan(
+                        text: "New to Netflex? ",
+                        style: TextStyle(fontSize: 20, color: Colors.white),
+                        children: [
+                          TextSpan(
+                            text: "Sign up now",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
+                            recognizer:
+                                TapGestureRecognizer()
+                                  ..onTap = () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => SignUpScreen(),
+                                      ),
+                                    );
+                                  },
                           ),
-                        );
-                      },
-                      backgroundColor: Colors.transparent,
-                      textColor: Colors.white,
-                      fontSize: 20,
+                        ],
+                      ),
                     ),
+
                     const SizedBox(height: 12),
                     Text(
                       "Sign in is protected by Google reCAPTCHA to ensure you're not a bot. Learn more.",
