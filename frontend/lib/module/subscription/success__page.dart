@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/module/auth/screens/login_screen.dart';
+import 'package:frontend/services/storage_service.dart';
 
 class SuccessPage extends StatelessWidget {
   const SuccessPage({Key? key}) : super(key: key);
@@ -30,7 +32,7 @@ class SuccessPage extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             const Text(
-              "Thanh toán thành công!",
+              "Payment Susscess",
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -40,7 +42,7 @@ class SuccessPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             const Text(
-              "Cảm ơn bạn đã đăng ký Netflix. Bạn đã sẵn sàng để thưởng thức các bộ phim và chương trình truyền hình yêu thích của mình.",
+              "Thank you for your payment. Your subscription is now active.",
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.white70,
@@ -48,24 +50,27 @@ class SuccessPage extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: () {
-                // Navigate to home screen
-                Navigator.pushReplacementNamed(context, '/home');
+            InkWell(
+              onTap: () async{
+                StorageService storageService = StorageService();
+                bool? isFirstInstall = await storageService.getFirstInstall();
+                storageService.clearStorage();
+                if(isFirstInstall != null){
+                  storageService.saveFirstInstall(isFirstInstall);
+                }
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                (Route<dynamic> route) => false,
+                );
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-                minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
               child: const Text(
-                "BẮT ĐẦU TRẢI NGHIỆM",
+                "Sign Out To Continue",
                 style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                  fontFamily: "Montserrat",
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -79,7 +84,7 @@ class SuccessPage extends StatelessWidget {
                 foregroundColor: Colors.white70,
               ),
               child: const Text(
-                "Quản lý tài khoản",
+                "Manage your account",
                 style: TextStyle(fontSize: 14),
               ),
             ),

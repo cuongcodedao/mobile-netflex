@@ -59,6 +59,7 @@ class _ManageSubscriptionScreenState extends ConsumerState<ManageSubscriptionScr
   Future<void> _fetchUserInfo() async {
     final authRepository = ref.read(authRepositoryProvider);
     final userId = await StorageService().getUserInfo();
+    print('User ID: $userId');
 
     if (userId != null) {
       try {
@@ -69,7 +70,8 @@ class _ManageSubscriptionScreenState extends ConsumerState<ManageSubscriptionScr
           (p) => p['id'] == userPlanId,
           orElse: () => plans[0],
         );
-
+        // print("User plan ID: $userPlanId");
+        // print("User plan: $plan");
         setState(() {
           currentPlan = plan;
         });

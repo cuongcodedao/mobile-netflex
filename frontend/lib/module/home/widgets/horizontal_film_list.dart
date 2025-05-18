@@ -54,8 +54,10 @@ class HorizontalFilmList extends StatelessWidget {
     );
   }
 
-  Widget _buildFilmItem(FilmItem film) {
-    return Container(
+Widget _buildFilmItem(FilmItem film) {
+  return GestureDetector(
+    onTap: film.onTap,
+    child: Container(
       width: itemWidth,
       margin: const EdgeInsets.symmetric(horizontal: 4),
       child: ClipRRect(
@@ -98,8 +100,9 @@ class HorizontalFilmList extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildFilmLabel(FilmLabelType type) {
     String assetPath;
@@ -125,10 +128,15 @@ class HorizontalFilmList extends StatelessWidget {
     );
   }
 }
-
 class FilmItem {
   final String imageUrl;
   final FilmLabelType labelType;
+  final VoidCallback? onTap;
 
-  FilmItem({required this.imageUrl, this.labelType = FilmLabelType.none});
+  FilmItem({
+    required this.imageUrl,
+    this.labelType = FilmLabelType.none,
+    this.onTap,
+  });
 }
+

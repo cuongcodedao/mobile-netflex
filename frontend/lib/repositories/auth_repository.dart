@@ -10,6 +10,7 @@ import 'package:frontend/services/storage_service.dart';
 
 class AuthRepository {
   final ApiService apiService;
+  final StorageService storageService = StorageService();
 
   AuthRepository(this.apiService);
 
@@ -127,7 +128,9 @@ class AuthRepository {
   // Hàm lấy thông tin người dùng bằng accountId
   Future<UserModel> getUserInfo(int accountId) async {
     try {
-      final response = await apiService.get('/api/v1/account/$accountId');
+      String? accessToken = await StorageService().getAccessToken();
+      final response = await apiService.get1('/api/v1/account/$accountId', 
+          token: accessToken);
       final authResponse = Auth<UserModel>.fromJson(
         response.data,
         (json) => UserModel.fromJson(json as Map<String, dynamic>),
