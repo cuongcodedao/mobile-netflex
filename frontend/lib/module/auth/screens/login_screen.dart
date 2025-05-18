@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +13,7 @@ import '../widgets/custom_textfield.dart';
 import '../widgets/custom_button.dart';
 import 'sign_up_screen.dart';
 import 'profile_selection_screen.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key, this.email});
@@ -48,6 +52,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
+    final deviceInfo = DeviceInfoPlugin();
+    String deviceId = 'unknown';
+    String deviceName = 'unknown';
+    String deviceType =
+        Platform.isAndroid
+            ? 'Android'
+            : Platform.isIOS
+            ? 'iOS'
+            : 'Other';
+
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      deviceId = androidInfo.id;
+      deviceName = androidInfo.model;
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      deviceId = iosInfo.identifierForVendor ?? 'unknown';
+      deviceName = iosInfo.name;
+    }
+    
+    print("device info $deviceId $deviceName $deviceType");
 
     // Kiểm tra thông tin đầu vào
     if (email.isEmpty || password.isEmpty) {
@@ -58,6 +83,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
       return;
     }
+
+    print("$deviceId $deviceName $deviceType");
 
     if (password.length < 8) {
       showErrorNotify(
@@ -73,6 +100,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final loginResult = await authRepository.login(
         email: email,
         password: password,
+        deviceId: deviceId,
+        deviceName: deviceName,
+        deviceType: deviceType,
       );
 
       final accountId = loginResult['accountId'] as int;
