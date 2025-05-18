@@ -28,6 +28,7 @@ class _MyListPageState extends State<MyListPage> {
 
   void loadMyList() async {
     List<Film> list = await MyListRepository(ApiService()).getMyListFilm();
+    if (!mounted) return;
     setState(() {
       myList = list;
       isLoading = false;
@@ -46,78 +47,80 @@ class _MyListPageState extends State<MyListPage> {
           style: TextStyle(color: Colors.redAccent, fontFamily: "Montserrat"),
         ),
       ),
-      body: isLoading
-          ? _buildShimmerLoading()
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: List.generate(
-                    myList.length,
-                    (index) => Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: InkWell(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => WatchingScreen(
-                              slug: myList[index].slug,
-                            ),
+      body:
+          isLoading
+              ? _buildShimmerLoading()
+              : SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children: List.generate(
+                      myList.length,
+                      (index) => Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: InkWell(
+                          onTap:
+                              () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => WatchingScreen(
+                                        slug: myList[index].slug,
+                                      ),
+                                ),
+                              ),
+                          child: ItemMyList(
+                            nameFilm: myList[index].name,
+                            content: myList[index].content,
+                            url: myList[index].urlPoster,
+                            onTap: () {},
                           ),
-                        ),
-                        child: ItemMyList(
-                          nameFilm: myList[index].name,
-                          content: myList[index].content,
-                          url: myList[index].urlPoster,
-                          onTap: () {},
                         ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
     );
   }
 
   Widget _buildShimmerLoading() => Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Shimmer.fromColors(
-            baseColor: Colors.grey.shade800,
-            highlightColor: Colors.grey.shade600,
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  10,
-                  (index) => Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Row(
-                      children: [
-                        Container(
-                          color: Colors.white,
-                          height: 100,
-                          width: 100,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            children: List.generate(3, (index) => Container(
-                                  height: 10,
-                                  margin: const EdgeInsets.only(bottom: 5),
-                                  color: Colors.white,
-                                )),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey.shade800,
+        highlightColor: Colors.grey.shade600,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              10,
+              (index) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Row(
+                  children: [
+                    Container(color: Colors.white, height: 100, width: 100),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        children: List.generate(
+                          3,
+                          (index) => Container(
+                            height: 10,
+                            margin: const EdgeInsets.only(bottom: 5),
+                            color: Colors.white,
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
           ),
         ),
-      );
+      ),
+    ),
+  );
 }
