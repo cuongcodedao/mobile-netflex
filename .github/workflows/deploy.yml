@@ -29,7 +29,7 @@ jobs:
       run: docker compose build backend db
 
     - name: Save Docker images to tar
-      run: docker save backend db postgres:15 -o app.tar
+      run: docker save backend postgres:15 -o app.tar
 
     - name: Copy files to EC2
       uses: appleboy/scp-action@v0.1.3
