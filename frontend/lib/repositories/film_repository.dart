@@ -14,7 +14,7 @@ class FilmRepository {
     final response = await apiService.get1(
       '/api/v1/movie/$slug',
       // token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmdAZ21haWwuY29tIiwiaWF0IjoxNzQ2NDE4NTAwLCJleHAiOjE3NDY1MDQ5MDB9.CuFycmZcaXTohc2OFtNLDPQMqOHG8CztbbVf6cd9G8o",
-        token: accessToken
+      token: accessToken,
     );
 
     final result = response.data['result'];
@@ -36,8 +36,8 @@ class FilmRepository {
       final response = await apiService.get1(
         '/api/v1/movie/search',
         data: {"keyword": keyword},
-      // token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmdAZ21haWwuY29tIiwiaWF0IjoxNzQ2NDE4NTAwLCJleHAiOjE3NDY1MDQ5MDB9.CuFycmZcaXTohc2OFtNLDPQMqOHG8CztbbVf6cd9G8o",
-        token: accessToken
+        // token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmdAZ21haWwuY29tIiwiaWF0IjoxNzQ2NDE4NTAwLCJleHAiOjE3NDY1MDQ5MDB9.CuFycmZcaXTohc2OFtNLDPQMqOHG8CztbbVf6cd9G8o",
+        token: accessToken,
       );
 
       print("search: " + response.data['result'].toString());
@@ -59,27 +59,12 @@ class FilmRepository {
     }
   }
 
-  Future<FilmPage> getFilmPage(int page) async {
-    String? accessToken = await StorageService().getAccessToken();
-    final response = await apiService.get1(
-      '/api/v1/movie',
-      data: {"page": page},
-      // token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmdAZ21haWwuY29tIiwiaWF0IjoxNzQ2NDE4NTAwLCJleHAiOjE3NDY1MDQ5MDB9.CuFycmZcaXTohc2OFtNLDPQMqOHG8CztbbVf6cd9G8o",
-      token: accessToken
-    );
-
-    final result = response.data['result'];
-    print("film page" + result.toString());
-    final film = FilmPage.fromJson(result);
-    return film;
-  }
-  Future<List<Film>> getListFilmByFavorite(int profileId) async {
+  Future<List<Film>> getFilmByGenre(String slug) async {
     try {
       String? accessToken = await StorageService().getAccessToken();
       final response = await apiService.get1(
-        '/api/v1/movie/favorite/$profileId',
-      // token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmdAZ21haWwuY29tIiwiaWF0IjoxNzQ2NDE4NTAwLCJleHAiOjE3NDY1MDQ5MDB9.CuFycmZcaXTohc2OFtNLDPQMqOHG8CztbbVf6cd9G8o",
-        token: accessToken
+        '/api/v1/movie/genre/$slug',
+        token: accessToken,
       );
       final List<dynamic> results = response.data['result'] ?? [];
       List<Film> films = [];
@@ -95,13 +80,52 @@ class FilmRepository {
       return [];
     }
   }
+
+  Future<FilmPage> getFilmPage(int page) async {
+    String? accessToken = await StorageService().getAccessToken();
+    final response = await apiService.get1(
+      '/api/v1/movie',
+      data: {"page": page},
+      // token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmdAZ21haWwuY29tIiwiaWF0IjoxNzQ2NDE4NTAwLCJleHAiOjE3NDY1MDQ5MDB9.CuFycmZcaXTohc2OFtNLDPQMqOHG8CztbbVf6cd9G8o",
+      token: accessToken,
+    );
+
+    final result = response.data['result'];
+    print("film page" + result.toString());
+    final film = FilmPage.fromJson(result);
+    return film;
+  }
+
+  Future<List<Film>> getListFilmByFavorite(int profileId) async {
+    try {
+      String? accessToken = await StorageService().getAccessToken();
+      final response = await apiService.get1(
+        '/api/v1/movie/favorite/$profileId',
+        // token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmdAZ21haWwuY29tIiwiaWF0IjoxNzQ2NDE4NTAwLCJleHAiOjE3NDY1MDQ5MDB9.CuFycmZcaXTohc2OFtNLDPQMqOHG8CztbbVf6cd9G8o",
+        token: accessToken,
+      );
+      final List<dynamic> results = response.data['result'] ?? [];
+      List<Film> films = [];
+      for (int i = 0; i < results.length; ++i) {
+        films.add(Film.fromJson(results[i]));
+      }
+      print(films[0].urlPoster);
+
+      print("Số phim tìm được: ${films.length}");
+      return films;
+    } catch (e) {
+      print("Lỗi khi tìm kiếm phim: $e");
+      return [];
+    }
+  }
+
   Future<List<Film>> getNewFilms() async {
     try {
       String? accessToken = await StorageService().getAccessToken();
       final response = await apiService.get1(
         '/api/v1/movie/year/2025',
-      // token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmdAZ21haWwuY29tIiwiaWF0IjoxNzQ2NDE4NTAwLCJleHAiOjE3NDY1MDQ5MDB9.CuFycmZcaXTohc2OFtNLDPQMqOHG8CztbbVf6cd9G8o",
-        token: accessToken
+        // token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdW9uZ2RhbmdAZ21haWwuY29tIiwiaWF0IjoxNzQ2NDE4NTAwLCJleHAiOjE3NDY1MDQ5MDB9.CuFycmZcaXTohc2OFtNLDPQMqOHG8CztbbVf6cd9G8o",
+        token: accessToken,
       );
 
       final List<dynamic> results = response.data['result'] ?? [];
@@ -110,7 +134,6 @@ class FilmRepository {
         films.add(Film.fromJson(results[i]));
       }
 
-
       print("Số new film được: ${films.length}");
       return films;
     } catch (e) {
@@ -118,5 +141,4 @@ class FilmRepository {
       return [];
     }
   }
-  
 }
