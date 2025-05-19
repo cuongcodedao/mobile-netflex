@@ -45,15 +45,20 @@ class FilmItem extends StatelessWidget {
                     height: 90,
                     width: 150,
                     fit: BoxFit.cover,
-                    frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                    frameBuilder: (
+                      context,
+                      child,
+                      frame,
+                      wasSynchronouslyLoaded,
+                    ) {
                       if (wasSynchronouslyLoaded || frame != null) return child;
                       return Shimmer.fromColors(
                         baseColor: Colors.grey.shade800,
                         highlightColor: Colors.grey.shade600,
                         child: Container(
                           color: Colors.white,
-                          width: 300,
-                          height: 300,
+                          width: 100,
+                          height: 100,
                         ),
                       );
                     },
