@@ -1,4 +1,4 @@
-name: Deploy Backend to EC2
+name: Build & Deploy Backend to EC2 using Docker Hub
 
 on:
   push:
@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
+    - name: Checkout code
       uses: actions/checkout@v3
 
     - name: Set up Java 17
@@ -18,42 +18,34 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Build backend JAR
+    - name: Build Spring Boot JAR
       run: |
         cd backend
         chmod +x mvnw
         ./mvnw clean package -DskipTests
 
-    - name: Pull postgres image
-      run: docker pull postgres:15
-
-    - name: Build Docker images
-      run: docker compose build backend db
-
-    - name: Show Docker images
-      run: docker images
-
-    - name: Save Docker images to tar
-      run: docker save backend postgres:15 -o app.tar
-
-
-    - name: Copy files to EC2
-      uses: appleboy/scp-action@v0.1.3
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
       with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ec2-user
-        key: ${{ secrets.EC2_SSH_KEY }}
-        source: "app.tar,docker-compose.yml"
-        target: "~/ci-deploy"
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: SSH and deploy
+    - name: Build Docker image
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest -f backend/Dockerfile .
+
+    - name: Push Docker image
+      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
+
+    - name: Deploy to EC2 via SSH
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
+          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
           cd ~/ci-deploy
-          docker load -i app.tar
+          docker-compose pull
           docker-compose down || true
           docker-compose up -d

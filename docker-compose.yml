@@ -13,8 +13,7 @@ services:
       - "5432:5432"
 
   backend:
-    build: ./backend
-    image: backend
+    image: cuongcodedao/backend:latest
     depends_on:
       - db
     environment:
